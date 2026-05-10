@@ -1,0 +1,79 @@
+import type { RosterPerson } from '@/lib/types'
+import { Badge } from '@/components/ui/Badge'
+import { getInitials } from '@/lib/utils/colors'
+import { calculateCompositeScore } from '@/lib/utils/scores'
+
+interface BattleCardProps {
+  person: RosterPerson
+  onClick: () => void
+  disabled?: boolean
+}
+
+export function BattleCard({ person, onClick, disabled }: BattleCardProps) {
+  const initials = getInitials(person.name)
+  const compositeScore = calculateCompositeScore(person)
+
+  return (
+    <button
+      onClick={onClick}
+      disabled={disabled}
+      className={`w-full bg-card border-2 border-border rounded-xl p-6 transition-all duration-200 ${
+        disabled
+          ? 'opacity-50 cursor-not-allowed'
+          : 'hover:border-pink hover:scale-105 active:scale-95 cursor-pointer'
+      }`}
+    >
+      {/* Avatar */}
+      <div
+        className="w-24 h-24 rounded-full flex items-center justify-center text-white font-bold text-3xl mx-auto mb-4"
+        style={{ backgroundColor: person.avatar_color }}
+      >
+        {initials}
+      </div>
+
+      {/* Name */}
+      <h3 className="text-xl font-serif font-bold text-foreground mb-2">
+        {person.name}
+      </h3>
+
+      {/* Tier Badge */}
+      <div className="flex justify-center mb-4">
+        <Badge variant="tier" tier={person.tier}>
+          {person.tier} Tier
+        </Badge>
+      </div>
+
+      {/* Scores */}
+      <div className="space-y-2 mb-4">
+        <div className="flex justify-between text-sm">
+          <span className="text-gray-400">Composite</span>
+          <span className="font-semibold text-pink">{compositeScore}</span>
+        </div>
+        <div className="flex justify-between text-sm">
+          <span className="text-gray-400">Attraction</span>
+          <span className="text-foreground">{person.attraction_score}</span>
+        </div>
+        <div className="flex justify-between text-sm">
+          <span className="text-gray-400">Personality</span>
+          <span className="text-foreground">{person.personality_score}</span>
+        </div>
+        <div className="flex justify-between text-sm">
+          <span className="text-gray-400">Reliability</span>
+          <span className="text-foreground">{person.reliability_score}</span>
+        </div>
+      </div>
+
+      {/* Elo Rating */}
+      <div className="text-xs text-gray-500">
+        Elo: {person.elo_rating}
+      </div>
+
+      {/* Tap instruction */}
+      {!disabled && (
+        <div className="mt-4 text-sm text-pink font-medium">
+          Tap to choose
+        </div>
+      )}
+    </button>
+  )
+}
