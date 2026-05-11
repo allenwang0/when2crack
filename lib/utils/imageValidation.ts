@@ -208,7 +208,7 @@ function getImageDimensions(
  * Validate base64 image string
  * Used for client-uploaded images
  */
-export function validateBase64Image(base64String: string): ImageValidationResult {
+export async function validateBase64Image(base64String: string): Promise<ImageValidationResult> {
   try {
     // Remove data URL prefix if present
     const base64Data = base64String.replace(/^data:image\/[a-z]+;base64,/, '')
@@ -223,7 +223,7 @@ export function validateBase64Image(base64String: string): ImageValidationResult
 
     // Convert to buffer and validate
     const buffer = Buffer.from(base64Data, 'base64')
-    return validateImageServer(buffer)
+    return await validateImageServer(buffer)
   } catch (error) {
     return {
       valid: false,
