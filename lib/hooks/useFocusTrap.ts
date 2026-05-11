@@ -17,7 +17,7 @@ interface UseFocusTrapOptions {
  * ```
  */
 export function useFocusTrap(
-  containerRef: React.RefObject<HTMLElement>,
+  containerRef: React.RefObject<HTMLElement | null>,
   options: UseFocusTrapOptions = { active: true, returnFocus: true }
 ) {
   const { active, initialFocus, returnFocus = true } = options

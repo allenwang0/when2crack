@@ -36,7 +36,7 @@ export function OnboardingTooltip({
   const tooltipRef = useRef<HTMLDivElement>(null)
 
   // Trap focus in tooltip
-  useFocusTrap(tooltipRef as React.RefObject<HTMLElement>, { active: true, returnFocus: false })
+  useFocusTrap(tooltipRef, { active: true, returnFocus: false })
 
   // Keyboard navigation
   useOnboardingKeyboardNav({
