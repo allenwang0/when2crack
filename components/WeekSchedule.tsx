@@ -382,6 +382,7 @@ export function WeekSchedule({ comparisonMode = false, comparisonName }: WeekSch
                     return (
                       <button
                         key={key}
+                        data-slot-key={key}
                         onMouseEnter={() => isDragging && toggleSlot(day, hour)}
                         onMouseDown={() => {
                           setIsDragging(true)
@@ -390,9 +391,22 @@ export function WeekSchedule({ comparisonMode = false, comparisonName }: WeekSch
                         onMouseUp={() => setIsDragging(false)}
                         onTouchStart={(e) => {
                           e.preventDefault() // Prevent mouse events from firing on mobile
+                          setIsTouchDragging(true)
                           toggleSlot(day, hour)
                         }}
-                        onTouchEnd={() => setIsDragging(false)}
+                        onTouchMove={(e) => {
+                          if (!isTouchDragging) return
+                          e.preventDefault() // Prevent scrolling while dragging
+                          const touch = e.touches[0]
+                          const slot = getSlotAtTouch(touch)
+                          if (slot && slot.key !== key) {
+                            toggleSlot(slot.day, slot.hour)
+                          }
+                        }}
+                        onTouchEnd={(e) => {
+                          e.preventDefault()
+                          setIsTouchDragging(false)
+                        }}
                         className={`flex-1 h-11 min-w-[60px] transition-all rounded-lg mx-0.5 touch-manipulation ${
                           isOverlap
                             ? 'bg-teal border-2 border-teal-dark'

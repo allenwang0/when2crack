@@ -209,8 +209,8 @@ export default function RosterPage() {
 
       {roster.length === 0 ? (
         <div className="bg-white border-2 border-dashed border-gray-300 rounded-2xl p-12 text-center">
-          <div className="text-6xl mb-6">👥</div>
-          <p className="text-gray-800 font-semibold text-lg mb-8">
+          <div className="text-6xl mb-8">👥</div>
+          <p className="text-gray-800 font-semibold text-lg mb-12">
             Add your first person to start
           </p>
           <Button onClick={() => router.push('/add')} className="shadow-md onboarding-add-button">

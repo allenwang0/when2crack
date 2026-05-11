@@ -62,8 +62,8 @@ export default function ProfilePage() {
         setUserAvatar(compressedBase64)
       } else {
         // Authenticated mode: Update Supabase
-        const { error } = await supabase
-          .from('users')
+        const { error } = await (supabase
+          .from('users') as any)
           .update({ avatar_url: compressedBase64 })
           .eq('id', user.id)
 
@@ -89,8 +89,8 @@ export default function ProfilePage() {
       setUserAvatar(null)
     } else {
       // Authenticated mode: Update Supabase
-      const { error } = await supabase
-        .from('users')
+      const { error } = await (supabase
+        .from('users') as any)
         .update({ avatar_url: null })
         .eq('id', user.id)
 
@@ -144,7 +144,7 @@ export default function ProfilePage() {
         }
 
         if (userResult.data) {
-          setAvatarUrl(userResult.data.avatar_url)
+          setAvatarUrl((userResult.data as any).avatar_url)
         }
 
         setLoading(false)

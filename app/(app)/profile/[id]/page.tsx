@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { useAuth } from '@/lib/contexts/AuthContext'
 import { GuestBanner } from '@/components/GuestBanner'
+import { SkeletonAvatar, SkeletonText, SkeletonRectangle } from '@/components/skeletons/Skeleton'
 import { useLocalStorage } from '@/lib/hooks/useLocalStorage'
 import { useToast } from '@/lib/hooks/useToast'
 import { ToastContainer } from '@/components/ui/Toast'
@@ -217,9 +218,8 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
     }
 
     // Authenticated mode: Update Supabase
-    // @ts-ignore
-    await supabase
-      .from('roster')
+    await (supabase
+      .from('roster') as any)
       .update({ notes: sanitizedNotes })
       .eq('id', person.id)
       .eq('user_id', user.id)
@@ -338,8 +338,31 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
 
   if (loading) {
     return (
-      <div className="py-6 flex items-center justify-center min-h-[60vh]">
-        <p className="text-gray-600">Loading...</p>
+      <div className="py-6" aria-label="Loading profile" aria-busy="true">
+        {/* Header */}
+        <div className="flex items-start gap-4 mb-6">
+          <SkeletonAvatar size="md" />
+          <div className="flex-1 min-w-0">
+            <div className="mb-2">
+              <SkeletonText width="w-48" height="h-6" />
+            </div>
+            <SkeletonText width="w-20" height="h-5" className="rounded-full" />
+          </div>
+        </div>
+
+        {/* Stats Cards */}
+        <div className="grid grid-cols-2 gap-3 mb-6">
+          <SkeletonRectangle height="h-20" rounded="2xl" />
+          <SkeletonRectangle height="h-20" rounded="2xl" />
+          <SkeletonRectangle height="h-20" rounded="2xl" />
+          <SkeletonRectangle height="h-20" rounded="2xl" />
+        </div>
+
+        {/* Notes Section */}
+        <SkeletonRectangle height="h-32" rounded="2xl" className="mb-6" />
+
+        {/* Hangs Section */}
+        <SkeletonRectangle height="h-48" rounded="2xl" />
       </div>
     )
   }
