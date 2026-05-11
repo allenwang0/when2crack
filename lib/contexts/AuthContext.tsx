@@ -22,25 +22,89 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const supabase = createClient()
 
   useEffect(() => {
-    // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null)
+    // Timeout to prevent infinite loading
+    const timeout = setTimeout(() => {
+      console.warn('Auth loading timeout - proceeding without auth')
       setLoading(false)
-    })
+    }, 3000) // 3 second timeout
+
+    // Get initial session
+    supabase.auth.getSession()
+      .then(({ data: { session }, error }) => {
+        if (error) {
+          console.error('Session error:', error)
+        }
+        setUser(session?.user ?? null)
+        setLoading(false)
+        clearTimeout(timeout)
+      })
+      .catch((error) => {
+        console.error('Auth error:', error)
+        setLoading(false)
+        clearTimeout(timeout)
+      })
 
     // Listen for auth changes
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
+    } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log('Auth event:', event, 'User:', session?.user?.email)
       setUser(session?.user ?? null)
+      setLoading(false)
+
+      // Create user profile on sign in if it doesn't exist
+      if (event === 'SIGNED_IN' && session?.user) {
+        try {
+          // @ts-ignore
+          const { data: existingUser } = await supabase
+            .from('users')
+            .select('id')
+            .eq('id', session.user.id)
+            .single()
+
+          if (!existingUser) {
+            // @ts-ignore
+            await supabase.from('users').insert({
+              id: session.user.id,
+              email: session.user.email!,
+            })
+          }
+        } catch (err) {
+          console.error('Error creating user profile:', err)
+        }
+      }
     })
 
-    return () => subscription.unsubscribe()
-  }, [supabase.auth])
+    return () => {
+      clearTimeout(timeout)
+      subscription.unsubscribe()
+    }
+  }, [supabase])
 
   const signOut = async () => {
-    await supabase.auth.signOut()
-    setUser(null)
+    try {
+      console.log('Signing out...')
+      await supabase.auth.signOut()
+      setUser(null)
+
+      // Clear any local storage (except guest data)
+      const guestRoster = localStorage.getItem('guest_roster')
+      localStorage.clear()
+      if (guestRoster) {
+        localStorage.setItem('guest_roster', guestRoster)
+      }
+
+      // Force redirect to home page
+      if (typeof window !== 'undefined') {
+        window.location.replace('/')
+      }
+    } catch (error) {
+      console.error('Sign out error:', error)
+      // Force redirect even if there's an error
+      if (typeof window !== 'undefined') {
+        window.location.replace('/')
+      }
+    }
   }
 
   return (

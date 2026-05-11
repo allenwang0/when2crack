@@ -4,11 +4,23 @@ import { useAuth } from '@/lib/contexts/AuthContext'
 import { Navigation } from '@/components/Navigation'
 import { PanicButton } from '@/components/PanicButton'
 import { useRouter } from 'next/navigation'
-import { useEffect } from 'react'
+import { useState } from 'react'
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const { user, loading, signOut } = useAuth()
   const router = useRouter()
+  const [signingOut, setSigningOut] = useState(false)
+
+  const handleSignOut = async () => {
+    setSigningOut(true)
+    try {
+      await signOut()
+    } catch (error) {
+      console.error('Sign out error:', error)
+    }
+    // Force redirect regardless
+    window.location.href = '/'
+  }
 
   if (loading) {
     return (
@@ -21,15 +33,16 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen flex flex-col">
       {/* Header */}
-      <header className="sticky top-0 bg-background border-b border-border z-40">
+      <header className="sticky top-0 bg-card border-b border-border z-40">
         <div className="max-w-md mx-auto flex items-center justify-between h-14 px-4">
-          <h1 className="font-serif text-xl font-bold text-pink">When2Crack</h1>
+          <h1 className="font-serif text-xl font-bold" style={{ color: '#FF8C69' }}>When2Crack</h1>
           <div className="flex items-center gap-2">
             {user && <PanicButton />}
             {user ? (
               <button
-                onClick={signOut}
-                className="p-2 rounded-lg hover:bg-card transition-colors"
+                onClick={handleSignOut}
+                disabled={signingOut}
+                className="p-2 rounded-lg hover:bg-card transition-colors disabled:opacity-50"
                 title="Sign Out"
               >
                 <svg
@@ -49,7 +62,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             ) : (
               <button
                 onClick={() => router.push('/')}
-                className="px-3 py-1.5 text-sm bg-pink text-white rounded-lg hover:bg-pink/90 transition-colors"
+                className="px-3 py-1.5 text-sm text-white rounded-lg transition-colors"
+                style={{ backgroundColor: '#FF8C69' }}
               >
                 Sign In
               </button>

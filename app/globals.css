@@ -1,23 +1,23 @@
 @import "tailwindcss";
 
 :root {
-  /* Dark mode first - these are the default colors */
-  --background: #0a0a0a;
-  --foreground: #ededed;
-  --card: #141414;
-  --border: #262626;
+  /* Light warm pastel theme */
+  --background: #FFF8F0;
+  --foreground: #4A3728;
+  --card: #FFFFFF;
+  --border: #F0E6D8;
 
-  /* Accent colors */
-  --pink: #ff6b9d;
-  --coral: #ff8c7a;
-  --teal: #4ecdc4;
-  --amber: #ffa07a;
+  /* Warm accent colors */
+  --orange: #FF8C69;
+  --peach: #FFB088;
+  --terracotta: #E07856;
+  --cream: #FFF5E6;
 
-  /* Tier colors */
-  --tier-s: #ff6b9d;
-  --tier-a: #a78bfa;
-  --tier-b: #60a5fa;
-  --tier-c: #9ca3af;
+  /* Tier colors - warm pastels */
+  --tier-s: #FF8C69;
+  --tier-a: #FFB088;
+  --tier-b: #F4A261;
+  --tier-c: #C9ADA7;
 }
 
 @theme inline {
@@ -28,10 +28,16 @@
   --color-border: var(--border);
 
   /* Accent colors */
-  --color-pink: var(--pink);
-  --color-coral: var(--coral);
-  --color-teal: var(--teal);
-  --color-amber: var(--amber);
+  --color-orange: var(--orange);
+  --color-peach: var(--peach);
+  --color-terracotta: var(--terracotta);
+  --color-cream: var(--cream);
+
+  /* Legacy names for compatibility */
+  --color-pink: var(--orange);
+  --color-coral: var(--peach);
+  --color-teal: var(--terracotta);
+  --color-amber: var(--peach);
 
   /* Tier colors */
   --color-tier-s: var(--tier-s);

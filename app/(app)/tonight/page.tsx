@@ -33,12 +33,25 @@ export default function TonightPage() {
           return scoreB - scoreA
         })
         .slice(0, 5)
-        .map((person, index) => ({
-          person,
-          rank: index + 1,
-          score: person.elo_rating,
-          reliability_boost: person.reliability_score * 10,
-        }))
+        .map((person, index) => {
+          // Calculate days since last contact
+          const lastContact = new Date(person.last_contact_date)
+          const now = new Date()
+          const daysSince = Math.floor((now.getTime() - lastContact.getTime()) / (1000 * 60 * 60 * 24))
+
+          return {
+            person,
+            reasoning: {
+              tier: person.tier,
+              elo_rating: person.elo_rating,
+              reliability: person.reliability_score,
+              recency_days: daysSince,
+            },
+            rank: index + 1,
+            score: person.elo_rating,
+            reliability_boost: person.reliability_score * 10,
+          }
+        })
 
       setRecommendations(sorted)
     } catch (err) {

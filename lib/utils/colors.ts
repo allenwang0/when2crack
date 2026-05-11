@@ -2,16 +2,16 @@
 // Generates a consistent color for a person based on their name
 
 const AVATAR_COLORS = [
-  '#ff6b9d', // pink
-  '#a78bfa', // purple
-  '#60a5fa', // blue
-  '#4ecdc4', // teal
-  '#ffa07a', // amber
-  '#ff8c7a', // coral
-  '#f472b6', // pink variant
-  '#818cf8', // indigo
-  '#34d399', // green
-  '#fb923c', // orange
+  '#FF8C69', // warm orange
+  '#FFB088', // peach
+  '#E07856', // terracotta
+  '#F4A261', // sandy orange
+  '#E9C46A', // golden
+  '#F08080', // light coral
+  '#D4A373', // tan
+  '#E76F51', // burnt orange
+  '#EE9B00', // honey
+  '#C9ADA7', // warm gray
 ]
 
 export function generateAvatarColor(name: string): string {
@@ -34,10 +34,10 @@ export function getInitials(name: string): string {
 
 export function getTierColor(tier: 'S' | 'A' | 'B' | 'C'): string {
   const tierColors = {
-    S: '#ff6b9d', // pink
-    A: '#a78bfa', // purple
-    B: '#60a5fa', // blue
-    C: '#9ca3af', // gray
+    S: '#FF8C69', // warm orange
+    A: '#FFB088', // peach
+    B: '#F4A261', // sandy orange
+    C: '#C9ADA7', // warm gray
   }
   return tierColors[tier]
 }
