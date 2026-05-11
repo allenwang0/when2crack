@@ -10,7 +10,7 @@ import { useToast } from '@/lib/hooks/useToast'
 import { ToastContainer } from '@/components/ui/Toast'
 
 export default function SchedulePage() {
-  const { user } = useAuth()
+  const { user, loading: authLoading } = useAuth()
   const router = useRouter()
   const searchParams = useSearchParams()
   const sharedFor = searchParams.get('for')
@@ -60,7 +60,7 @@ export default function SchedulePage() {
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-6 pb-28">
-      {!user && <GuestBanner />}
+      {!user && !authLoading && <GuestBanner />}
 
       <Button
         variant="ghost"
@@ -111,10 +111,6 @@ export default function SchedulePage() {
           >
             {linkCopied ? '✓ Link Copied!' : 'Copy Link to Share'}
           </Button>
-
-          <p className="text-xs text-gray-500 mt-3">
-            They'll see when you're free and can mark their availability too
-          </p>
         </div>
       )}
 

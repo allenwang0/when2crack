@@ -21,7 +21,7 @@ import type { RosterPerson, Hang } from '@/lib/types'
 export default function ProfilePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params)
   const router = useRouter()
-  const { user } = useAuth()
+  const { user, loading: authLoading } = useAuth()
   const supabase = createClient()
   const { toasts, showToast, removeToast } = useToast()
   const [localRoster, setLocalRoster] = useLocalStorage<RosterPerson[]>('guest_roster', [])
@@ -322,7 +322,7 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-6 pb-28">
-      {!user && <GuestBanner />}
+      {!user && !authLoading && <GuestBanner />}
 
       {/* Header */}
       <div className="flex items-start gap-4 mb-6">

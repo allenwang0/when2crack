@@ -17,7 +17,7 @@ type HangWithPerson = Hang & {
 
 export default function HistoryPage() {
   const router = useRouter()
-  const { user } = useAuth()
+  const { user, loading: authLoading } = useAuth()
   const supabase = createClient()
 
   const [hangs, setHangs] = useState<HangWithPerson[]>([])
@@ -102,7 +102,7 @@ export default function HistoryPage() {
   }
 
 
-  if (!user) {
+  if (!user && !authLoading) {
     return (
       <div className="min-h-screen bg-background pb-20">
         <div className="max-w-md mx-auto px-4 py-8">

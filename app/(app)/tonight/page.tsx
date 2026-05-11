@@ -342,7 +342,7 @@ export default function TonightPage() {
   if (activeTab === 'battle' && showOutOfComparisons && !user) {
     return (
       <div>
-        {!user && <GuestBanner />}
+        {!user && !authLoading && <GuestBanner />}
         <OutOfComparisons
           onReset={() => {
             setCompletedBattles([])
@@ -365,7 +365,7 @@ export default function TonightPage() {
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-6 pb-28">
-      {!user && <GuestBanner />}
+      {!user && !authLoading && <GuestBanner />}
 
       {/* Tabs */}
       <div className="flex gap-3 mb-8">

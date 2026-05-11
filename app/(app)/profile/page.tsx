@@ -16,7 +16,7 @@ import type { RosterPerson } from '@/lib/types'
 
 export default function ProfilePage() {
   const router = useRouter()
-  const { user, signOut } = useAuth()
+  const { user, loading: authLoading, signOut } = useAuth()
   const supabase = createClient()
   const { toasts, showToast, removeToast } = useToast()
   const [localRoster] = useLocalStorage<RosterPerson[]>('guest_roster', [])
@@ -189,7 +189,7 @@ export default function ProfilePage() {
   return (
     <div className="max-w-2xl mx-auto px-4 py-6 pb-28">
       <ToastContainer toasts={toasts} removeToast={removeToast} />
-      {!user && <GuestBanner />}
+      {!user && !authLoading && <GuestBanner />}
 
       {/* Header */}
       <div className="text-center mb-8">
@@ -365,7 +365,7 @@ export default function ProfilePage() {
       )}
 
       {/* Sign In CTA for Guest */}
-      {!user && (
+      {!user && !authLoading && (
         <div className="bg-gradient-to-r from-pink-50 to-purple-50 border-2 border-pink rounded-2xl p-6 text-center shadow-sm">
           <div className="text-4xl mb-3">✨</div>
           <h3 className="font-bold text-xl mb-2 text-gray-800">Unlock Full Features</h3>

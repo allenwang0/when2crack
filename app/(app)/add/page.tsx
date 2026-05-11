@@ -14,7 +14,7 @@ import type { Tier, Status, RosterPerson } from '@/lib/types'
 
 export default function AddPage() {
   const router = useRouter()
-  const { user } = useAuth()
+  const { user, loading: authLoading } = useAuth()
   const supabase = createClient()
   const [localRoster, setLocalRoster] = useLocalStorage<RosterPerson[]>('guest_roster', [])
 
@@ -184,7 +184,7 @@ export default function AddPage() {
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-6 pb-28">
-      {!user && <GuestBanner />}
+      {!user && !authLoading && <GuestBanner />}
 
       <h2 className="text-2xl font-serif font-bold mb-6">Add Person</h2>
 

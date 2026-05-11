@@ -14,7 +14,7 @@ import { calculateAchievements } from '@/lib/utils/achievements'
 
 export default function AchievementsPage() {
   const router = useRouter()
-  const { user } = useAuth()
+  const { user, loading: authLoading } = useAuth()
   const [localRoster] = useLocalStorage<RosterPerson[]>('guest_roster', [])
   const [completedBattles] = useLocalStorage<string[]>('completed_battles', [])
   const [weekSchedule] = useLocalStorage<string[]>('week_schedule', [])
@@ -36,7 +36,7 @@ export default function AchievementsPage() {
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-6 pb-28">
-      {!user && <GuestBanner />}
+      {!user && !authLoading && <GuestBanner />}
 
       <Button
         variant="ghost"

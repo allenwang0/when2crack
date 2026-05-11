@@ -240,7 +240,7 @@ export default function BattlePage() {
   if (showOutOfComparisons && !user) {
     return (
       <div>
-        {!user && <GuestBanner />}
+        {!user && !authLoading && <GuestBanner />}
         <OutOfComparisons
           onReset={() => {
             // Reset completed and skipped battles
@@ -296,7 +296,7 @@ export default function BattlePage() {
 
   return (
     <div className="py-6">
-      {!user && <GuestBanner />}
+      {!user && !authLoading && <GuestBanner />}
 
       <div className="text-center mb-6">
         <h2 className="text-2xl font-serif font-bold mb-2">Battle</h2>

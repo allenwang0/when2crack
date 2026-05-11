@@ -22,35 +22,42 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const supabase = createClient()
 
   useEffect(() => {
-    // Timeout to prevent infinite loading
-    const timeout = setTimeout(() => {
-      console.warn('Auth loading timeout - proceeding without auth')
-      setLoading(false)
-    }, 3000) // 3 second timeout
+    let isSubscribed = true
 
     // Get initial session
-    supabase.auth.getSession()
-      .then(({ data: { session }, error }) => {
+    const initializeAuth = async () => {
+      try {
+        const { data: { session }, error } = await supabase.auth.getSession()
+
         if (error) {
           console.error('Session error:', error)
         }
-        setUser(session?.user ?? null)
-        setLoading(false)
-        clearTimeout(timeout)
-      })
-      .catch((error) => {
+
+        if (isSubscribed) {
+          setUser(session?.user ?? null)
+          setLoading(false)
+        }
+      } catch (error) {
         console.error('Auth error:', error)
-        setLoading(false)
-        clearTimeout(timeout)
-      })
+        if (isSubscribed) {
+          setUser(null)
+          setLoading(false)
+        }
+      }
+    }
+
+    initializeAuth()
 
     // Listen for auth changes
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
       console.log('Auth event:', event, 'User:', session?.user?.email)
-      setUser(session?.user ?? null)
-      setLoading(false)
+
+      if (isSubscribed) {
+        setUser(session?.user ?? null)
+        setLoading(false)
+      }
 
       // Create user profile on sign in if it doesn't exist
       if (event === 'SIGNED_IN' && session?.user) {
@@ -81,7 +88,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     })
 
     return () => {
-      clearTimeout(timeout)
+      isSubscribed = false
       subscription.unsubscribe()
     }
   }, [supabase])

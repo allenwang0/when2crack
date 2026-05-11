@@ -27,6 +27,16 @@ export function WeekSchedule({ comparisonMode = false, comparisonName }: WeekSch
 
   // For comparison mode - decode schedule from URL if present
   const [comparisonSlots, setComparisonSlots] = useState<Set<string>>(new Set<string>())
+  const [comparisonTimezone, setComparisonTimezone] = useState<string>('')
+  const [userTimezone, setUserTimezone] = useState<string>('')
+
+  // Get user's timezone on mount
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const { getUserTimezone } = require('@/lib/utils/timezone')
+      setUserTimezone(getUserTimezone())
+    }
+  }, [])
 
   // Extract shared schedule from URL on mount
   useEffect(() => {
@@ -37,8 +47,9 @@ export function WeekSchedule({ comparisonMode = false, comparisonName }: WeekSch
         try {
           // Try new timezone-aware format first
           const { decodeScheduleWithTimezone } = require('@/lib/utils/timezone')
-          const { convertedSlots } = decodeScheduleWithTimezone(encodedSchedule)
+          const { convertedSlots, originalTimezone } = decodeScheduleWithTimezone(encodedSchedule)
           setComparisonSlots(new Set(convertedSlots))
+          setComparisonTimezone(originalTimezone)
         } catch (e) {
           // Fallback to old format (plain array)
           try {
@@ -72,7 +83,46 @@ export function WeekSchedule({ comparisonMode = false, comparisonName }: WeekSch
     return overlaps
   }
 
+  // Find best consecutive time blocks
+  const getBestTimeBlocks = (overlaps: string[]) => {
+    if (overlaps.length === 0) return []
+
+    // Sort by day and hour
+    const sorted = [...overlaps].sort((a, b) => {
+      const [dayA, hourA] = a.split('-')
+      const [dayB, hourB] = b.split('-')
+      const dayIndexA = days.indexOf(dayA)
+      const dayIndexB = days.indexOf(dayB)
+      if (dayIndexA !== dayIndexB) return dayIndexA - dayIndexB
+      return parseInt(hourA) - parseInt(hourB)
+    })
+
+    // Group consecutive hours on same day
+    const blocks: Array<{ day: string; startHour: number; endHour: number; count: number }> = []
+    let currentBlock: { day: string; startHour: number; endHour: number; count: number } | null = null
+
+    sorted.forEach(slot => {
+      const [day, hourStr] = slot.split('-')
+      const hour = parseInt(hourStr)
+
+      if (!currentBlock || currentBlock.day !== day || currentBlock.endHour !== hour) {
+        // Start new block
+        if (currentBlock) blocks.push(currentBlock)
+        currentBlock = { day, startHour: hour, endHour: hour + 1, count: 1 }
+      } else {
+        // Extend current block
+        currentBlock.endHour = hour + 1
+        currentBlock.count++
+      }
+    })
+    if (currentBlock) blocks.push(currentBlock)
+
+    // Sort by count (longest blocks first)
+    return blocks.sort((a, b) => b.count - a.count)
+  }
+
   const overlappingSlots = comparisonMode ? getOverlappingSlots() : []
+  const bestBlocks = comparisonMode ? getBestTimeBlocks(overlappingSlots) : []
 
   const getSlotKey = (day: string, hour: number) => `${day}-${hour}`
 
@@ -96,6 +146,34 @@ export function WeekSchedule({ comparisonMode = false, comparisonName }: WeekSch
     return `${hour - 12}pm`
   }
 
+  const handleSendScheduleBack = async () => {
+    try {
+      if (selectedSlots.size === 0) {
+        alert('Please mark some times as available first!')
+        return
+      }
+
+      // Encode user's schedule
+      const { encodeScheduleWithTimezone } = require('@/lib/utils/timezone')
+      const encodedSchedule = encodeScheduleWithTimezone(Array.from(selectedSlots))
+
+      // Get display name
+      const displayName = typeof window !== 'undefined'
+        ? JSON.parse(localStorage.getItem('display_name') || '"Someone"')
+        : 'Someone'
+
+      const baseUrl = typeof window !== 'undefined' ? window.location.origin : ''
+      const shareUrl = `${baseUrl}/schedule?for=${encodeURIComponent(displayName)}&schedule=${encodedSchedule}`
+
+      // Copy to clipboard
+      await navigator.clipboard.writeText(shareUrl)
+      alert('✓ Link copied! Send it to ' + (comparisonName || 'them') + ' to share your availability')
+    } catch (err) {
+      console.error('Failed to generate response link:', err)
+      alert('Failed to copy link. Please try again.')
+    }
+  }
+
   return (
     <div className="bg-white rounded-3xl p-6 shadow-lg border-[3px] border-yellow-bright">
       {/* Header */}
@@ -104,8 +182,25 @@ export function WeekSchedule({ comparisonMode = false, comparisonName }: WeekSch
           <span className="font-bold text-lg">📅 This Week's Availability</span>
         </div>
         <p className="text-sm text-gray-600">
-          Tap times when you're free to hang (8pm-4am)
+          Tap times when you're free to hang
         </p>
+        {userTimezone && (
+          <div className="mt-2 text-xs text-gray-500">
+            {comparisonMode && comparisonTimezone && comparisonTimezone !== userTimezone ? (
+              <>
+                <span className="font-medium">Your timezone:</span> {userTimezone}
+                {' • '}
+                <span className="font-medium">{comparisonName || 'Their'} timezone:</span> {comparisonTimezone}
+                {' • '}
+                <span className="text-teal">✓ Times converted</span>
+              </>
+            ) : (
+              <>
+                <span className="font-medium">Timezone:</span> {userTimezone}
+              </>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Calendar Grid */}
@@ -214,11 +309,29 @@ export function WeekSchedule({ comparisonMode = false, comparisonName }: WeekSch
       {/* Summary */}
       <div className="mt-6 text-center space-y-3">
         {comparisonMode && overlappingSlots.length > 0 ? (
-          <div className="inline-block bg-teal text-white rounded-2xl px-6 py-3">
-            <span className="font-bold">
-              🎉 {overlappingSlots.length} hour{overlappingSlots.length !== 1 ? 's' : ''} of mutual free time!
-            </span>
-          </div>
+          <>
+            <div className="inline-block bg-teal text-white rounded-2xl px-6 py-3">
+              <span className="font-bold">
+                🎉 {overlappingSlots.length} hour{overlappingSlots.length !== 1 ? 's' : ''} of mutual free time!
+              </span>
+            </div>
+            {/* Best time suggestions */}
+            {bestBlocks.length > 0 && (
+              <div className="mt-3 space-y-2">
+                <p className="text-xs font-semibold text-gray-700">✨ Best times to meet:</p>
+                {bestBlocks.slice(0, 3).map((block, idx) => (
+                  <div key={idx} className="inline-block bg-white border-2 border-teal rounded-xl px-4 py-2 mx-1">
+                    <span className="font-semibold text-foreground">
+                      {block.day} {formatHour(block.startHour)}-{formatHour(block.endHour)}
+                    </span>
+                    <span className="text-xs text-gray-500 ml-2">
+                      ({block.count}hr{block.count !== 1 ? 's' : ''})
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </>
         ) : comparisonMode ? (
           <div className="inline-block bg-gray-200 text-gray-600 rounded-2xl px-6 py-3">
             <span className="font-bold">
@@ -242,6 +355,21 @@ export function WeekSchedule({ comparisonMode = false, comparisonName }: WeekSch
         {!user && !comparisonMode && (
           <div className="text-xs text-gray-500 max-w-sm mx-auto">
             Note: Your schedule is saved locally. Sign in to sync across devices.
+          </div>
+        )}
+
+        {/* Send Schedule Back Button - Only in comparison mode */}
+        {comparisonMode && (
+          <div className="mt-4">
+            <button
+              onClick={handleSendScheduleBack}
+              className="bg-gradient-to-r from-pink to-purple text-white px-6 py-3 rounded-full font-semibold hover:opacity-90 transition-opacity shadow-lg"
+            >
+              📤 Send Your Schedule to {comparisonName || 'Them'}
+            </button>
+            <p className="text-xs text-gray-500 mt-2">
+              Share your availability so {comparisonName || 'they'} can see when you're both free
+            </p>
           </div>
         )}
       </div>
