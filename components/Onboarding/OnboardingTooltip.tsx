@@ -48,7 +48,11 @@ export function OnboardingTooltip({
 
     const calculatePosition = () => {
       const element = document.querySelector(targetSelector)
-      if (!element) return
+      if (!element) {
+        // Reset styles when element not found to avoid stale positioning
+        setTooltipStyle({})
+        return
+      }
 
       const rect = element.getBoundingClientRect()
       const viewportWidth = window.innerWidth
@@ -101,9 +105,13 @@ export function OnboardingTooltip({
       setTooltipStyle(style)
     }
 
-    calculatePosition()
+    // Delay initial calculation to let SpotlightOverlay render first (100ms + buffer)
+    const initialDelay = setTimeout(calculatePosition, 150)
     window.addEventListener('resize', calculatePosition)
-    return () => window.removeEventListener('resize', calculatePosition)
+    return () => {
+      clearTimeout(initialDelay)
+      window.removeEventListener('resize', calculatePosition)
+    }
   }, [targetSelector, isMobile])
 
   const getPositionClasses = () => {
@@ -186,12 +194,12 @@ export function OnboardingTooltip({
       <style jsx>{`
         @keyframes slideUp {
           from {
-            transform: translateY(20px);
             opacity: 0;
+            margin-top: 20px;
           }
           to {
-            transform: translateY(0);
             opacity: 1;
+            margin-top: 0;
           }
         }
       `}</style>

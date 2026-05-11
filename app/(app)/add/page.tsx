@@ -113,7 +113,7 @@ export default function AddPage() {
             avatar_color: avatarColor,
             avatar_url: avatarUrl,
             notes: null,
-            last_contact_date: new Date().toISOString(),
+            last_contact_date: null, // Don't set until actual contact
             elo_rating: calculateInitialElo(
               sanitizedAttractionScore,
               sanitizedPersonalityScore,
@@ -181,7 +181,7 @@ export default function AddPage() {
         personality_score: sanitizedPersonalityScore,
         reliability_score: sanitizedReliabilityScore,
         avatar_color: avatarColor,
-        last_contact_date: new Date().toISOString(),
+        last_contact_date: null, // Don't set until actual contact
       }
 
       // Only include avatar_url if it exists (column might not exist in DB yet)

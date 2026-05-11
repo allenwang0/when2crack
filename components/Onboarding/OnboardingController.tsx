@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import { useAuth } from '@/lib/contexts/AuthContext'
 import { useOnboarding } from '@/lib/contexts/OnboardingContext'
@@ -22,6 +22,7 @@ export function OnboardingController({ children }: OnboardingControllerProps) {
   const [showWelcome, setShowWelcome] = useState(false)
   const [showConfetti, setShowConfetti] = useState(false)
   const [isReady, setIsReady] = useState(false)
+  const tabEventTimeoutsRef = useRef<NodeJS.Timeout[]>([])
 
   // Check if should show welcome on mount
   useEffect(() => {
@@ -44,6 +45,10 @@ export function OnboardingController({ children }: OnboardingControllerProps) {
 
   // Handle step navigation
   useEffect(() => {
+    // Clear any pending tab event timeouts from previous step
+    tabEventTimeoutsRef.current.forEach(clearTimeout)
+    tabEventTimeoutsRef.current = []
+
     if (!state.isActive || state.currentStep === 0) return
 
     const step = ONBOARDING_STEPS[state.currentStep - 1]
@@ -66,11 +71,19 @@ export function OnboardingController({ children }: OnboardingControllerProps) {
 
         // Retry up to 3 times if page might still be loading
         if (retries < 3) {
-          setTimeout(() => dispatchTabEvent(retries + 1), 200)
+          const timeout = setTimeout(() => dispatchTabEvent(retries + 1), 200)
+          tabEventTimeoutsRef.current.push(timeout)
         }
       }
 
-      setTimeout(() => dispatchTabEvent(), 300)
+      const initialTimeout = setTimeout(() => dispatchTabEvent(), 300)
+      tabEventTimeoutsRef.current.push(initialTimeout)
+    }
+
+    // Cleanup on unmount or step change
+    return () => {
+      tabEventTimeoutsRef.current.forEach(clearTimeout)
+      tabEventTimeoutsRef.current = []
     }
   }, [state.currentStep, state.isActive, pathname, router])
 

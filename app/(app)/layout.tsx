@@ -96,7 +96,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       </header>
 
       {/* Main content - scrollable with padding for fixed header and nav */}
-      <main className="flex-1 overflow-y-auto pt-16 pb-20">
+      <main className="flex-1 overflow-y-auto pt-20 pb-20">
         <div className="max-w-md mx-auto w-full px-4">
           {children}
         </div>
