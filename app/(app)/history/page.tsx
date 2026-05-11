@@ -104,7 +104,6 @@ export default function HistoryPage() {
     if (!user) return
 
     try {
-      // @ts-expect-error - when2crack_shares table may not exist yet
       const { data, error } = await supabase
         .from('when2crack_shares')
         .select('*')

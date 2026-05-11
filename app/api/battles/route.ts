@@ -33,14 +33,14 @@ export async function POST(request: NextRequest) {
     })
 
     if (error) {
-      console.error('Battle RPC error:', error)
+      // console.error('Battle RPC error:', error)
       throw error
     }
 
     // The RPC function returns the result in the correct format
     return NextResponse.json(data)
   } catch (error) {
-    console.error('Error processing battle:', error)
+    // console.error('Error processing battle:', error)
     return NextResponse.json(
       { error: 'Failed to process battle' },
       { status: 500 }
