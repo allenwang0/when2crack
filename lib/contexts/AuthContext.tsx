@@ -24,6 +24,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     let isSubscribed = true
 
+    // Safety timeout to prevent infinite loading (10 seconds)
+    const timeout = setTimeout(() => {
+      if (isSubscribed) {
+        console.warn('Auth initialization timeout - proceeding')
+        setLoading(false)
+      }
+    }, 10000)
+
     // Get initial session
     const initializeAuth = async () => {
       try {
@@ -36,12 +44,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (isSubscribed) {
           setUser(session?.user ?? null)
           setLoading(false)
+          clearTimeout(timeout)
         }
       } catch (error) {
         console.error('Auth error:', error)
         if (isSubscribed) {
           setUser(null)
           setLoading(false)
+          clearTimeout(timeout)
         }
       }
     }
@@ -89,9 +99,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     return () => {
       isSubscribed = false
+      clearTimeout(timeout)
       subscription.unsubscribe()
     }
-  }, [supabase])
+  }, [])
 
   const signOut = async () => {
     try {
