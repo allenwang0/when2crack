@@ -15,12 +15,29 @@ interface WeekScheduleProps {
   comparisonName?: string
 }
 
+// Helper function to get Monday of a given date
+function getMonday(date: Date): Date {
+  const d = new Date(date)
+  const day = d.getDay()
+  const diff = d.getDate() - day + (day === 0 ? -6 : 1) // Adjust when day is Sunday
+  return new Date(d.setDate(diff))
+}
+
+// Format date as YYYY-MM-DD
+function formatDate(date: Date): string {
+  return date.toISOString().split('T')[0]
+}
+
 export function WeekSchedule({ comparisonMode = false, comparisonName }: WeekScheduleProps) {
   const { user } = useAuth()
   const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
   const hours = Array.from({ length: 24 }, (_, i) => i) // 0-23
 
-  const [selectedSlotsArray, setSelectedSlotsArray] = useLocalStorage<string[]>('week_schedule', [])
+  // Week selection state
+  const [selectedWeekStart, setSelectedWeekStart] = useState<Date>(getMonday(new Date()))
+  const weekKey = `week_schedule_${formatDate(selectedWeekStart)}`
+
+  const [selectedSlotsArray, setSelectedSlotsArray] = useLocalStorage<string[]>(weekKey, [])
   const [selectedSlots, setSelectedSlotsState] = useState<Set<string>>(new Set(selectedSlotsArray))
   const [isDragging, setIsDragging] = useState(false)
   const [showSavedMessage, setShowSavedMessage] = useState(false)
@@ -71,6 +88,42 @@ export function WeekSchedule({ comparisonMode = false, comparisonName }: WeekSch
     setShowSavedMessage(true)
     setTimeout(() => setShowSavedMessage(false), 1500)
   }
+
+  // Week navigation functions
+  const goToThisWeek = () => {
+    setSelectedWeekStart(getMonday(new Date()))
+  }
+
+  const goToNextWeek = () => {
+    const nextWeek = new Date(selectedWeekStart)
+    nextWeek.setDate(nextWeek.getDate() + 7)
+    setSelectedWeekStart(nextWeek)
+  }
+
+  const goToPreviousWeek = () => {
+    const prevWeek = new Date(selectedWeekStart)
+    prevWeek.setDate(prevWeek.getDate() - 7)
+    setSelectedWeekStart(prevWeek)
+  }
+
+  // Update slots when week changes
+  useEffect(() => {
+    const newWeekKey = `week_schedule_${formatDate(selectedWeekStart)}`
+    const storedSlots = typeof window !== 'undefined'
+      ? JSON.parse(localStorage.getItem(newWeekKey) || '[]')
+      : []
+    setSelectedSlotsState(new Set(storedSlots))
+  }, [selectedWeekStart])
+
+  // Format week display
+  const getWeekDisplay = () => {
+    const weekEnd = new Date(selectedWeekStart)
+    weekEnd.setDate(weekEnd.getDate() + 6)
+    const options: Intl.DateTimeFormatOptions = { month: 'short', day: 'numeric' }
+    return `${selectedWeekStart.toLocaleDateString('en-US', options)} - ${weekEnd.toLocaleDateString('en-US', options)}`
+  }
+
+  const isThisWeek = formatDate(selectedWeekStart) === formatDate(getMonday(new Date()))
 
   // Calculate overlapping slots
   const getOverlappingSlots = () => {
@@ -162,7 +215,7 @@ export function WeekSchedule({ comparisonMode = false, comparisonName }: WeekSch
         ? JSON.parse(localStorage.getItem('display_name') || '"Someone"')
         : 'Someone'
 
-      const baseUrl = typeof window !== 'undefined' ? window.location.origin : ''
+      const baseUrl = process.env.NEXT_PUBLIC_APP_URL || (typeof window !== 'undefined' ? window.location.origin : '')
       const shareUrl = `${baseUrl}/schedule?for=${encodeURIComponent(displayName)}&schedule=${encodedSchedule}`
 
       // Copy to clipboard
@@ -181,6 +234,44 @@ export function WeekSchedule({ comparisonMode = false, comparisonName }: WeekSch
         <div className="inline-block bg-black text-yellow-bright px-6 py-2 rounded-full mb-3">
           <span className="font-bold text-lg">📅 This Week's Availability</span>
         </div>
+
+        {/* Week Picker - Only show when NOT in comparison mode */}
+        {!comparisonMode && (
+          <div className="flex items-center justify-center gap-2 mb-3">
+            <button
+              onClick={goToPreviousWeek}
+              className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+              aria-label="Previous week"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+            </button>
+
+            <div className="min-w-[180px] text-center">
+              <p className="font-semibold text-foreground">{getWeekDisplay()}</p>
+              {!isThisWeek && (
+                <button
+                  onClick={goToThisWeek}
+                  className="text-xs text-pink hover:underline"
+                >
+                  Jump to this week
+                </button>
+              )}
+            </div>
+
+            <button
+              onClick={goToNextWeek}
+              className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+              aria-label="Next week"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+          </div>
+        )}
+
         <p className="text-sm text-gray-600">
           Tap times when you're free to hang
         </p>

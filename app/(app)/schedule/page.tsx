@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/Button'
 import { useAuth } from '@/lib/contexts/AuthContext'
 import { useToast } from '@/lib/hooks/useToast'
 import { ToastContainer } from '@/components/ui/Toast'
+import { encodeScheduleWithTimezone } from '@/lib/utils/timezone'
 
 export default function SchedulePage() {
   const { user, loading: authLoading } = useAuth()
@@ -35,14 +36,13 @@ export default function SchedulePage() {
       }
 
       // Encode schedule with timezone
-      const { encodeScheduleWithTimezone } = await import('@/lib/utils/timezone')
       const encodedSchedule = encodeScheduleWithTimezone(mySchedule)
 
       // Get display name if set
       const displayName = localStorage.getItem('display_name') || 'Someone'
       const cleanName = displayName ? JSON.parse(displayName) : 'Someone'
 
-      const baseUrl = window.location.origin
+      const baseUrl = process.env.NEXT_PUBLIC_APP_URL || window.location.origin
       const shareUrl = `${baseUrl}/schedule?for=${encodeURIComponent(cleanName)}&schedule=${encodedSchedule}`
 
       // Copy to clipboard
@@ -80,15 +80,6 @@ export default function SchedulePage() {
           </p>
         </div>
       )}
-
-      <div className="text-center mb-6">
-        <div className="inline-block bg-black text-yellow-bright px-6 py-3 rounded-full mb-3">
-          <span className="font-bold text-xl">📅 {sharedFor ? 'Your Availability' : 'My Schedule'}</span>
-        </div>
-        <p className="text-sm text-gray-600">
-          Mark when you're free this week (8pm-4am)
-        </p>
-      </div>
 
       <WeekSchedule comparisonMode={!!sharedFor} comparisonName={sharedFor || undefined} />
 

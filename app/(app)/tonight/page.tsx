@@ -306,7 +306,7 @@ export default function TonightPage() {
     const safetyTimeout = setTimeout(() => {
       console.warn('Loading timeout - forcing completion')
       setLoading(false)
-    }, 3000)
+    }, 2000)
 
     if (activeTab === 'tonight') {
       setLoadingMessage('Loading recommendations...')
@@ -327,7 +327,9 @@ export default function TonightPage() {
     }
 
     return () => clearTimeout(safetyTimeout)
-  }, [user, authLoading, localRoster, activeTab])
+    // Note: Removed localRoster dependency to prevent refetch loop after battles
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user, authLoading, activeTab])
 
   if (loading) {
     return (

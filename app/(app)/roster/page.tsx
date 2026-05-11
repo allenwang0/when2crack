@@ -103,19 +103,56 @@ export default function RosterPage() {
 
     fetchRoster()
 
-    // Subscribe to realtime changes
+    // Subscribe to realtime changes with smart delta updates
     const channel = supabase
       .channel('roster_changes')
       .on(
         'postgres_changes',
         {
-          event: '*',
+          event: 'INSERT',
           schema: 'public',
           table: 'roster',
           filter: `user_id=eq.${user.id}`,
         },
-        () => {
-          fetchRoster()
+        (payload) => {
+          const newPerson = payload.new as RosterPerson
+          if (newPerson.status !== 'Archived') {
+            setRoster((prev) => [...prev, newPerson].sort((a, b) => b.elo_rating - a.elo_rating))
+          }
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'roster',
+          filter: `user_id=eq.${user.id}`,
+        },
+        (payload) => {
+          const updatedPerson = payload.new as RosterPerson
+          setRoster((prev) => {
+            // Remove if archived, otherwise update
+            if (updatedPerson.status === 'Archived') {
+              return prev.filter((p) => p.id !== updatedPerson.id)
+            }
+            return prev
+              .map((p) => (p.id === updatedPerson.id ? updatedPerson : p))
+              .sort((a, b) => b.elo_rating - a.elo_rating)
+          })
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: 'DELETE',
+          schema: 'public',
+          table: 'roster',
+          filter: `user_id=eq.${user.id}`,
+        },
+        (payload) => {
+          const deletedId = payload.old.id
+          setRoster((prev) => prev.filter((p) => p.id !== deletedId))
         }
       )
       .subscribe()

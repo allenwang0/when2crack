@@ -15,12 +15,25 @@ type HangWithPerson = Hang & {
   person: RosterPerson
 }
 
+type When2CrackShare = {
+  id: string
+  recipient_name: string
+  share_url: string
+  viewed: boolean
+  viewed_at: string | null
+  responded: boolean
+  responded_at: string | null
+  created_at: string
+}
+
 export default function HistoryPage() {
   const router = useRouter()
   const { user, loading: authLoading } = useAuth()
   const supabase = createClient()
 
+  const [activeTab, setActiveTab] = useState<'hangs' | 'when2cracks'>('hangs')
   const [hangs, setHangs] = useState<HangWithPerson[]>([])
+  const [when2cracks, setWhen2cracks] = useState<When2CrackShare[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -30,6 +43,7 @@ export default function HistoryPage() {
     }
 
     fetchHangs()
+    fetchWhen2cracks()
   }, [user])
 
   const fetchHangs = async () => {
@@ -83,6 +97,28 @@ export default function HistoryPage() {
     setLoading(false)
   }
 
+  const fetchWhen2cracks = async () => {
+    if (!user) return
+
+    try {
+      // @ts-ignore
+      const { data, error } = await supabase
+        .from('when2crack_shares')
+        .select('*')
+        .eq('sender_id', user.id)
+        .order('created_at', { ascending: false })
+
+      if (error) {
+        console.error('Error fetching when2cracks:', error)
+        return
+      }
+
+      setWhen2cracks((data as When2CrackShare[]) || [])
+    } catch (err) {
+      console.error('Error fetching when2cracks:', err)
+    }
+  }
+
   const getScoreIcon = (dimension: string) => {
     switch (dimension) {
       case 'attraction': return '🔥'
@@ -125,21 +161,46 @@ export default function HistoryPage() {
           <h1 className="text-3xl font-bold mb-2 bg-gradient-to-r from-pink to-purple bg-clip-text text-transparent">
             History
           </h1>
-          <p className="text-gray-500 text-sm">Your encounter log</p>
+          <p className="text-gray-500 text-sm">Your encounter log & when2cracks</p>
+        </div>
+
+        {/* Tabs */}
+        <div className="flex gap-2 mb-6">
+          <button
+            onClick={() => setActiveTab('hangs')}
+            className={`flex-1 py-3 px-4 rounded-xl font-semibold transition-all ${
+              activeTab === 'hangs'
+                ? 'bg-gradient-to-r from-pink to-purple text-white shadow-md'
+                : 'bg-card text-gray-600 hover:bg-gray-50'
+            }`}
+          >
+            Hangs ({hangs.length})
+          </button>
+          <button
+            onClick={() => setActiveTab('when2cracks')}
+            className={`flex-1 py-3 px-4 rounded-xl font-semibold transition-all ${
+              activeTab === 'when2cracks'
+                ? 'bg-gradient-to-r from-pink to-purple text-white shadow-md'
+                : 'bg-card text-gray-600 hover:bg-gray-50'
+            }`}
+          >
+            When2Cracks ({when2cracks.length})
+          </button>
         </div>
 
         {loading ? (
           <div className="flex justify-center items-center py-20">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink"></div>
           </div>
-        ) : hangs.length === 0 ? (
-          <div className="bg-card border border-border rounded-lg p-12 text-center">
-            <p className="text-gray-400 mb-2">No encounters logged yet</p>
-            <p className="text-sm text-gray-500">
-              Start logging hangs from individual profiles
-            </p>
-          </div>
-        ) : (
+        ) : activeTab === 'hangs' ? (
+          hangs.length === 0 ? (
+            <div className="bg-card border border-border rounded-lg p-12 text-center">
+              <p className="text-gray-400 mb-2">No encounters logged yet</p>
+              <p className="text-sm text-gray-500">
+                Start logging hangs from individual profiles
+              </p>
+            </div>
+          ) : (
           <div className="space-y-4">
             {hangs.map((hang) => {
               const person = hang.person
@@ -252,6 +313,77 @@ export default function HistoryPage() {
               )
             })}
           </div>
+          )
+        ) : (
+          // When2Cracks Tab
+          when2cracks.length === 0 ? (
+            <div className="bg-card border border-border rounded-lg p-12 text-center">
+              <p className="text-gray-400 mb-2">No when2cracks sent yet</p>
+              <p className="text-sm text-gray-500">
+                Share your schedule from the Schedule page or profile pages
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {when2cracks.map((share) => (
+                <div
+                  key={share.id}
+                  className="bg-card border border-border rounded-lg p-4 hover:shadow-md transition-shadow"
+                >
+                  <div className="flex items-start justify-between mb-3">
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-lg mb-1">
+                        📅 {share.recipient_name}
+                      </h3>
+                      <p className="text-sm text-gray-500">
+                        {formatRelativeTime(share.created_at)}
+                      </p>
+                    </div>
+                    <div className="flex gap-2">
+                      {share.viewed && (
+                        <span className="text-xs bg-teal/10 text-teal px-2 py-1 rounded-full">
+                          ✓ Viewed
+                        </span>
+                      )}
+                      {share.responded && (
+                        <span className="text-xs bg-purple/10 text-purple px-2 py-1 rounded-full">
+                          💬 Responded
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="flex gap-2">
+                    <button
+                      onClick={async () => {
+                        try {
+                          await navigator.clipboard.writeText(share.share_url)
+                          alert('Link copied!')
+                        } catch (err) {
+                          console.error('Failed to copy:', err)
+                        }
+                      }}
+                      className="flex-1 px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg text-sm font-medium transition-colors"
+                    >
+                      📋 Copy Link
+                    </button>
+                    <button
+                      onClick={() => window.open(share.share_url, '_blank')}
+                      className="flex-1 px-4 py-2 bg-gradient-to-r from-pink to-purple text-white rounded-lg text-sm font-medium hover:opacity-90 transition-opacity"
+                    >
+                      👁️ View
+                    </button>
+                  </div>
+
+                  {share.responded && share.responded_at && (
+                    <p className="text-xs text-gray-500 mt-2">
+                      Responded {formatRelativeTime(share.responded_at)}
+                    </p>
+                  )}
+                </div>
+              ))}
+            </div>
+          )
         )}
       </div>
     </div>

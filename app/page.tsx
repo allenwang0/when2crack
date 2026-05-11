@@ -1,8 +1,9 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
+import { useAuth } from '@/lib/contexts/AuthContext'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 
@@ -11,16 +12,25 @@ export default function AuthPage() {
   const [error, setError] = useState('')
   const router = useRouter()
   const supabase = createClient()
+  const { user, loading: authLoading } = useAuth()
+
+  // Auto-redirect authenticated users to roster
+  useEffect(() => {
+    if (!authLoading && user) {
+      router.push('/roster')
+    }
+  }, [user, authLoading, router])
 
   const handleGoogleSignIn = async () => {
     setError('')
     setLoading(true)
 
     try {
+      const appUrl = process.env.NEXT_PUBLIC_APP_URL || window.location.origin
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/`,
+          redirectTo: `${appUrl}/`,
         },
       })
 
@@ -40,6 +50,18 @@ export default function AuthPage() {
       }
       setLoading(false)
     }
+  }
+
+  // Show loading spinner while checking auth status
+  if (authLoading) {
+    return (
+      <div className="h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    )
   }
 
   return (

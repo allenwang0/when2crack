@@ -230,7 +230,7 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
     const { encodeScheduleWithTimezone } = await import('@/lib/utils/timezone')
     const encodedSchedule = encodeScheduleWithTimezone(mySchedule)
 
-    const baseUrl = window.location.origin
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || window.location.origin
     const shareUrl = `${baseUrl}/schedule?for=${encodeURIComponent(person?.name || '')}&schedule=${encodedSchedule}`
 
     try {

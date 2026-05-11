@@ -24,13 +24,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     let isSubscribed = true
 
-    // Safety timeout to prevent infinite loading (10 seconds)
+    // Safety timeout to prevent infinite loading (3 seconds)
     const timeout = setTimeout(() => {
       if (isSubscribed) {
         console.warn('Auth initialization timeout - proceeding')
         setLoading(false)
       }
-    }, 10000)
+    }, 3000)
 
     // Get initial session
     const initializeAuth = async () => {
