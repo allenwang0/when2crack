@@ -284,7 +284,7 @@ export default function AddPage() {
           </div>
         )}
 
-        <div className="flex gap-3">
+        <div className="flex gap-3 pb-6">
           <Button type="submit" className="flex-1" disabled={loading}>
             {loading ? 'Adding...' : 'Add to Roster'}
           </Button>

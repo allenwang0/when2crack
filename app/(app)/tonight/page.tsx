@@ -12,6 +12,8 @@ import { useLocalStorage } from '@/lib/hooks/useLocalStorage'
 import { useToast } from '@/lib/hooks/useToast'
 import { ToastContainer } from '@/components/ui/Toast'
 import type { TonightRecommendation, RosterPerson } from '@/lib/types'
+import { calculateEloChanges, calculateInitialElo } from '@/lib/algorithms/elo'
+import { API_SAFETY_TIMEOUT, BATTLE_RESULT_DISPLAY_DURATION } from '@/lib/constants'
 
 export default function TonightPage() {
   const { user, loading: authLoading } = useAuth()
@@ -187,22 +189,24 @@ export default function TonightPage() {
         setCompletedBattles([...completedBattles, battleKey])
       }
 
-      const K = 32
-      let actualWinnerChange = 0
-      let actualLoserChange = 0
+      const winner = localRoster.find(p => p.id === winnerId)
+      const loser = localRoster.find(p => p.id === loserId)
+
+      if (!winner || !loser) {
+        throw new Error('Person not found')
+      }
+
+      const { winnerChange, loserChange, newWinnerRating, newLoserRating } = calculateEloChanges(
+        winner.elo_rating,
+        loser.elo_rating
+      )
 
       const updatedRoster = localRoster.map(person => {
         if (person.id === winnerId) {
-          const expectedScore = 1 / (1 + Math.pow(10, ((person2?.elo_rating || 1000) - person.elo_rating) / 400))
-          const change = Math.round(K * (1 - expectedScore))
-          actualWinnerChange = change
-          return { ...person, elo_rating: person.elo_rating + change }
+          return { ...person, elo_rating: newWinnerRating }
         }
         if (person.id === loserId) {
-          const expectedScore = 1 / (1 + Math.pow(10, ((person1?.elo_rating || 1000) - person.elo_rating) / 400))
-          const change = Math.round(K * (0 - expectedScore))
-          actualLoserChange = change
-          return { ...person, elo_rating: person.elo_rating + change }
+          return { ...person, elo_rating: newLoserRating }
         }
         return person
       })
@@ -211,13 +215,13 @@ export default function TonightPage() {
 
       setBattleResult({
         winner: winnerId,
-        winnerChange: actualWinnerChange,
-        loserChange: actualLoserChange,
+        winnerChange,
+        loserChange,
       })
 
       setTimeout(() => {
         fetchBattlePairGuest()
-      }, 2000)
+      }, BATTLE_RESULT_DISPLAY_DURATION)
     } catch (err) {
       if (err instanceof Error) {
         setError(err.message)
@@ -306,9 +310,11 @@ export default function TonightPage() {
     }
 
     const safetyTimeout = setTimeout(() => {
-      console.warn('Loading timeout - forcing completion')
+      if (process.env.NODE_ENV === 'development') {
+        console.warn('Loading timeout - forcing completion')
+      }
       setLoading(false)
-    }, 2000)
+    }, API_SAFETY_TIMEOUT)
 
     if (activeTab === 'tonight') {
       setLoadingMessage('Loading recommendations...')
@@ -352,7 +358,11 @@ export default function TonightPage() {
             setCompletedBattles([])
             const resetRoster = localRoster.map(person => ({
               ...person,
-              elo_rating: 1000 + (person.attraction_score + person.personality_score + person.reliability_score) * 10
+              elo_rating: calculateInitialElo(
+                person.attraction_score,
+                person.personality_score,
+                person.reliability_score
+              )
             }))
             setLocalRoster(resetRoster)
             setShowOutOfComparisons(false)
