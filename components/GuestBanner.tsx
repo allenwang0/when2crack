@@ -25,7 +25,7 @@ export function GuestBanner() {
           </svg>
           <div>
             <p className="text-sm font-medium">You're using Guest Mode</p>
-            <p className="text-xs text-gray-400 mt-0.5">
+            <p className="text-xs text-gray-400 mt-1.5">
               Your data is saved locally and won't persist across devices. Sign up to save your progress.
             </p>
           </div>

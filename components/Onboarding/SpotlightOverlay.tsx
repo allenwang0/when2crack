@@ -33,8 +33,8 @@ export function SpotlightOverlay({
   const retryCountRef = useRef(0)
   const previousTargetRef = useRef<string | null>(null)
   const observerRef = useRef<MutationObserver | null>(null)
-  const retryTimeoutRef = useRef<NodeJS.Timeout>()
-  const resizeTimeoutRef = useRef<NodeJS.Timeout>()
+  const retryTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined)
+  const resizeTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined)
 
   useEffect(() => {
     if (!targetSelector) return

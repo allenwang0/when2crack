@@ -27,7 +27,7 @@ export const BattleCard = memo(function BattleCard({ person, onClick, disabled }
     >
       {/* Avatar */}
       {person.avatar_url ? (
-        <div className="w-16 h-16 sm:w-24 sm:h-24 rounded-full overflow-hidden mx-auto mb-3 sm:mb-4 border-2 border-pink relative">
+        <div className="w-16 h-16 sm:w-24 sm:h-24 rounded-full overflow-hidden mx-auto mb-4 sm:mb-5 border-2 border-pink relative">
           <Image
             src={person.avatar_url}
             alt={`${person.name}'s profile photo`}
@@ -39,7 +39,7 @@ export const BattleCard = memo(function BattleCard({ person, onClick, disabled }
         </div>
       ) : (
         <div
-          className="w-16 h-16 sm:w-24 sm:h-24 rounded-full flex items-center justify-center text-white font-bold text-2xl sm:text-3xl mx-auto mb-3 sm:mb-4"
+          className="w-16 h-16 sm:w-24 sm:h-24 rounded-full flex items-center justify-center text-white font-bold text-2xl sm:text-3xl mx-auto mb-4 sm:mb-5"
           style={{ backgroundColor: person.avatar_color }}
         >
           {initials}
@@ -47,7 +47,7 @@ export const BattleCard = memo(function BattleCard({ person, onClick, disabled }
       )}
 
       {/* Name */}
-      <div className="mb-2 text-center">
+      <div className="mb-3 sm:mb-4 text-center">
         {person.name.split(' ').map((part, index, array) => {
           if (index === array.length - 1 && array.length > 1) {
             // Last name - slightly larger
@@ -68,7 +68,7 @@ export const BattleCard = memo(function BattleCard({ person, onClick, disabled }
       </div>
 
       {/* Scores */}
-      <div className="space-y-1 sm:space-y-2 mb-3 sm:mb-4">
+      <div className="space-y-2 sm:space-y-3 mb-4 sm:mb-5">
         <div className="flex justify-between text-xs sm:text-sm">
           <span className="text-gray-600">Composite</span>
           <span className="font-semibold text-pink">{compositeScore}</span>
@@ -88,7 +88,7 @@ export const BattleCard = memo(function BattleCard({ person, onClick, disabled }
       </div>
 
       {/* Elo Rating */}
-      <div className="text-xs text-gray-500">
+      <div className="text-xs text-gray-500 mt-3">
         Elo: {person.elo_rating}
       </div>
     </button>

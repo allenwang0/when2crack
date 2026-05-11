@@ -215,9 +215,9 @@ export default function AddPage() {
     <div className="py-6">
       {!user && !authLoading && <GuestBanner />}
 
-      <h2 className="text-2xl font-serif font-bold mb-6">Add Person</h2>
+      <h2 className="text-2xl font-serif font-bold mb-8">Add Person</h2>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <form onSubmit={handleSubmit} className="space-y-8">
         <Input
           label="Name"
           value={name}
@@ -228,7 +228,7 @@ export default function AddPage() {
 
         {/* Photo Upload */}
         <div>
-          <label className="block text-sm font-medium text-foreground mb-2">
+          <label className="block text-sm font-medium text-foreground mb-3">
             Photo (optional)
           </label>
           <div className="flex items-center gap-4">
@@ -262,12 +262,12 @@ export default function AddPage() {
               </div>
             </label>
           </div>
-          <p className="text-xs text-gray-500 mt-2">Max 5MB • JPG, PNG, or GIF</p>
+          <p className="text-xs text-gray-500 mt-3">Max 5MB • JPG, PNG, or GIF</p>
         </div>
 
         {/* Status Selection */}
         <div>
-          <label className="block text-sm font-medium text-foreground mb-2">
+          <label className="block text-sm font-medium text-foreground mb-3">
             Status
           </label>
           <select
@@ -283,7 +283,7 @@ export default function AddPage() {
         </div>
 
         {/* Score Sliders */}
-        <div className="space-y-6">
+        <div className="space-y-8">
           <Slider
             label="Looks"
             value={attractionScore}
@@ -308,12 +308,12 @@ export default function AddPage() {
         </div>
 
         {error && (
-          <div className="p-3 bg-red-500/10 border border-red-500/50 rounded-lg text-red-500 text-sm">
+          <div className="p-4 bg-red-500/10 border border-red-500/50 rounded-lg text-red-500 text-sm">
             {error}
           </div>
         )}
 
-        <div className="flex gap-3 pb-6">
+        <div className="flex gap-4 pb-6">
           <Button type="submit" className="flex-1" disabled={loading || authLoading}>
             {loading ? 'Adding...' : authLoading ? 'Loading...' : 'Add to Roster'}
           </Button>

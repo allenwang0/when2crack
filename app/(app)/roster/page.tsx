@@ -123,7 +123,7 @@ export default function RosterPage() {
           table: 'roster',
           filter: `user_id=eq.${user.id}`,
         },
-        (payload) => {
+        (payload: any) => {
           const newPerson = payload.new as RosterPerson
           if (newPerson.status !== 'Archived') {
             setRoster((prev) => [...prev, newPerson].sort((a, b) => b.elo_rating - a.elo_rating))
@@ -138,7 +138,7 @@ export default function RosterPage() {
           table: 'roster',
           filter: `user_id=eq.${user.id}`,
         },
-        (payload) => {
+        (payload: any) => {
           const updatedPerson = payload.new as RosterPerson
           setRoster((prev) => {
             // Remove if archived, otherwise update
@@ -159,7 +159,7 @@ export default function RosterPage() {
           table: 'roster',
           filter: `user_id=eq.${user.id}`,
         },
-        (payload) => {
+        (payload: any) => {
           const deletedId = payload.old.id
           setRoster((prev) => prev.filter((p) => p.id !== deletedId))
         }
@@ -186,10 +186,10 @@ export default function RosterPage() {
     <div className="py-6 roster-section">
       {!user && !authLoading && <GuestBanner />}
 
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-8">
         <div>
           <h2 className="text-3xl font-serif font-bold text-gray-800">Your Roster</h2>
-          <span className="text-sm text-gray-500 mt-1 block">{roster.length} {roster.length === 1 ? 'person' : 'people'}</span>
+          <span className="text-sm text-gray-500 mt-2 block">{roster.length} {roster.length === 1 ? 'person' : 'people'}</span>
         </div>
         <Button onClick={() => router.push('/add')} className="flex items-center gap-2 shadow-md onboarding-add-button">
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -201,8 +201,8 @@ export default function RosterPage() {
 
       {roster.length === 0 ? (
         <div className="bg-white border-2 border-dashed border-gray-300 rounded-2xl p-12 text-center">
-          <div className="text-6xl mb-4">👥</div>
-          <p className="text-gray-800 font-semibold text-lg mb-6">
+          <div className="text-6xl mb-6">👥</div>
+          <p className="text-gray-800 font-semibold text-lg mb-8">
             Add your first person to start
           </p>
           <Button onClick={() => router.push('/add')} className="shadow-md onboarding-add-button">

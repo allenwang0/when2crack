@@ -9,7 +9,7 @@ export function Input({ label, error, className = '', ...props }: InputProps) {
   return (
     <div className="w-full">
       {label && (
-        <label className="block text-sm font-medium text-foreground mb-1.5">
+        <label className="block text-sm font-medium text-foreground mb-2">
           {label}
         </label>
       )}
@@ -19,7 +19,7 @@ export function Input({ label, error, className = '', ...props }: InputProps) {
         } ${className}`}
         {...props}
       />
-      {error && <p className="mt-1 text-sm text-red-500">{error}</p>}
+      {error && <p className="mt-2 text-sm text-red-500">{error}</p>}
     </div>
   )
 }
@@ -33,7 +33,7 @@ export function Textarea({ label, error, className = '', ...props }: TextareaPro
   return (
     <div className="w-full">
       {label && (
-        <label className="block text-sm font-medium text-foreground mb-1.5">
+        <label className="block text-sm font-medium text-foreground mb-2">
           {label}
         </label>
       )}
@@ -43,7 +43,7 @@ export function Textarea({ label, error, className = '', ...props }: TextareaPro
         } ${className}`}
         {...props}
       />
-      {error && <p className="mt-1 text-sm text-red-500">{error}</p>}
+      {error && <p className="mt-2 text-sm text-red-500">{error}</p>}
     </div>
   )
 }

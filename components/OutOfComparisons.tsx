@@ -27,11 +27,11 @@ export function OutOfComparisons({ onReset, totalPeople }: OutOfComparisonsProps
         </div>
 
         {/* Title */}
-        <h2 className="text-3xl font-serif font-bold mb-3 text-pink">
+        <h2 className="text-3xl font-serif font-bold mb-5 text-pink">
           All Done!
         </h2>
 
-        <p className="text-lg mb-2 text-foreground/80">
+        <p className="text-lg mb-4 text-foreground/80">
           You've compared everyone! 🏆
         </p>
 
@@ -43,19 +43,19 @@ export function OutOfComparisons({ onReset, totalPeople }: OutOfComparisonsProps
         <div className="bg-gradient-to-r from-pink/10 via-purple/10 to-blue/10 rounded-3xl p-6 mb-8">
           <div className="grid grid-cols-3 gap-4">
             <div>
-              <div className="text-2xl font-bold text-pink">
+              <div className="text-2xl font-bold text-pink mb-1">
                 {totalBattles}
               </div>
               <div className="text-xs text-foreground/60">Battles</div>
             </div>
             <div>
-              <div className="text-2xl font-bold text-purple">
+              <div className="text-2xl font-bold text-purple mb-1">
                 {totalPeople}
               </div>
               <div className="text-xs text-foreground/60">People</div>
             </div>
             <div>
-              <div className="text-2xl font-bold text-blue">
+              <div className="text-2xl font-bold text-blue mb-1">
                 100%
               </div>
               <div className="text-xs text-foreground/60">Complete</div>

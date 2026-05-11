@@ -583,7 +583,7 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
         </div>
         <div className="bg-card border border-border rounded-lg p-4 text-center">
           <p className="text-sm font-bold text-foreground">
-            {formatRelativeTime(person.last_contact_date)}
+            {person.last_contact_date ? formatRelativeTime(person.last_contact_date) : 'Never'}
           </p>
           <p className="text-xs text-gray-500">Last Contact</p>
         </div>

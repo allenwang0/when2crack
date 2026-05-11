@@ -63,21 +63,19 @@ export default function TonightPage() {
         })
         .slice(0, 5)
         .map((person, index) => {
-          const lastContact = new Date(person.last_contact_date)
+          const lastContact = person.last_contact_date ? new Date(person.last_contact_date) : new Date(0)
           const now = new Date()
           const daysSince = Math.floor((now.getTime() - lastContact.getTime()) / (1000 * 60 * 60 * 24))
 
           return {
             person,
+            tonight_score: person.elo_rating + (person.reliability_score * 10),
             reasoning: {
               tier: person.tier,
               elo_rating: person.elo_rating,
               reliability: person.reliability_score,
               recency_days: daysSince,
             },
-            rank: index + 1,
-            score: person.elo_rating,
-            reliability_boost: person.reliability_score * 10,
           }
         })
 
@@ -420,7 +418,7 @@ export default function TonightPage() {
       {activeTab === 'tonight' && (
         <div className="tonight-recommendations">
           <div className="text-center mb-8">
-            <h2 className="text-3xl font-serif font-bold mb-3 text-gray-800">Tonight's Top Picks</h2>
+            <h2 className="text-3xl font-serif font-bold mb-5 text-gray-800">Tonight's Top Picks</h2>
             <p className="text-sm text-gray-600">
               Weighted by reliability, recency, and vibe
             </p>
@@ -429,7 +427,7 @@ export default function TonightPage() {
           {error && (
             <div className="bg-red-500/10 border border-red-500/50 rounded-lg p-4 mb-6 text-center">
               <p className="text-red-500 text-sm">{error}</p>
-              <Button onClick={user ? fetchRecommendations : fetchRecommendationsGuest} variant="ghost" size="sm" className="mt-2">
+              <Button onClick={user ? fetchRecommendations : fetchRecommendationsGuest} variant="ghost" size="sm" className="mt-3">
                 Try Again
               </Button>
             </div>
@@ -437,8 +435,8 @@ export default function TonightPage() {
 
           {recommendations.length === 0 ? (
             <div className="bg-white border-2 border-dashed border-gray-300 rounded-2xl p-12 text-center">
-              <div className="text-6xl mb-4">📅</div>
-              <p className="text-gray-800 font-semibold text-lg mb-2">No recommendations yet</p>
+              <div className="text-6xl mb-6">📅</div>
+              <p className="text-gray-800 font-semibold text-lg mb-4">No recommendations yet</p>
               <p className="text-sm text-gray-600">
                 Add people to your roster and run some battles to get personalized picks
               </p>
@@ -470,8 +468,8 @@ export default function TonightPage() {
       {activeTab === 'battle' && (
         <div className="battle-section">
           <div className="text-center mb-8">
-            <h2 className="text-3xl font-serif font-bold mb-3 text-gray-800">Battle Mode</h2>
-            <p className="text-sm text-gray-600 mb-2">
+            <h2 className="text-3xl font-serif font-bold mb-5 text-gray-800">Battle Mode</h2>
+            <p className="text-sm text-gray-600 mb-4">
               Right now, tonight — who would you rather?
             </p>
             {!user && totalPossibleBattles > 0 && (
@@ -490,8 +488,8 @@ export default function TonightPage() {
 
           {!person1 || !person2 ? (
             <div className="bg-white border-2 border-dashed border-gray-300 rounded-2xl p-12 text-center">
-              <div className="text-6xl mb-4">⚔️</div>
-              <p className="text-gray-800 font-semibold text-lg mb-2">Need more people</p>
+              <div className="text-6xl mb-6">⚔️</div>
+              <p className="text-gray-800 font-semibold text-lg mb-4">Need more people</p>
               <p className="text-sm text-gray-600">
                 Add at least 2 people to your roster to start battles
               </p>
@@ -500,7 +498,7 @@ export default function TonightPage() {
             <>
               {battleResult && (
                 <div className="bg-pink/10 border border-pink rounded-lg p-4 mb-6 text-center animate-fade-in">
-                  <p className="text-pink font-semibold mb-1">Battle Complete!</p>
+                  <p className="text-pink font-semibold mb-2">Battle Complete!</p>
                   <p className="text-sm text-gray-600">
                     Winner: {battleResult.winnerChange > 0 ? '+' : ''}
                     {battleResult.winnerChange} Elo

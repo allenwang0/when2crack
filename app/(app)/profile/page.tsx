@@ -264,7 +264,7 @@ export default function ProfilePage() {
           </div>
         ) : (
           <>
-            <div className="flex items-center justify-center gap-2 mb-2">
+            <div className="flex items-center justify-center gap-2 mb-3">
               <h1 className="text-3xl font-serif font-bold">
                 {displayName || (user ? user.email?.split('@')[0] : 'Guest User')}
               </h1>
@@ -287,27 +287,27 @@ export default function ProfilePage() {
       {/* Stats Grid */}
       <div className="grid grid-cols-2 gap-3 mb-6 profile-stats">
         <div className="bg-white border-2 border-pink/20 rounded-2xl p-5 text-center hover:border-pink/40 transition-colors">
-          <div className="text-4xl font-bold text-pink mb-2">{totalPeople}</div>
+          <div className="text-4xl font-bold text-pink mb-3">{totalPeople}</div>
           <div className="text-sm font-medium text-gray-600">Total People</div>
         </div>
         <div className="bg-white border-2 border-purple/20 rounded-2xl p-5 text-center hover:border-purple/40 transition-colors">
-          <div className="text-4xl font-bold text-purple mb-2">{topTierCount}</div>
+          <div className="text-4xl font-bold text-purple mb-3">{topTierCount}</div>
           <div className="text-sm font-medium text-gray-600">S-Tier</div>
         </div>
         {!user && (
           <div className="bg-white border-2 border-teal/20 rounded-2xl p-5 text-center hover:border-teal/40 transition-colors">
-            <div className="text-4xl font-bold text-teal mb-2">{totalBattles}</div>
+            <div className="text-4xl font-bold text-teal mb-3">{totalBattles}</div>
             <div className="text-sm font-medium text-gray-600">Battles</div>
           </div>
         )}
         {user && (
           <div className="bg-white border-2 border-teal/20 rounded-2xl p-5 text-center hover:border-teal/40 transition-colors">
-            <div className="text-4xl font-bold text-teal mb-2">{totalHangs}</div>
+            <div className="text-4xl font-bold text-teal mb-3">{totalHangs}</div>
             <div className="text-sm font-medium text-gray-600">Total Hangs</div>
           </div>
         )}
         <div className="bg-white border-2 border-amber/20 rounded-2xl p-5 text-center hover:border-amber/40 transition-colors">
-          <div className="text-4xl font-bold text-amber mb-2">{avgCompositeScore}</div>
+          <div className="text-4xl font-bold text-amber mb-3">{avgCompositeScore}</div>
           <div className="text-sm font-medium text-gray-600">Avg Score</div>
         </div>
       </div>

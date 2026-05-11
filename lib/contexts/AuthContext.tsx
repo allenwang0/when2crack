@@ -3,6 +3,7 @@
 import { createContext, useContext, useEffect, useState, useRef, useCallback } from 'react'
 import { User } from '@supabase/supabase-js'
 import { createClient } from '@/lib/supabase/client'
+import { logger } from '@/lib/utils/logger'
 
 interface AuthContextType {
   user: User | null
@@ -48,11 +49,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         })
 
         if (insertError && insertError.code !== '23505') { // Ignore duplicate key errors
-          console.error('Error inserting user profile:', insertError)
+          logger.error('Error inserting user profile:', insertError)
         }
       }
     } catch (err) {
-      console.error('Error ensuring user profile:', err)
+      logger.error('Error ensuring user profile:', err)
     } finally {
       // Allow retry after 5 seconds if needed
       setTimeout(() => {
@@ -67,7 +68,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // Safety timeout to prevent infinite loading (5 seconds, increased from 3)
     const timeout = setTimeout(() => {
       if (isSubscribed && loading) {
-        console.warn('Auth initialization timeout - proceeding with fallback')
+        logger.warn('Auth initialization timeout - proceeding with fallback')
         setLoading(false)
       }
     }, 5000)
@@ -78,7 +79,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const { data: { session }, error } = await supabase.auth.getSession()
 
         if (error) {
-          console.error('Session error:', error)
+          logger.error('Session error:', error)
         }
 
         if (isSubscribed) {
@@ -93,7 +94,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           }
         }
       } catch (error) {
-        console.error('Auth error:', error)
+        logger.error('Auth error:', error)
         if (isSubscribed) {
           setUser(null)
           setLoading(false)
@@ -129,7 +130,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signOut = async () => {
     try {
-      console.log('Signing out...')
+      logger.auth('Signing out')
 
       // Clear any local storage (except guest data) FIRST
       const guestRoster = localStorage.getItem('guest_roster')
@@ -157,7 +158,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         window.location.href = '/'
       }
     } catch (error) {
-      console.error('Sign out error:', error)
+      logger.error('Sign out error:', error)
       // Clear user and redirect even if there's an error
       setUser(null)
       if (typeof window !== 'undefined') {

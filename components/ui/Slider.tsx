@@ -46,8 +46,8 @@ export function Slider({
 
   return (
     <div className="w-full">
-      <div className="mb-2">
-        <div className="flex items-center justify-center gap-2 mb-1">
+      <div className="mb-3">
+        <div className="flex items-center justify-center gap-2 mb-2">
           <span className="text-purple-400">{getIcon()}</span>
           <label className="text-sm font-medium text-foreground">{label}</label>
         </div>
@@ -69,7 +69,7 @@ export function Slider({
           }%, #E6E6FA ${((value - min) / (max - min)) * 100}%, #E6E6FA 100%)`,
         }}
       />
-      <div className="flex justify-between text-xs text-gray-500 mt-1">
+      <div className="flex justify-between text-xs text-gray-500 mt-3">
         <span>{min}</span>
         <span>{max}</span>
       </div>

@@ -45,7 +45,7 @@ export type Database = {
           notes: string | null
           avatar_color: string
           avatar_url: string | null
-          last_contact_date: string
+          last_contact_date: string | null
           created_at: string
           updated_at: string
         }
@@ -62,7 +62,7 @@ export type Database = {
           notes?: string | null
           avatar_color?: string
           avatar_url?: string | null
-          last_contact_date?: string
+          last_contact_date?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -79,7 +79,7 @@ export type Database = {
           notes?: string | null
           avatar_color?: string
           avatar_url?: string | null
-          last_contact_date?: string
+          last_contact_date?: string | null
           created_at?: string
           updated_at?: string
         }

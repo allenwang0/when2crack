@@ -25,6 +25,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Call atomic RPC function that handles everything in a single transaction
+    // @ts-ignore - Supabase RPC types not fully configured
     const { data, error } = await supabase.rpc('process_battle', {
       p_user_id: user.id,
       p_winner_id: winner_id,

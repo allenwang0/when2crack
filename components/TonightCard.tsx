@@ -57,7 +57,7 @@ export const TonightCard = memo(function TonightCard({ recommendation, rank, onS
         )}
 
         <div className="flex-1 min-w-0">
-          <h3 className="font-serif font-bold text-lg mb-1">{person.name}</h3>
+          <h3 className="font-serif font-bold text-lg mb-2">{person.name}</h3>
           <div className="flex items-center gap-2 flex-wrap">
             <Badge variant="status" status={person.status}>
               {person.status}
@@ -70,8 +70,8 @@ export const TonightCard = memo(function TonightCard({ recommendation, rank, onS
       </div>
 
       {/* Reasoning */}
-      <div className="bg-background rounded-lg p-3 mb-4 space-y-1.5">
-        <p className="text-xs text-gray-600 font-medium">Why tonight:</p>
+      <div className="bg-background rounded-lg p-4 mb-4 space-y-2.5">
+        <p className="text-xs text-gray-600 font-medium mb-1">Why tonight:</p>
         <div className="flex items-center justify-between text-sm">
           <span className="text-gray-600">Composite</span>
           <span className="font-semibold">{Math.round((person.attraction_score + person.personality_score + person.reliability_score) / 3)}/10</span>

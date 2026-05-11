@@ -301,7 +301,7 @@ export function WeekSchedule({ comparisonMode = false, comparisonName }: WeekSch
           </div>
         )}
         {userTimezone && (
-          <div className="mt-2 text-xs text-gray-500">
+          <div className="mt-4 text-xs text-gray-500">
             {comparisonMode && comparisonTimezone && comparisonTimezone !== userTimezone ? (
               <>
                 <span className="font-medium">Your timezone:</span> {userTimezone}
@@ -484,7 +484,7 @@ export function WeekSchedule({ comparisonMode = false, comparisonName }: WeekSch
             >
               📤 Send Your Schedule to {comparisonName || 'Them'}
             </button>
-            <p className="text-xs text-gray-500 mt-2">
+            <p className="text-xs text-gray-500 mt-3">
               Share your availability so {comparisonName || 'they'} can see when you're both free
             </p>
           </div>
