@@ -17,6 +17,7 @@ import { PostHangPrompt } from '@/components/PostHangPrompt'
 import { getInitials } from '@/lib/utils/colors'
 import { calculateCompositeScore } from '@/lib/utils/scores'
 import { formatDate, formatRelativeTime } from '@/lib/utils/dates'
+import { logger } from '@/lib/utils/logger'
 import type { RosterPerson, Hang } from '@/lib/types'
 
 export default function ProfilePage({ params }: { params: Promise<{ id: string }> }) {
@@ -82,7 +83,7 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
           .eq('user_id', user.id)
 
         if (updateError) {
-          console.error('Failed to update avatar:', updateError)
+          logger.error('Failed to update avatar:', updateError)
           showToast('Failed to save photo. Please try again.', 'error')
           return
         }
@@ -92,7 +93,7 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
 
       showToast('Photo updated!', 'success')
     } catch (err) {
-      console.error('Image compression error:', err)
+      logger.error('Image compression error:', err)
       showToast('Failed to process image. Please try another.', 'error')
     }
   }
@@ -118,7 +119,7 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
         .eq('user_id', user.id)
 
       if (updateError) {
-        console.error('Failed to remove avatar:', updateError)
+        logger.error('Failed to remove avatar:', updateError)
         showToast('Failed to remove photo. Please try again.', 'error')
         // Restore the avatar in UI
         setAvatarUrl(person.avatar_url)
@@ -161,7 +162,7 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
         .single()
 
       if (personError) {
-        console.error('Error fetching person:', personError)
+        logger.error('Error fetching person:', personError)
         router.push('/roster')
         return
       }
@@ -240,7 +241,7 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
     try {
       mySchedule = storedSchedule ? JSON.parse(storedSchedule) : []
     } catch (e) {
-      console.error('Failed to parse schedule:', e)
+      logger.error('Failed to parse schedule:', e)
     }
 
     // Encode schedule with timezone information
@@ -255,7 +256,7 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
       setLinkCopied(true)
       setTimeout(() => setLinkCopied(false), 2000)
     } catch (err) {
-      console.error('Failed to copy:', err)
+      logger.error('Failed to copy:', err)
     }
   }
 
@@ -296,7 +297,7 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
         .eq('user_id', user.id)
 
       if (updateError) {
-        console.error('Failed to save changes:', updateError)
+        logger.error('Failed to save changes:', updateError)
         showToast('Failed to save changes. Please try again.', 'error')
         setSaving(false)
         return
@@ -327,7 +328,7 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
         .eq('user_id', user.id)
 
       if (deleteError) {
-        console.error('Failed to delete person:', deleteError)
+        logger.error('Failed to delete person:', deleteError)
         showToast('Failed to delete. Please try again.', 'error')
         return
       }
@@ -381,7 +382,7 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
       {/* Header */}
       <div className="flex items-start gap-4 mb-6">
         <div className="relative flex-shrink-0">
-          {avatarUrl ? (
+          {avatarUrl && avatarUrl.trim() !== '' ? (
             <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-pink">
               <img src={avatarUrl} alt={person.name} className="w-full h-full object-cover" />
             </div>
@@ -405,7 +406,7 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
             </svg>
           </label>
-          {avatarUrl && (
+          {avatarUrl && avatarUrl.trim() !== '' && (
             <button
               onClick={handleRemovePhoto}
               className="absolute -top-1 -right-1 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center text-xs hover:bg-red-600 transition-colors"

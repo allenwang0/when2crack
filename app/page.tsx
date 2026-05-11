@@ -92,7 +92,7 @@ export default function AuthPage() {
 
           <Button
             onClick={handleGoogleSignIn}
-            variant="outline"
+            variant="secondary"
             className="w-full flex items-center justify-center gap-3 py-3"
             disabled={loading}
           >

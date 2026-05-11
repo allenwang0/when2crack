@@ -13,6 +13,7 @@ import { generateAvatarColor } from '@/lib/utils/colors'
 import type { Tier, Status, RosterPerson } from '@/lib/types'
 import { calculateInitialElo } from '@/lib/algorithms/elo'
 import { MAX_IMAGE_SIZE_BYTES, ALLOWED_IMAGE_TYPES, ROSTER_INITIAL_TIER } from '@/lib/constants'
+import { logger } from '@/lib/utils/logger'
 
 export default function AddPage() {
   const router = useRouter()
@@ -51,7 +52,7 @@ export default function AddPage() {
       const compressedBase64 = await compressImage(file)
       setAvatarUrl(compressedBase64)
     } catch (err) {
-      console.error('Image compression error:', err)
+      logger.error('Image compression error:', err)
       setError('Failed to process image. Please try another.')
     }
   }
@@ -59,8 +60,7 @@ export default function AddPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    console.log('=== SUBMIT STARTED ===')
-    console.log('User:', user ? user.id : 'Guest')
+    logger.debug('Submit started, user:', user ? user.id : 'Guest')
 
     // Prevent submission during auth loading to avoid race conditions
     if (authLoading) {
@@ -80,7 +80,7 @@ export default function AddPage() {
       const sanitizedPersonalityScore = Math.max(1, sanitizeScore(personalityScore))
       const sanitizedReliabilityScore = Math.max(1, sanitizeScore(reliabilityScore))
 
-      console.log('Sanitized scores:', {
+      logger.debug('Sanitized scores:', {
         attraction: sanitizedAttractionScore,
         personality: sanitizedPersonalityScore,
         reliability: sanitizedReliabilityScore
@@ -96,9 +96,7 @@ export default function AddPage() {
 
       // Guest mode: Use localStorage
       if (!user) {
-        if (process.env.NODE_ENV === 'development') {
-          console.log('Guest mode - saving to localStorage')
-        }
+        logger.debug('Guest mode - saving to localStorage')
 
         try {
           const newPerson: RosterPerson = {
@@ -127,7 +125,7 @@ export default function AddPage() {
           router.push('/roster')
           return
         } catch (err) {
-          console.error('Guest mode localStorage error:', err)
+          logger.error('Guest mode localStorage error:', err)
           setError('Failed to save locally. Your browser storage might be full.')
           setLoading(false)
           return
@@ -150,26 +148,24 @@ export default function AddPage() {
 
       // If user profile doesn't exist, create it
       if (userCheckError && userCheckError.code === 'PGRST116') {
-        console.log('User profile not found, creating...')
+        logger.info('User profile not found, creating...')
         const { error: createUserError } = await supabase.from('users').insert({
           id: user.id,
           email: user.email,
         } as any)
 
         if (createUserError) {
-          console.error('Failed to create user profile:', createUserError)
+          logger.error('Failed to create user profile:', createUserError)
           throw new Error(`Failed to create user profile: ${createUserError.message}`)
         }
-        console.log('User profile created successfully')
+        logger.info('User profile created successfully')
       } else if (userCheckError) {
-        console.error('Error checking user profile:', userCheckError)
+        logger.error('Error checking user profile:', userCheckError)
         throw new Error(`Error checking user profile: ${userCheckError.message}`)
       }
 
       // Now insert into roster
-      if (process.env.NODE_ENV === 'development') {
-        console.log('Inserting into roster...')
-      }
+      logger.debug('Inserting into roster...')
 
       // Prepare insert data (excluding avatar_url if it's null to avoid schema issues)
       const insertData: any = {
@@ -193,14 +189,14 @@ export default function AddPage() {
       const { error: insertError } = await supabase.from('roster').insert(insertData)
 
       if (insertError) {
-        console.error('Insert error:', insertError)
+        logger.error('Insert error:', insertError)
         throw new Error(`Failed to add to roster: ${insertError.message}`)
       }
 
-      console.log('Successfully added to roster')
+      logger.info('Successfully added to roster')
       router.push('/roster')
     } catch (err: unknown) {
-      console.error('Add person error:', err)
+      logger.error('Add person error:', err)
       if (err instanceof Error) {
         setError(err.message)
       } else {

@@ -24,7 +24,7 @@ export const RosterCard = memo(function RosterCard({ person }: RosterCardProps) 
       <div className="bg-white border-2 border-gray-200 rounded-2xl p-5 hover:border-yellow-400 hover:shadow-lg hover:scale-[1.01] transition-all duration-200 cursor-pointer focus-within:ring-4 focus-within:ring-yellow-bright focus-within:ring-offset-2">
         <div className="flex items-start gap-4">
           {/* Avatar - Increased to 64px */}
-          {person.avatar_url ? (
+          {person.avatar_url && person.avatar_url.trim() !== '' ? (
             <div className="w-16 h-16 rounded-full overflow-hidden flex-shrink-0 border-2 border-pink relative">
               <Image
                 src={person.avatar_url}

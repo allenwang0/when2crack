@@ -40,7 +40,7 @@ export const TonightCard = memo(function TonightCard({ recommendation, rank, onS
 
       {/* Person Info */}
       <div className="flex items-start gap-4 mb-4">
-        {person.avatar_url ? (
+        {person.avatar_url && person.avatar_url.trim() !== '' ? (
           <div className="w-16 h-16 rounded-full overflow-hidden flex-shrink-0 border-2 border-pink">
             <img
               src={person.avatar_url}

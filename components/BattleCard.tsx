@@ -26,7 +26,7 @@ export const BattleCard = memo(function BattleCard({ person, onClick, disabled }
       }`}
     >
       {/* Avatar */}
-      {person.avatar_url ? (
+      {person.avatar_url && person.avatar_url.trim() !== '' ? (
         <div className="w-16 h-16 sm:w-24 sm:h-24 rounded-full overflow-hidden mx-auto mb-4 sm:mb-5 border-2 border-pink relative">
           <Image
             src={person.avatar_url}

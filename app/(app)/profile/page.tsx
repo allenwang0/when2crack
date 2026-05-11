@@ -206,7 +206,7 @@ export default function ProfilePage() {
       {/* Header */}
       <div className="text-center mb-8">
         <div className="relative inline-block group">
-          {avatarUrl ? (
+          {avatarUrl && avatarUrl.trim() !== '' ? (
             <div className="w-24 h-24 rounded-full overflow-hidden border-4 border-pink shadow-lg">
               <img src={avatarUrl} alt="Profile" className="w-full h-full object-cover" />
             </div>
@@ -236,7 +236,7 @@ export default function ProfilePage() {
           </div>
 
           {/* Remove photo button */}
-          {avatarUrl && (
+          {avatarUrl && avatarUrl.trim() !== '' && (
             <button
               onClick={handleRemovePhoto}
               className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full p-1.5 shadow-lg hover:bg-red-600 transition-colors"
@@ -247,7 +247,6 @@ export default function ProfilePage() {
             </button>
           )}
         </div>
-        <div className="mb-4"></div>
 
         {isEditingName ? (
           <div className="max-w-xs mx-auto mb-4">
@@ -284,7 +283,8 @@ export default function ProfilePage() {
         )}
       </div>
 
-      {/* Stats Grid */}
+      {/* Statistics Section */}
+      <h3 className="text-lg font-bold text-gray-900 mb-4 mt-6">Statistics</h3>
       <div className="grid grid-cols-2 gap-3 mb-6 profile-stats">
         <div className="bg-white border-2 border-pink/20 rounded-2xl p-5 text-center hover:border-pink/40 transition-colors">
           <div className="text-4xl font-bold text-pink mb-3">{totalPeople}</div>
@@ -313,52 +313,53 @@ export default function ProfilePage() {
       </div>
 
       {/* Quick Actions */}
-      <div className="bg-white border-2 border-gray-200 rounded-2xl p-6 mb-6 shadow-sm">
-        <h3 className="font-bold text-lg mb-4 text-gray-800">Quick Actions</h3>
+      <h3 className="text-lg font-bold text-gray-900 mb-4">Quick Actions</h3>
+      <div className="bg-white border-2 border-gray-200 rounded-2xl p-5 mb-6 shadow-sm">
         <div className="space-y-3">
           <Button
-            variant="secondary"
+            variant="primary"
             onClick={() => router.push('/schedule')}
-            className="w-full justify-start text-left hover:bg-pink/5 hover:border-pink/30 transition-all"
+            className="w-full justify-start text-left"
           >
             <svg className="w-5 h-5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
             <div>
               <div className="font-semibold">Set My Schedule</div>
-              <div className="text-xs text-gray-500">Mark when you're free to hang</div>
+              <div className="text-xs opacity-90">Mark when you're free to hang</div>
             </div>
           </Button>
           <Button
             variant="secondary"
             onClick={() => router.push('/roster')}
-            className="w-full justify-start text-left hover:bg-purple/5 hover:border-purple/30 transition-all"
+            className="w-full justify-start text-left"
           >
             <svg className="w-5 h-5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
             </svg>
             <div>
               <div className="font-semibold">View Roster</div>
-              <div className="text-xs text-gray-500">See all your people</div>
+              <div className="text-xs text-gray-600">See all your people</div>
             </div>
           </Button>
           <Button
             variant="secondary"
             onClick={() => router.push('/add')}
-            className="w-full justify-start text-left hover:bg-teal/5 hover:border-teal/30 transition-all"
+            className="w-full justify-start text-left"
           >
             <svg className="w-5 h-5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
             </svg>
             <div>
               <div className="font-semibold">Add Person</div>
-              <div className="text-xs text-gray-500">Add someone new to your roster</div>
+              <div className="text-xs text-gray-600">Add someone new to your roster</div>
             </div>
           </Button>
         </div>
       </div>
 
       {/* Achievements Section */}
+      <h3 className="text-lg font-bold text-gray-900 mb-4">Achievements</h3>
       <div className="mb-6">
         <Achievements achievements={achievements} />
       </div>
@@ -366,7 +367,7 @@ export default function ProfilePage() {
       {/* Restart Tour Button */}
       <div className="mb-6">
         <Button
-          variant="tertiary"
+          variant="secondary"
           onClick={() => {
             localStorage.removeItem('onboarding_seen')
             localStorage.removeItem('onboarding_completed')

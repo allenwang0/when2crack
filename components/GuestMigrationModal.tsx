@@ -42,7 +42,7 @@ export function GuestMigrationModal({
 
         const { error: insertError } = await supabase
           .from('roster')
-          .insert(batch)
+          .insert(batch as any)
 
         if (insertError) {
           throw new Error(`Failed to migrate roster: ${insertError.message}`)

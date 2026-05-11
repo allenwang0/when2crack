@@ -63,12 +63,12 @@ export function HelpFAQ({ isOpen, onClose }: HelpFAQProps) {
         >
           {/* Header */}
           <div
-            className="px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between flex-shrink-0"
+            className="px-6 py-4 flex items-center justify-between flex-shrink-0"
             style={{ background: '#1A1A1A' }}
           >
-            <div className="flex items-center gap-2">
-              <span className="text-xl sm:text-2xl">💡</span>
-              <h3 className="font-bold text-base sm:text-lg" style={{ color: '#FFD93D' }}>
+            <div className="flex items-center gap-3">
+              <span className="text-2xl">💡</span>
+              <h3 className="font-bold text-lg text-yellow-bright">
                 Help & FAQ
               </h3>
             </div>
@@ -83,7 +83,7 @@ export function HelpFAQ({ isOpen, onClose }: HelpFAQProps) {
           </div>
 
           {/* FAQ Items */}
-          <div className="overflow-y-auto p-3 sm:p-4 space-y-2 flex-1">
+          <div className="overflow-y-auto p-4 space-y-3 flex-1">
             {FAQ_ITEMS.map((item, index) => (
               <div
                 key={index}
@@ -130,8 +130,8 @@ export function HelpFAQ({ isOpen, onClose }: HelpFAQProps) {
           </div>
 
           {/* Footer */}
-          <div className="px-4 sm:px-6 py-3 border-t border-gray-200 text-center flex-shrink-0">
-            <p className="text-xs text-gray-500">
+          <div className="px-6 py-3 border-t border-gray-200 text-center flex-shrink-0">
+            <p className="text-xs text-gray-600">
               Close this and reopen anytime with the info button
             </p>
           </div>
