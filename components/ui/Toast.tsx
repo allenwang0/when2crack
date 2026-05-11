@@ -22,9 +22,9 @@ export function Toast({ message, type = 'info', duration = 3000, onClose }: Toas
   }, [duration, onClose])
 
   const bgColors = {
-    success: 'bg-teal',
-    error: 'bg-red-500',
-    info: 'bg-gray-800'
+    success: 'bg-teal dark:bg-teal',
+    error: 'bg-red-500 dark:bg-red-600',
+    info: 'bg-gray-800 dark:bg-gray-700'
   }
 
   const icons = {

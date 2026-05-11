@@ -271,10 +271,10 @@ export function WeekSchedule({ comparisonMode = false, comparisonName }: WeekSch
   }
 
   return (
-    <div className="bg-white rounded-3xl p-3 sm:p-6 shadow-lg border-[3px] border-yellow-bright schedule-grid">
+    <div className="bg-white dark:bg-gray-800 rounded-3xl p-3 sm:p-6 shadow-lg border-[3px] border-yellow-bright schedule-grid">
       {/* Header */}
       <div className="mb-4 sm:mb-6 text-center">
-        <div className="inline-block bg-black text-yellow-bright px-4 sm:px-6 py-2 rounded-full mb-4">
+        <div className="inline-block bg-black dark:bg-yellow-bright text-yellow-bright dark:text-black px-4 sm:px-6 py-2 rounded-full mb-4">
           <span className="font-bold text-base sm:text-lg">📅 This Week's Availability</span>
         </div>
 
@@ -283,7 +283,7 @@ export function WeekSchedule({ comparisonMode = false, comparisonName }: WeekSch
           <div className="flex items-center justify-center gap-2 mb-4">
             <button
               onClick={goToPreviousWeek}
-              className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+              className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-colors"
               aria-label="Previous week"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -353,7 +353,7 @@ export function WeekSchedule({ comparisonMode = false, comparisonName }: WeekSch
           {/* Time labels - 8pm through 4am */}
           <div className="space-y-1">
             {[20, 21, 22, 23, 0, 1, 2, 3, 4].map(hour => (
-              <div key={hour} className="w-16 text-xs text-gray-600 text-right pr-2 h-11 flex items-center justify-end">
+              <div key={hour} className="w-16 text-xs text-gray-600 dark:text-gray-400 text-right pr-2 h-11 flex items-center justify-end">
                 {formatHour(hour)}
               </div>
             ))}
@@ -421,7 +421,7 @@ export function WeekSchedule({ comparisonMode = false, comparisonName }: WeekSch
                             ? 'bg-yellow-bright border-2 border-foreground'
                             : isComparison
                             ? 'bg-pink border-2 border-foreground'
-                            : 'bg-background border border-gray-200'
+                            : 'bg-background dark:bg-gray-900 border border-gray-200 dark:border-gray-700'
                         } cursor-pointer active:scale-95`}
                       />
                     )
@@ -457,7 +457,7 @@ export function WeekSchedule({ comparisonMode = false, comparisonName }: WeekSch
               <span>Available</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-6 h-6 rounded bg-background border border-gray-200" />
+              <div className="w-6 h-6 rounded bg-background dark:bg-gray-900 border border-gray-200 dark:border-gray-700" />
               <span>Unavailable</span>
             </div>
           </>
@@ -476,10 +476,10 @@ export function WeekSchedule({ comparisonMode = false, comparisonName }: WeekSch
             {/* Best time suggestions */}
             {bestBlocks.length > 0 && (
               <div className="mt-3 space-y-2">
-                <p className="text-xs font-semibold text-gray-700">✨ Best times to meet:</p>
+                <p className="text-xs font-semibold text-gray-700 dark:text-gray-300">✨ Best times to meet:</p>
                 {bestBlocks.slice(0, 3).map((block, idx) => (
-                  <div key={idx} className="inline-block bg-white border-2 border-teal rounded-xl px-4 py-2 mx-1">
-                    <span className="font-semibold text-foreground">
+                  <div key={idx} className="inline-block bg-white dark:bg-gray-800 border-2 border-teal rounded-xl px-4 py-2 mx-1">
+                    <span className="font-semibold text-foreground dark:text-gray-100">
                       {block.day} {formatHour(block.startHour)}-{formatHour(block.endHour)}
                     </span>
                     <span className="text-xs text-gray-600 ml-2">

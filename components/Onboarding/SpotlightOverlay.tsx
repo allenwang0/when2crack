@@ -71,7 +71,28 @@ export function SpotlightOverlay({
           retryTimeoutRef.current = setTimeout(calculatePosition, RETRY_DELAY)
           return
         }
+
+        // MAX RETRIES REACHED - AUTO-SKIP
         console.warn(`Spotlight target not found after ${MAX_RETRIES} attempts: ${targetSelector}`)
+
+        // Track analytics
+        trackOnboardingEvent(ONBOARDING_ANALYTICS_EVENTS.TARGET_NOT_FOUND, {
+          selector: targetSelector,
+          retries: MAX_RETRIES,
+        })
+
+        // Auto-skip to next step if enabled
+        if (ONBOARDING.AUTO_SKIP_AFTER_RETRIES && onAutoSkip) {
+          console.info('Auto-skipping to next step due to missing target')
+
+          trackOnboardingEvent(ONBOARDING_ANALYTICS_EVENTS.STEP_SKIP_AUTO, {
+            reason: 'target_not_found',
+            selector: targetSelector,
+          })
+
+          setTimeout(() => onAutoSkip(), 1000) // Delay for user to see message
+        }
+
         setTargetFound(false)
         setPosition(null)
         return
@@ -94,14 +115,14 @@ export function SpotlightOverlay({
     }
 
     // Initial calculation with small delay to let DOM settle
-    const initialTimeout = setTimeout(calculatePosition, 100)
+    const initialTimeout = setTimeout(calculatePosition, ONBOARDING.INITIAL_CALCULATION_DELAY)
 
     // Recalculate on resize (debounced)
     const handleResize = () => {
       if (resizeTimeoutRef.current) {
         clearTimeout(resizeTimeoutRef.current)
       }
-      resizeTimeoutRef.current = setTimeout(calculatePosition, 200)
+      resizeTimeoutRef.current = setTimeout(calculatePosition, RETRY_DELAY)
     }
 
     window.addEventListener('resize', handleResize)
@@ -111,7 +132,7 @@ export function SpotlightOverlay({
       if (resizeTimeoutRef.current) {
         clearTimeout(resizeTimeoutRef.current)
       }
-      resizeTimeoutRef.current = setTimeout(calculatePosition, 500) // Increased from 300ms to 500ms
+      resizeTimeoutRef.current = setTimeout(calculatePosition, ONBOARDING.MUTATION_DEBOUNCE_MS)
     })
 
     // Store observer ref for cleanup on target change
@@ -138,13 +159,14 @@ export function SpotlightOverlay({
         clearTimeout(retryTimeoutRef.current)
       }
       clearTimeout(initialTimeout)
+      console.debug('SpotlightOverlay cleanup complete for target:', targetSelector)
     }
-  }, [targetSelector, padding])
+  }, [targetSelector, padding, onAutoSkip])
 
   if (shape === 'none') {
     return (
       <div
-        className="fixed inset-0 bg-black/75 flex items-center justify-center"
+        className="fixed inset-0 bg-black/75 dark:bg-black/60 flex items-center justify-center"
         style={{ zIndex: 10000 }}
       >
         {children}
@@ -156,13 +178,19 @@ export function SpotlightOverlay({
   if (!position) {
     return (
       <div
-        className="fixed inset-0 bg-black/75 flex items-center justify-center"
+        className="fixed inset-0 bg-black/75 dark:bg-black/60 flex items-center justify-center"
         style={{ zIndex: 10000, pointerEvents: 'none' }}
       >
         {!targetFound && (
-          <div className="bg-white rounded-2xl p-6 max-w-sm mx-4 text-center">
-            <p className="text-gray-600 mb-2">Looking for the next element...</p>
-            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-pink mx-auto"></div>
+          <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 max-w-sm mx-4 text-center">
+            <p className="text-gray-600 dark:text-gray-400 mb-2">
+              {ONBOARDING.AUTO_SKIP_AFTER_RETRIES
+                ? 'Target element not found. Skipping to next step...'
+                : 'Looking for the next element...'}
+            </p>
+            {!ONBOARDING.AUTO_SKIP_AFTER_RETRIES && (
+              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-pink mx-auto"></div>
+            )}
           </div>
         )}
         {children}
@@ -170,13 +198,17 @@ export function SpotlightOverlay({
     )
   }
 
+  const prefersReducedMotion =
+    typeof window !== 'undefined' &&
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
   const borderRadius = shape === 'circle' ? '50%' : '24px'
 
   return (
     <>
       {/* Overlay with spotlight cutout */}
       <div
-        className="fixed inset-0 transition-all duration-400"
+        className={`fixed inset-0 ${prefersReducedMotion ? '' : 'transition-all duration-400'}`}
         style={{
           zIndex: 10000,
           background: 'rgba(0, 0, 0, 0.75)',
@@ -198,7 +230,7 @@ export function SpotlightOverlay({
 
       {/* Spotlight highlight (pulsing border) */}
       <div
-        className="fixed transition-all duration-400 pointer-events-none"
+        className={`fixed ${prefersReducedMotion ? '' : 'transition-all duration-400'} pointer-events-none`}
         style={{
           zIndex: 10001,
           top: position.top,
@@ -207,7 +239,7 @@ export function SpotlightOverlay({
           height: position.height,
           borderRadius,
           boxShadow: '0 0 0 3px rgba(255, 217, 61, 0.5), 0 0 20px rgba(255, 217, 61, 0.3)',
-          animation: 'pulse 2s ease-in-out infinite',
+          animation: prefersReducedMotion ? 'none' : 'pulse 2s ease-in-out infinite',
         }}
       />
 
@@ -246,6 +278,13 @@ export function SpotlightOverlay({
           50% {
             transform: scale(1.02);
             opacity: 0.8;
+          }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          .fixed {
+            transition: none !important;
+            animation: none !important;
           }
         }
       `}</style>

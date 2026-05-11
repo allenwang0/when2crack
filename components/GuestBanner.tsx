@@ -7,7 +7,7 @@ export function GuestBanner() {
   const router = useRouter()
 
   return (
-    <div className="bg-gradient-to-r from-pink/20 to-purple/20 border border-pink/30 rounded-lg p-4 mb-6">
+    <div className="bg-gradient-to-r from-pink/20 to-purple/20 dark:from-pink/10 dark:to-purple/10 border border-pink/30 dark:border-pink/20 rounded-lg p-4 mb-6">
       <div className="flex items-center justify-between gap-4 flex-wrap">
         <div className="flex items-center gap-3">
           <svg
@@ -24,8 +24,8 @@ export function GuestBanner() {
             />
           </svg>
           <div>
-            <p className="text-sm font-medium">You're using Guest Mode</p>
-            <p className="text-xs text-gray-400 mt-2">
+            <p className="text-sm font-medium dark:text-gray-100">You're using Guest Mode</p>
+            <p className="text-xs text-gray-400 dark:text-gray-500 mt-2">
               Your data is saved locally and won't persist across devices. Sign up to save your progress.
             </p>
           </div>

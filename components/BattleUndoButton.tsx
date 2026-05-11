@@ -41,7 +41,7 @@ export function BattleUndoButton({
 
   return (
     <div className="fixed bottom-24 left-1/2 -translate-x-1/2 z-50 animate-slide-up">
-      <div className="bg-white rounded-full shadow-2xl border-2 border-pink p-2 flex items-center gap-3">
+      <div className="bg-white dark:bg-gray-800 rounded-full shadow-2xl border-2 border-pink p-2 flex items-center gap-3">
         <Button
           onClick={onUndo}
           variant="tertiary"
@@ -71,7 +71,7 @@ export function BattleUndoButton({
               cy="20"
               r="18"
               fill="none"
-              stroke="#f1f1f1"
+              className="stroke-gray-200 dark:stroke-gray-700"
               strokeWidth="4"
             />
             <circle
@@ -79,7 +79,7 @@ export function BattleUndoButton({
               cy="20"
               r="18"
               fill="none"
-              stroke="#ec4899"
+              stroke="var(--pink)"
               strokeWidth="4"
               strokeDasharray={`${(remainingSeconds / 5) * 113} 113`}
               className="transition-all duration-100"

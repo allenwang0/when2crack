@@ -1,7 +1,26 @@
 'use client'
 
 export function ConfettiAnimation() {
-  const emojis = ['🎉', '🥚', '⚔️', '📅', '💖', '🎉', '🥚', '⚔️', '📅']
+  const prefersReducedMotion =
+    typeof window !== 'undefined' &&
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
+  // Don't show animation if user prefers reduced motion
+  if (prefersReducedMotion) {
+    return (
+      <div
+        className="fixed inset-0 flex items-center justify-center pointer-events-none"
+        style={{ zIndex: 10001 }}
+      >
+        <div className="text-6xl">🎉</div>
+      </div>
+    )
+  }
+
+  const emojis = [
+    '🎉', '🥚', '⚔️', '📅', '💖', '✨', '🌟', '⭐', '🎊', '🎈',
+    '💫', '🔥', '💯', '👏', '🙌', '🎯', '🏆', '👑', '💪', '🚀'
+  ]
 
   return (
     <div className="confetti-container" style={{ zIndex: 10001 }}>
@@ -10,7 +29,7 @@ export function ConfettiAnimation() {
           key={i}
           className="confetti"
           style={{
-            left: `${(i + 1) * 10}%`,
+            left: `${(i + 1) * 5}%`,
             animationDelay: `${i * 0.1}s`,
           }}
         >
@@ -35,6 +54,12 @@ export function ConfettiAnimation() {
           font-size: 2rem;
           animation: confettiFall 2s ease-in forwards;
           pointer-events: none;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          .confetti {
+            animation: none;
+          }
         }
       `}</style>
     </div>

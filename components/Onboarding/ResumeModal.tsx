@@ -5,24 +5,23 @@ import { Button } from '@/components/ui/Button'
 import { useFocusTrap } from '@/lib/hooks/useFocusTrap'
 import { useKeyboardShortcuts } from '@/lib/hooks/useKeyboardShortcuts'
 
-interface WelcomeModalProps {
-  onStart: () => void
+interface ResumeModalProps {
+  stepNumber: number
+  onResume: () => void
   onSkip: () => void
 }
 
-export function WelcomeModal({ onStart, onSkip }: WelcomeModalProps) {
+export function ResumeModal({ stepNumber, onResume, onSkip }: ResumeModalProps) {
   const modalRef = useRef<HTMLDivElement>(null)
 
-  // Trap focus in modal
   useFocusTrap(modalRef, { active: true, returnFocus: false })
 
-  // Keyboard shortcuts
   useKeyboardShortcuts({
     shortcuts: [
       {
         key: 'Enter',
-        description: 'Start tour',
-        handler: onStart,
+        description: 'Resume tour',
+        handler: onResume,
       },
       {
         key: 'Escape',
@@ -32,6 +31,7 @@ export function WelcomeModal({ onStart, onSkip }: WelcomeModalProps) {
     ],
     enabled: true,
   })
+
   return (
     <div
       className="fixed inset-0 flex items-center justify-center p-4 bg-gradient-to-br from-pink via-purple to-yellow-bright dark:from-pink-900 dark:via-purple-900 dark:to-yellow-900"
@@ -43,37 +43,28 @@ export function WelcomeModal({ onStart, onSkip }: WelcomeModalProps) {
         ref={modalRef}
         className="bg-white dark:bg-gray-900 rounded-3xl p-8 max-w-md w-full shadow-2xl"
         role="dialog"
-        aria-labelledby="welcome-modal-title"
-        aria-describedby="welcome-modal-description"
+        aria-labelledby="resume-modal-title"
+        aria-describedby="resume-modal-description"
       >
         <div className="flex flex-col items-center text-center">
-          {/* App Icon */}
-          <img
-            src="/icon.jpg"
-            alt="When2Crack"
-            className="w-20 h-20 rounded-full mb-6 border-2 border-yellow-bright"
-          />
+          <div className="text-6xl mb-6">👋</div>
 
-          {/* Tagline */}
-          <h1 id="welcome-modal-title" className="font-serif text-2xl font-bold text-gray-800 dark:text-gray-100 mb-3">
-            Your roster, ranked. Your night, decided.
+          <h1 id="resume-modal-title" className="font-serif text-2xl font-bold text-gray-800 dark:text-gray-100 mb-3">
+            Welcome back!
           </h1>
 
-          {/* Description */}
-          <p id="welcome-modal-description" className="text-base text-gray-600 dark:text-gray-400 leading-relaxed mb-8">
-            When2Crack helps you manage your romantic prospects with smart rankings and recommendations. Take a 60-second tour to get started!
+          <p id="resume-modal-description" className="text-base text-gray-600 dark:text-gray-400 leading-relaxed mb-8">
+            You were on step {stepNumber} of the tour. Would you like to continue where you left off?
           </p>
 
-          {/* Start Button */}
           <Button
-            onClick={onStart}
+            onClick={onResume}
             variant="primary"
             className="w-full mb-4"
           >
-            Start Tour
+            Continue Tour
           </Button>
 
-          {/* Skip Link */}
           <button
             onClick={onSkip}
             className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 underline transition-colors"
@@ -81,9 +72,8 @@ export function WelcomeModal({ onStart, onSkip }: WelcomeModalProps) {
             Skip
           </button>
 
-          {/* Keyboard hints */}
           <p className="text-xs text-gray-500 dark:text-gray-400 text-center mt-4">
-            Press <kbd className="px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded">Enter</kbd> to start or <kbd className="px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded">Esc</kbd> to skip
+            Press <kbd className="px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded">Enter</kbd> to continue or <kbd className="px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded">Esc</kbd> to skip
           </p>
         </div>
       </div>

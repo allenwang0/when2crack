@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Avatar Test</title>
+    <style>
+        body { font-family: sans-serif; padding: 40px; }
+        .test { margin: 20px 0; }
+        .avatar-container {
+            width: 96px;
+            height: 96px;
+            background: linear-gradient(135deg, #ffc0cb 0%, #dda0dd 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 4px solid #ff1493;
+            overflow: hidden;
+        }
+        img { object-fit: contain; }
+    </style>
+</head>
+<body>
+    <h1>Profile Picture Test</h1>
+
+    <div class="test">
+        <h2>Test 1: Direct egg.png (relative path)</h2>
+        <div class="avatar-container">
+            <img src="/egg.png" width="80" height="80" alt="Egg" id="test1">
+        </div>
+        <p id="result1">Testing...</p>
+    </div>
+
+    <div class="test">
+        <h2>Test 2: Absolute path</h2>
+        <div class="avatar-container">
+            <img src="http://localhost:3000/egg.png" width="80" height="80" alt="Egg" id="test2">
+        </div>
+        <p id="result2">Testing...</p>
+    </div>
+
+    <div class="test">
+        <h2>Test 3: Fallback simulation</h2>
+        <div class="avatar-container">
+            <img src="/nonexistent.png" width="80" height="80" alt="Fallback" id="test3">
+        </div>
+        <p id="result3">Testing...</p>
+    </div>
+
+    <script>
+        document.getElementById('test1').onload = () => {
+            document.getElementById('result1').innerHTML = '✅ SUCCESS: /egg.png loaded!';
+            document.getElementById('result1').style.color = 'green';
+        };
+        document.getElementById('test1').onerror = () => {
+            document.getElementById('result1').innerHTML = '❌ FAILED: /egg.png not found!';
+            document.getElementById('result1').style.color = 'red';
+        };
+
+        document.getElementById('test2').onload = () => {
+            document.getElementById('result2').innerHTML = '✅ SUCCESS: Absolute path loaded!';
+            document.getElementById('result2').style.color = 'green';
+        };
+        document.getElementById('test2').onerror = () => {
+            document.getElementById('result2').innerHTML = '❌ FAILED: Absolute path not found!';
+            document.getElementById('result2').style.color = 'red';
+        };
+
+        document.getElementById('test3').onerror = (e) => {
+            document.getElementById('result3').innerHTML = '✅ FALLBACK WORKING: Error caught, switching to egg.png';
+            document.getElementById('result3').style.color = 'blue';
+            e.target.src = '/egg.png';
+        };
+        document.getElementById('test3').onload = () => {
+            document.getElementById('result3').innerHTML = '✅ Fallback image loaded!';
+            document.getElementById('result3').style.color = 'green';
+        };
+    </script>
+</body>
+</html>

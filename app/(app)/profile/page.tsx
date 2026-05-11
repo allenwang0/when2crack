@@ -207,21 +207,19 @@ export default function ProfilePage() {
       {/* Header */}
       <div className="text-center mb-8">
         <div className="relative inline-block group">
-          <div className="w-24 h-24 bg-white rounded-full flex items-center justify-center shadow-lg border-4 border-pink/20 overflow-hidden">
-            {isValidAvatarUrl(avatarUrl) ? (
-              <img
-                src={avatarUrl!}
-                alt="Profile"
-                className="w-full h-full object-cover"
-                onError={(e) => {
-                  // Fallback to default if image fails to load
-                  e.currentTarget.src = DEFAULT_PROFILE_PIC
-                  e.currentTarget.className = 'w-20 h-20 object-contain'
-                }}
-              />
-            ) : (
-              <img src={DEFAULT_PROFILE_PIC} alt="Default Profile" className="w-20 h-20 object-contain" />
-            )}
+          {/* ULTRA SIMPLE VERSION - ALWAYS SHOWS EGG IF NO VALID AVATAR */}
+          <div className="w-24 h-24 bg-gradient-to-br from-pink-100 to-purple-100 rounded-full flex items-center justify-center shadow-lg border-4 border-pink overflow-hidden">
+            <img
+              src={isValidAvatarUrl(avatarUrl) ? avatarUrl! : '/egg.png'}
+              alt="Profile"
+              className={isValidAvatarUrl(avatarUrl) ? 'w-full h-full object-cover' : 'w-20 h-20 object-contain'}
+              onError={(e) => {
+                console.error('Image failed to load:', e.currentTarget.src)
+                e.currentTarget.src = '/egg.png'
+                e.currentTarget.className = 'w-20 h-20 object-contain'
+              }}
+              onLoad={() => console.log('Image loaded successfully:', isValidAvatarUrl(avatarUrl) ? 'user avatar' : 'default egg')}
+            />
           </div>
 
           {/* Photo upload overlay */}
