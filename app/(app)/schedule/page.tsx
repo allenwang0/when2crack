@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { useSearchParams } from 'next/navigation'
+import { useSearchParams, useRouter } from 'next/navigation'
 import { WeekSchedule } from '@/components/WeekSchedule'
 import { GuestBanner } from '@/components/GuestBanner'
 import { Button } from '@/components/ui/Button'
@@ -11,6 +11,7 @@ import { ToastContainer } from '@/components/ui/Toast'
 
 export default function SchedulePage() {
   const { user } = useAuth()
+  const router = useRouter()
   const searchParams = useSearchParams()
   const sharedFor = searchParams.get('for')
   const { toasts, showToast, removeToast } = useToast()
@@ -60,6 +61,14 @@ export default function SchedulePage() {
   return (
     <div className="max-w-2xl mx-auto px-4 py-6 pb-28">
       {!user && <GuestBanner />}
+
+      <Button
+        variant="ghost"
+        onClick={() => router.back()}
+        className="mb-4"
+      >
+        ← Back
+      </Button>
 
       {sharedFor && (
         <div className="bg-gradient-to-r from-pink-50 to-purple-50 border-2 border-pink rounded-2xl p-4 mb-6 text-center">

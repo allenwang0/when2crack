@@ -82,7 +82,7 @@ export default function RosterPage() {
         // @ts-ignore
         const { data, error } = await supabase
           .from('roster')
-          .select('*')
+          .select('id, user_id, name, tier, status, attraction_score, personality_score, reliability_score, elo_rating, notes, avatar_color, last_contact_date, created_at, updated_at')
           .eq('user_id', user.id)
           .neq('status', 'Archived')
           .order('elo_rating', { ascending: false })

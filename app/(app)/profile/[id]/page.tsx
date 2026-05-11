@@ -251,13 +251,14 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
 
     setSaving(true)
 
+    // Ensure scores are at least 1 (DB constraint requires >= 1)
     const updatedPerson = {
       ...person,
       name: editedName,
       status: editedStatus,
-      attraction_score: editedAttractionScore,
-      personality_score: editedPersonalityScore,
-      reliability_score: editedReliabilityScore,
+      attraction_score: Math.max(1, editedAttractionScore),
+      personality_score: Math.max(1, editedPersonalityScore),
+      reliability_score: Math.max(1, editedReliabilityScore),
     }
 
     if (!user) {

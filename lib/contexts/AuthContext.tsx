@@ -56,18 +56,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (event === 'SIGNED_IN' && session?.user) {
         try {
           // @ts-ignore
-          const { data: existingUser } = await supabase
+          const { data: existingUser, error: fetchError } = await supabase
             .from('users')
             .select('id')
             .eq('id', session.user.id)
             .single()
 
-          if (!existingUser) {
+          // If user doesn't exist (PGRST116 is "not found" error), create them
+          if (fetchError && fetchError.code === 'PGRST116') {
             // @ts-ignore
-            await supabase.from('users').insert({
+            const { error: insertError } = await supabase.from('users').insert({
               id: session.user.id,
               email: session.user.email!,
             })
+
+            if (insertError) {
+              console.error('Error inserting user profile:', insertError)
+            } else {
+              console.log('User profile created successfully')
+            }
           }
         } catch (err) {
           console.error('Error creating user profile:', err)

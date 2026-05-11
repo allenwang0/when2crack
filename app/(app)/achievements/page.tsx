@@ -1,8 +1,10 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { Achievements } from '@/components/Achievements'
 import { GuestBanner } from '@/components/GuestBanner'
+import { Button } from '@/components/ui/Button'
 import { useAuth } from '@/lib/contexts/AuthContext'
 import { useLocalStorage } from '@/lib/hooks/useLocalStorage'
 import { getLoginStreak } from '@/lib/utils/loginStreak'
@@ -11,6 +13,7 @@ import type { Achievement } from '@/lib/utils/achievements'
 import { calculateAchievements } from '@/lib/utils/achievements'
 
 export default function AchievementsPage() {
+  const router = useRouter()
   const { user } = useAuth()
   const [localRoster] = useLocalStorage<RosterPerson[]>('guest_roster', [])
   const [completedBattles] = useLocalStorage<string[]>('completed_battles', [])
@@ -32,8 +35,17 @@ export default function AchievementsPage() {
   }, [user, localRoster, completedBattles, weekSchedule])
 
   return (
-    <div className="py-6">
+    <div className="max-w-2xl mx-auto px-4 py-6 pb-28">
       {!user && <GuestBanner />}
+
+      <Button
+        variant="ghost"
+        onClick={() => router.back()}
+        className="mb-4"
+      >
+        ← Back
+      </Button>
+
       <Achievements achievements={achievements} />
     </div>
   )

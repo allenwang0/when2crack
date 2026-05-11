@@ -57,6 +57,9 @@ export default function AddPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
+    console.log('=== SUBMIT STARTED ===')
+    console.log('User:', user ? user.id : 'Guest')
+
     setLoading(true)
     setError('')
 
@@ -64,9 +67,16 @@ export default function AddPage() {
       // Sanitize inputs
       const { sanitizeName, sanitizeScore } = await import('@/lib/utils/sanitize')
       const sanitizedName = sanitizeName(name)
-      const sanitizedAttractionScore = sanitizeScore(attractionScore)
-      const sanitizedPersonalityScore = sanitizeScore(personalityScore)
-      const sanitizedReliabilityScore = sanitizeScore(reliabilityScore)
+      // Ensure scores are at least 1 (DB constraint requires >= 1)
+      const sanitizedAttractionScore = Math.max(1, sanitizeScore(attractionScore))
+      const sanitizedPersonalityScore = Math.max(1, sanitizeScore(personalityScore))
+      const sanitizedReliabilityScore = Math.max(1, sanitizeScore(reliabilityScore))
+
+      console.log('Sanitized scores:', {
+        attraction: sanitizedAttractionScore,
+        personality: sanitizedPersonalityScore,
+        reliability: sanitizedReliabilityScore
+      })
 
       if (!sanitizedName) {
         setError('Please enter a valid name')
@@ -78,6 +88,7 @@ export default function AddPage() {
 
       // Guest mode: Use localStorage
       if (!user) {
+        console.log('Guest mode - saving to localStorage')
         const newPerson: RosterPerson = {
           id: `guest-${Date.now()}-${Math.random().toString(36).substring(7)}`,
           user_id: 'guest',
@@ -102,8 +113,39 @@ export default function AddPage() {
       }
 
       // Authenticated mode: Use Supabase
-      // @ts-ignore - Supabase types not fully configured
-      const { error: insertError } = await supabase.from('roster').insert({
+
+      // First, ensure user profile exists in public.users
+      // @ts-ignore
+      const { data: userProfile, error: userCheckError } = await supabase
+        .from('users')
+        .select('id')
+        .eq('id', user.id)
+        .single()
+
+      // If user profile doesn't exist, create it
+      if (userCheckError && userCheckError.code === 'PGRST116') {
+        console.log('User profile not found, creating...')
+        // @ts-ignore
+        const { error: createUserError } = await supabase.from('users').insert({
+          id: user.id,
+          email: user.email!,
+        })
+
+        if (createUserError) {
+          console.error('Failed to create user profile:', createUserError)
+          throw new Error(`Failed to create user profile: ${createUserError.message}`)
+        }
+        console.log('User profile created successfully')
+      } else if (userCheckError) {
+        console.error('Error checking user profile:', userCheckError)
+        throw new Error(`Error checking user profile: ${userCheckError.message}`)
+      }
+
+      // Now insert into roster
+      console.log('Inserting into roster...')
+
+      // Prepare insert data (excluding avatar_url if it's null to avoid schema issues)
+      const insertData: any = {
         user_id: user.id,
         name: sanitizedName,
         tier: 'A', // Default tier, not shown in UI
@@ -112,16 +154,30 @@ export default function AddPage() {
         personality_score: sanitizedPersonalityScore,
         reliability_score: sanitizedReliabilityScore,
         avatar_color: avatarColor,
-        avatar_url: avatarUrl,
         last_contact_date: new Date().toISOString(),
-      })
+      }
 
-      if (insertError) throw insertError
+      // Only include avatar_url if it exists (column might not exist in DB yet)
+      if (avatarUrl) {
+        insertData.avatar_url = avatarUrl
+      }
 
+      // @ts-ignore - Supabase types not fully configured
+      const { error: insertError } = await supabase.from('roster').insert(insertData)
+
+      if (insertError) {
+        console.error('Insert error:', insertError)
+        throw new Error(`Failed to add to roster: ${insertError.message}`)
+      }
+
+      console.log('Successfully added to roster')
       router.push('/roster')
     } catch (err: unknown) {
+      console.error('Add person error:', err)
       if (err instanceof Error) {
         setError(err.message)
+      } else {
+        setError('An unexpected error occurred. Please try again.')
       }
     } finally {
       setLoading(false)
