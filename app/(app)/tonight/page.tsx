@@ -28,6 +28,15 @@ export default function TonightPage() {
   const [loadingMessage, setLoadingMessage] = useState('Loading...')
   const [error, setError] = useState('')
 
+  // Listen for onboarding tab change events
+  useEffect(() => {
+    const handleTabChange = (event: CustomEvent<{ tab: 'tonight' | 'battle' }>) => {
+      setActiveTab(event.detail.tab)
+    }
+    window.addEventListener('onboarding:forceTab' as any, handleTabChange)
+    return () => window.removeEventListener('onboarding:forceTab' as any, handleTabChange)
+  }, [])
+
   // Battle state
   const [person1, setPerson1] = useState<RosterPerson | null>(null)
   const [person2, setPerson2] = useState<RosterPerson | null>(null)
@@ -343,7 +352,7 @@ export default function TonightPage() {
     return (
       <div className="py-6 flex flex-col items-center justify-center min-h-[60vh] gap-3">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-pink"></div>
-        <p className="text-gray-400">{loadingMessage}</p>
+        <p className="text-gray-600">{loadingMessage}</p>
       </div>
     )
   }
@@ -492,7 +501,7 @@ export default function TonightPage() {
               {battleResult && (
                 <div className="bg-pink/10 border border-pink rounded-lg p-4 mb-6 text-center animate-fade-in">
                   <p className="text-pink font-semibold mb-1">Battle Complete!</p>
-                  <p className="text-sm text-gray-400">
+                  <p className="text-sm text-gray-600">
                     Winner: {battleResult.winnerChange > 0 ? '+' : ''}
                     {battleResult.winnerChange} Elo
                     {' • '}
@@ -516,7 +525,7 @@ export default function TonightPage() {
               </div>
 
               <div className="text-center mb-6">
-                <span className="inline-block px-4 py-2 bg-card border border-border rounded-full text-sm font-semibold text-gray-400">
+                <span className="inline-block px-4 py-2 bg-card border border-border rounded-full text-sm font-semibold text-gray-600">
                   VS
                 </span>
               </div>
@@ -526,7 +535,7 @@ export default function TonightPage() {
                   variant="ghost"
                   onClick={user ? fetchBattlePair : fetchBattlePairGuest}
                   disabled={processing}
-                  className="text-gray-400"
+                  className="text-gray-600"
                 >
                   Skip this battle
                 </Button>

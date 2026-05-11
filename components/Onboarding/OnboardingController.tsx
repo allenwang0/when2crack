@@ -12,10 +12,9 @@ import { ConfettiAnimation } from './ConfettiAnimation'
 
 interface OnboardingControllerProps {
   children: React.ReactNode
-  onForceTab?: (tab: 'tonight' | 'battle') => void
 }
 
-export function OnboardingController({ children, onForceTab }: OnboardingControllerProps) {
+export function OnboardingController({ children }: OnboardingControllerProps) {
   const router = useRouter()
   const pathname = usePathname()
   const { loading: authLoading } = useAuth()
@@ -28,7 +27,7 @@ export function OnboardingController({ children, onForceTab }: OnboardingControl
   useEffect(() => {
     if (authLoading) return
 
-    // Wait for auth to resolve (max 3s)
+    // Small delay to ensure auth state is settled
     const timeout = setTimeout(() => {
       const onboardingSeen = localStorage.getItem('onboarding_seen')
       const onboardingCompleted = localStorage.getItem('onboarding_completed')
@@ -55,11 +54,17 @@ export function OnboardingController({ children, onForceTab }: OnboardingControl
       router.push(step.route)
     }
 
-    // Handle tab state for Tonight page
-    if (step.tabState && onForceTab) {
-      onForceTab(step.tabState.activeTab)
+    // Handle tab state for Tonight page via custom event
+    if (step.tabState) {
+      // Small delay to ensure route has loaded before forcing tab
+      setTimeout(() => {
+        const event = new CustomEvent('onboarding:forceTab', {
+          detail: { tab: step.tabState!.activeTab }
+        })
+        window.dispatchEvent(event)
+      }, 300)
     }
-  }, [state.currentStep, state.isActive, pathname, router, onForceTab])
+  }, [state.currentStep, state.isActive, pathname, router])
 
   const handleStart = () => {
     setShowWelcome(false)
@@ -73,7 +78,7 @@ export function OnboardingController({ children, onForceTab }: OnboardingControl
   }
 
   const handleNext = () => {
-    if (state.currentStep === 7) {
+    if (state.currentStep === ONBOARDING_STEPS.length) {
       handleComplete()
     } else {
       nextStep()
@@ -106,11 +111,11 @@ export function OnboardingController({ children, onForceTab }: OnboardingControl
   }
 
   // Show tour steps
-  if (state.isActive && state.currentStep > 0 && state.currentStep <= 7) {
+  if (state.isActive && state.currentStep > 0 && state.currentStep <= ONBOARDING_STEPS.length) {
     const step = ONBOARDING_STEPS[state.currentStep - 1]
 
-    // Special handling for step 7 (FAQ)
-    if (state.currentStep === 7) {
+    // Special handling for last step (FAQ)
+    if (state.currentStep === ONBOARDING_STEPS.length) {
       return (
         <>
           {children}
@@ -122,7 +127,7 @@ export function OnboardingController({ children, onForceTab }: OnboardingControl
           >
             <OnboardingTooltip
               step={state.currentStep}
-              totalSteps={7}
+              totalSteps={ONBOARDING_STEPS.length}
               title={step.title}
               description={step.description}
               onNext={handleNext}
@@ -146,7 +151,7 @@ export function OnboardingController({ children, onForceTab }: OnboardingControl
         >
           <OnboardingTooltip
             step={state.currentStep}
-            totalSteps={7}
+            totalSteps={ONBOARDING_STEPS.length}
             title={step.title}
             description={step.description}
             onNext={handleNext}

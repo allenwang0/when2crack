@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 
 interface SpotlightOverlayProps {
   targetSelector: string | null
@@ -17,6 +17,9 @@ interface SpotlightPosition {
   height: number
 }
 
+const MAX_RETRIES = 10
+const RETRY_DELAY = 200
+
 export function SpotlightOverlay({
   targetSelector,
   shape,
@@ -25,17 +28,38 @@ export function SpotlightOverlay({
   children,
 }: SpotlightOverlayProps) {
   const [position, setPosition] = useState<SpotlightPosition | null>(null)
+  const [targetFound, setTargetFound] = useState(true)
+  const hasScrolledRef = useRef(false)
+  const retryCountRef = useRef(0)
+  const previousTargetRef = useRef<string | null>(null)
 
   useEffect(() => {
     if (!targetSelector) return
 
+    // Reset when target changes
+    if (previousTargetRef.current !== targetSelector) {
+      hasScrolledRef.current = false
+      retryCountRef.current = 0
+      setTargetFound(true)
+      previousTargetRef.current = targetSelector
+    }
+
     const calculatePosition = () => {
       const element = document.querySelector(targetSelector)
       if (!element) {
-        console.warn(`Spotlight target not found: ${targetSelector}`)
+        // Retry logic for missing elements
+        if (retryCountRef.current < MAX_RETRIES) {
+          retryCountRef.current++
+          setTimeout(calculatePosition, RETRY_DELAY)
+          return
+        }
+        console.warn(`Spotlight target not found after ${MAX_RETRIES} attempts: ${targetSelector}`)
+        setTargetFound(false)
+        setPosition(null)
         return
       }
 
+      setTargetFound(true)
       const rect = element.getBoundingClientRect()
       setPosition({
         top: rect.top - padding,
@@ -44,12 +68,15 @@ export function SpotlightOverlay({
         height: rect.height + padding * 2,
       })
 
-      // Auto-scroll into view
-      element.scrollIntoView({ behavior: 'smooth', block: 'center' })
+      // Only scroll once when target first appears
+      if (!hasScrolledRef.current) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'center' })
+        hasScrolledRef.current = true
+      }
     }
 
-    // Initial calculation
-    calculatePosition()
+    // Initial calculation with small delay to let DOM settle
+    const initialTimeout = setTimeout(calculatePosition, 100)
 
     // Recalculate on resize (debounced)
     let resizeTimeout: NodeJS.Timeout
@@ -60,22 +87,25 @@ export function SpotlightOverlay({
 
     window.addEventListener('resize', handleResize)
 
-    // Recalculate on any DOM mutations (for dynamic content)
+    // Optimized MutationObserver - only watch the likely container
     const observer = new MutationObserver(() => {
       clearTimeout(resizeTimeout)
       resizeTimeout = setTimeout(calculatePosition, 300)
     })
 
-    observer.observe(document.body, {
+    // Watch only the main content area, not entire body
+    const mainContent = document.querySelector('main') || document.body
+    observer.observe(mainContent, {
       childList: true,
       subtree: true,
-      attributes: true,
+      attributes: false, // Don't watch attribute changes for performance
     })
 
     return () => {
       window.removeEventListener('resize', handleResize)
       observer.disconnect()
       clearTimeout(resizeTimeout)
+      clearTimeout(initialTimeout)
     }
   }, [targetSelector, padding])
 
@@ -90,12 +120,19 @@ export function SpotlightOverlay({
     )
   }
 
+  // Show loading/error state when target not found
   if (!position) {
     return (
       <div
-        className="fixed inset-0 bg-black/75"
-        style={{ zIndex: 10000, pointerEvents: 'auto' }}
+        className="fixed inset-0 bg-black/75 flex items-center justify-center"
+        style={{ zIndex: 10000, pointerEvents: targetFound ? 'auto' : 'none' }}
       >
+        {!targetFound && (
+          <div className="bg-white rounded-2xl p-6 max-w-sm mx-4 text-center">
+            <p className="text-gray-600 mb-2">Looking for the next element...</p>
+            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-pink mx-auto"></div>
+          </div>
+        )}
         {children}
       </div>
     )

@@ -116,7 +116,7 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
     }
   }, [setOnboardingCompleted, setOnboardingVersion, state.startedAt])
 
-  const pauseForAction = useCallback((actionType: string) => {
+  const pauseForAction = useCallback(() => {
     setState(prev => ({
       ...prev,
       pausedForAction: true,

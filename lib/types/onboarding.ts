@@ -38,6 +38,6 @@ export interface OnboardingContextValue {
   previousStep: () => void
   goToStep: (step: number) => void
   completeTour: () => void
-  pauseForAction: (actionType: string) => void
+  pauseForAction: () => void
   resumeFromAction: () => void
 }

@@ -28,6 +28,7 @@ export function OnboardingTooltip({
   customContent,
 }: OnboardingTooltipProps) {
   const [position, setPosition] = useState<'bottom' | 'top' | 'left' | 'right'>('bottom')
+  const [tooltipStyle, setTooltipStyle] = useState<React.CSSProperties>({})
   const [isMobile, setIsMobile] = useState(false)
 
   useEffect(() => {
@@ -40,7 +41,10 @@ export function OnboardingTooltip({
   }, [])
 
   useEffect(() => {
-    if (!targetSelector || isMobile) return
+    if (!targetSelector || isMobile) {
+      setTooltipStyle({})
+      return
+    }
 
     const calculatePosition = () => {
       const element = document.querySelector(targetSelector)
@@ -49,35 +53,76 @@ export function OnboardingTooltip({
       const rect = element.getBoundingClientRect()
       const viewportWidth = window.innerWidth
       const viewportHeight = window.innerHeight
+      const tooltipWidth = 400
+      const tooltipHeight = 300
+      const gap = 16
+
+      let newPosition: 'bottom' | 'top' | 'left' | 'right' = 'bottom'
+      let style: React.CSSProperties = {}
 
       // Try right first
-      if (rect.right + 420 < viewportWidth) {
-        setPosition('right')
+      if (rect.right + tooltipWidth + gap < viewportWidth) {
+        newPosition = 'right'
+        style = {
+          top: rect.top + rect.height / 2,
+          left: rect.right + gap,
+          transform: 'translateY(-50%)',
+        }
       }
       // Try left
-      else if (rect.left - 420 > 0) {
-        setPosition('left')
+      else if (rect.left - tooltipWidth - gap > 0) {
+        newPosition = 'left'
+        style = {
+          top: rect.top + rect.height / 2,
+          right: viewportWidth - rect.left + gap,
+          transform: 'translateY(-50%)',
+        }
       }
       // Try bottom
-      else if (rect.bottom + 300 < viewportHeight) {
-        setPosition('bottom')
+      else if (rect.bottom + tooltipHeight + gap < viewportHeight) {
+        newPosition = 'bottom'
+        style = {
+          top: rect.bottom + gap,
+          left: rect.left + rect.width / 2,
+          transform: 'translateX(-50%)',
+        }
       }
       // Default to top
       else {
-        setPosition('top')
+        newPosition = 'top'
+        style = {
+          bottom: viewportHeight - rect.top + gap,
+          left: rect.left + rect.width / 2,
+          transform: 'translateX(-50%)',
+        }
       }
+
+      setPosition(newPosition)
+      setTooltipStyle(style)
     }
 
     calculatePosition()
+    window.addEventListener('resize', calculatePosition)
+    return () => window.removeEventListener('resize', calculatePosition)
   }, [targetSelector, isMobile])
 
   const getPositionClasses = () => {
     if (isMobile) {
-      return 'fixed left-4 right-4 bottom-24' // 96px from bottom
+      // Position above navigation bar (80px height)
+      return 'fixed left-4 right-4'
     }
 
-    // Desktop positioning relative to spotlight
+    // Desktop positioning - will be controlled by inline styles
     return 'fixed'
+  }
+
+  const getMobileStyle = (): React.CSSProperties => {
+    if (!isMobile) return tooltipStyle
+
+    // Fixed position above nav bar on mobile
+    return {
+      bottom: 'calc(80px + 1rem)', // nav height + gap
+    }
   }
 
   return (
@@ -88,6 +133,7 @@ export function OnboardingTooltip({
         zIndex: 10003,
         maxWidth: isMobile ? 'calc(100vw - 32px)' : '400px',
         animation: 'slideUp 300ms ease-out',
+        ...getMobileStyle(),
       }}
       role="dialog"
       aria-label={`Onboarding tour, Step ${step} of ${totalSteps}`}
