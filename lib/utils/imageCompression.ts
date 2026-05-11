@@ -86,6 +86,10 @@ export async function compressImage(file: File): Promise<string> {
             return
           }
 
+          // Fill with white background first (prevents black images)
+          ctx.fillStyle = '#FFFFFF'
+          ctx.fillRect(0, 0, Math.round(width), Math.round(height))
+
           // Use better image smoothing
           ctx.imageSmoothingEnabled = true
           ctx.imageSmoothingQuality = 'high'
@@ -95,6 +99,10 @@ export async function compressImage(file: File): Promise<string> {
           // Convert to JPEG at configured quality
           try {
             const compressedBase64 = canvas.toDataURL('image/jpeg', IMAGE_COMPRESSION_QUALITY)
+
+            // DEBUG: Check if image is actually black
+            console.log('🖼️ Compressed image size:', compressedBase64.length)
+            console.log('🖼️ First 100 chars:', compressedBase64.substring(0, 100))
 
             // Validate output size (should be under limit for localStorage)
             if (compressedBase64.length > MAX_COMPRESSED_IMAGE_SIZE_BYTES) {

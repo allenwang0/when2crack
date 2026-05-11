@@ -55,6 +55,10 @@ export default function ProfilePage() {
       // Compress and resize image
       const { compressImage } = await import('@/lib/utils/imageCompression')
       const compressedBase64 = await compressImage(file)
+
+      console.log('📸 Upload completed, base64 length:', compressedBase64.length)
+      console.log('📸 Setting avatar URL...')
+
       setAvatarUrl(compressedBase64)
 
       // Save immediately
@@ -206,30 +210,11 @@ export default function ProfilePage() {
 
       {/* Header */}
       <div className="text-center mb-8">
-        {/* DEBUG INFO */}
-        <div className="mb-4 p-4 bg-yellow-100 border-2 border-yellow-500 rounded text-xs text-left max-w-md mx-auto">
-          <div className="font-bold mb-2">🔍 Avatar Debug Info:</div>
-          <div>avatarUrl: {avatarUrl || 'null'}</div>
-          <div>isValid: {isValidAvatarUrl(avatarUrl) ? '✅ YES' : '❌ NO'}</div>
-          <div>Will show: {isValidAvatarUrl(avatarUrl) ? 'UPLOADED IMAGE' : 'DEFAULT EGG.PNG'}</div>
-          {avatarUrl && <div className="mt-2">First 50 chars: <code className="bg-white px-1">{avatarUrl.substring(0, 50)}...</code></div>}
-          <button
-            onClick={() => {
-              localStorage.removeItem('user_avatar')
-              window.location.reload()
-            }}
-            className="mt-3 px-3 py-1 bg-red-500 text-white rounded text-xs font-bold"
-          >
-            🗑️ Clear Avatar & Reload
-          </button>
-        </div>
-
         <div className="relative inline-block group">
-          {/* FORCE VISIBLE BACKGROUND */}
           <div style={{
             width: '96px',
             height: '96px',
-            background: 'linear-gradient(135deg, #ffc0cb 0%, #dda0dd 100%)',
+            background: 'transparent',
             borderRadius: '50%',
             display: 'flex',
             alignItems: 'center',
