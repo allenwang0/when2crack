@@ -71,17 +71,17 @@ export const TonightCard = memo(function TonightCard({ recommendation, rank, onS
 
       {/* Reasoning */}
       <div className="bg-background rounded-lg p-3 mb-4 space-y-1.5">
-        <p className="text-xs text-gray-400 font-medium">Why tonight:</p>
+        <p className="text-xs text-gray-600 font-medium">Why tonight:</p>
         <div className="flex items-center justify-between text-sm">
-          <span className="text-gray-400">Composite</span>
+          <span className="text-gray-600">Composite</span>
           <span className="font-semibold">{Math.round((person.attraction_score + person.personality_score + person.reliability_score) / 3)}/10</span>
         </div>
         <div className="flex items-center justify-between text-sm">
-          <span className="text-gray-400">Reliability</span>
+          <span className="text-gray-600">Reliability</span>
           <span className="font-semibold">{reasoning.reliability}/10</span>
         </div>
         <div className="flex items-center justify-between text-sm">
-          <span className="text-gray-400">Last contact</span>
+          <span className="text-gray-600">Last contact</span>
           <span className="font-semibold">
             {reasoning.recency_days === 0
               ? 'Today'

@@ -11,6 +11,8 @@ import { GuestBanner } from '@/components/GuestBanner'
 import { useLocalStorage } from '@/lib/hooks/useLocalStorage'
 import { generateAvatarColor } from '@/lib/utils/colors'
 import type { Tier, Status, RosterPerson } from '@/lib/types'
+import { calculateInitialElo } from '@/lib/algorithms/elo'
+import { MAX_IMAGE_SIZE_BYTES, ALLOWED_IMAGE_TYPES, ROSTER_INITIAL_TIER } from '@/lib/constants'
 
 export default function AddPage() {
   const router = useRouter()
@@ -31,15 +33,15 @@ export default function AddPage() {
     const file = e.target.files?.[0]
     if (!file) return
 
-    // Check file size (max 5MB)
-    if (file.size > 5 * 1024 * 1024) {
+    // Check file size
+    if (file.size > MAX_IMAGE_SIZE_BYTES) {
       setError('Image must be less than 5MB')
       return
     }
 
     // Check file type
-    if (!file.type.startsWith('image/')) {
-      setError('Please upload an image file')
+    if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
+      setError('Please upload a valid image file (JPG, PNG, GIF, or WebP)')
       return
     }
 
@@ -59,6 +61,12 @@ export default function AddPage() {
 
     console.log('=== SUBMIT STARTED ===')
     console.log('User:', user ? user.id : 'Guest')
+
+    // Prevent submission during auth loading to avoid race conditions
+    if (authLoading) {
+      setError('Please wait for authentication to complete')
+      return
+    }
 
     setLoading(true)
     setError('')
@@ -88,28 +96,42 @@ export default function AddPage() {
 
       // Guest mode: Use localStorage
       if (!user) {
-        console.log('Guest mode - saving to localStorage')
-        const newPerson: RosterPerson = {
-          id: `guest-${Date.now()}-${Math.random().toString(36).substring(7)}`,
-          user_id: 'guest',
-          name: sanitizedName,
-          tier: 'A', // Default tier, not shown in UI
-          status,
-          attraction_score: sanitizedAttractionScore,
-          personality_score: sanitizedPersonalityScore,
-          reliability_score: sanitizedReliabilityScore,
-          avatar_color: avatarColor,
-          avatar_url: avatarUrl,
-          notes: null,
-          last_contact_date: new Date().toISOString(),
-          elo_rating: 1000 + (attractionScore + personalityScore + reliabilityScore) * 10,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
+        if (process.env.NODE_ENV === 'development') {
+          console.log('Guest mode - saving to localStorage')
         }
 
-        setLocalRoster([...localRoster, newPerson])
-        router.push('/roster')
-        return
+        try {
+          const newPerson: RosterPerson = {
+            id: `guest-${Date.now()}-${Math.random().toString(36).substring(7)}`,
+            user_id: 'guest',
+            name: sanitizedName,
+            tier: ROSTER_INITIAL_TIER,
+            status,
+            attraction_score: sanitizedAttractionScore,
+            personality_score: sanitizedPersonalityScore,
+            reliability_score: sanitizedReliabilityScore,
+            avatar_color: avatarColor,
+            avatar_url: avatarUrl,
+            notes: null,
+            last_contact_date: new Date().toISOString(),
+            elo_rating: calculateInitialElo(
+              sanitizedAttractionScore,
+              sanitizedPersonalityScore,
+              sanitizedReliabilityScore
+            ),
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          }
+
+          setLocalRoster([...localRoster, newPerson])
+          router.push('/roster')
+          return
+        } catch (err) {
+          console.error('Guest mode localStorage error:', err)
+          setError('Failed to save locally. Your browser storage might be full.')
+          setLoading(false)
+          return
+        }
       }
 
       // Authenticated mode: Use Supabase
@@ -140,13 +162,15 @@ export default function AddPage() {
       }
 
       // Now insert into roster
-      console.log('Inserting into roster...')
+      if (process.env.NODE_ENV === 'development') {
+        console.log('Inserting into roster...')
+      }
 
       // Prepare insert data (excluding avatar_url if it's null to avoid schema issues)
       const insertData: any = {
         user_id: user.id,
         name: sanitizedName,
-        tier: 'A', // Default tier, not shown in UI
+        tier: ROSTER_INITIAL_TIER,
         status,
         attraction_score: sanitizedAttractionScore,
         personality_score: sanitizedPersonalityScore,
@@ -215,7 +239,7 @@ export default function AddPage() {
                 </button>
               </div>
             ) : (
-              <div className="w-20 h-20 rounded-full bg-gray-200 flex items-center justify-center text-gray-400 flex-shrink-0">
+              <div className="w-20 h-20 rounded-full bg-gray-200 flex items-center justify-center text-gray-600 flex-shrink-0">
                 <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                 </svg>
@@ -259,21 +283,21 @@ export default function AddPage() {
             label="Looks"
             value={attractionScore}
             onChange={setAttractionScore}
-            min={0}
+            min={1}
             max={10}
           />
           <Slider
             label="Personality"
             value={personalityScore}
             onChange={setPersonalityScore}
-            min={0}
+            min={1}
             max={10}
           />
           <Slider
             label="Values"
             value={reliabilityScore}
             onChange={setReliabilityScore}
-            min={0}
+            min={1}
             max={10}
           />
         </div>
@@ -285,13 +309,14 @@ export default function AddPage() {
         )}
 
         <div className="flex gap-3 pb-6">
-          <Button type="submit" className="flex-1" disabled={loading}>
-            {loading ? 'Adding...' : 'Add to Roster'}
+          <Button type="submit" className="flex-1" disabled={loading || authLoading}>
+            {loading ? 'Adding...' : authLoading ? 'Loading...' : 'Add to Roster'}
           </Button>
           <Button
             type="button"
             variant="secondary"
             onClick={() => router.back()}
+            disabled={loading}
           >
             Cancel
           </Button>

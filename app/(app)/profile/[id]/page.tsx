@@ -338,7 +338,7 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
   if (loading) {
     return (
       <div className="py-6 flex items-center justify-center min-h-[60vh]">
-        <p className="text-gray-400">Loading...</p>
+        <p className="text-gray-600">Loading...</p>
       </div>
     )
   }
@@ -493,7 +493,7 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
 
       {/* Composite Score */}
       <div className="bg-card border border-border rounded-lg p-6 mb-6 text-center">
-        <p className="text-sm text-gray-400 mb-1">Composite Score</p>
+        <p className="text-sm text-gray-600 mb-1">Composite Score</p>
         <p className="text-4xl font-serif font-bold" style={{ color: '#FFB6C1' }}>{compositeScore}</p>
         <p className="text-xs text-gray-500 mt-1">
           Average of Looks, Personality, Values
@@ -511,7 +511,7 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
               <svg className="w-5 h-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
-              <span className="text-sm text-gray-400">Looks</span>
+              <span className="text-sm text-gray-600">Looks</span>
             </div>
             <span className="font-semibold" style={{ color: '#FFB6C1' }}>{person.attraction_score}/10</span>
           </div>
@@ -533,7 +533,7 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
               <svg className="w-5 h-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clipRule="evenodd" />
               </svg>
-              <span className="text-sm text-gray-400">Personality</span>
+              <span className="text-sm text-gray-600">Personality</span>
             </div>
             <span className="font-semibold" style={{ color: '#98D8C8' }}>{person.personality_score}/10</span>
           </div>
@@ -555,7 +555,7 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
               <svg className="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
                 <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
               </svg>
-              <span className="text-sm text-gray-400">Values</span>
+              <span className="text-sm text-gray-600">Values</span>
             </div>
             <span className="font-semibold" style={{ color: '#F0E68C' }}>{person.reliability_score}/10</span>
           </div>
@@ -610,7 +610,7 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
         <h3 className="font-semibold mb-4">Contact History</h3>
 
         {hangs.length === 0 ? (
-          <p className="text-sm text-gray-400 text-center py-4">
+          <p className="text-sm text-gray-600 text-center py-4">
             No hangs logged yet
           </p>
         ) : (
@@ -667,7 +667,7 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
                   )}
                 </div>
                 {hang.notes && (
-                  <p className="text-xs text-gray-400 mt-1">{hang.notes}</p>
+                  <p className="text-xs text-gray-600 mt-1">{hang.notes}</p>
                 )}
               </div>
             ))}

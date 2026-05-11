@@ -37,7 +37,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   if (loading) {
     return (
       <div className="h-screen flex items-center justify-center overflow-hidden">
-        <div className="text-gray-400">Loading...</div>
+        <div className="text-gray-600">Loading...</div>
       </div>
     )
   }

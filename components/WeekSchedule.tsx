@@ -3,6 +3,8 @@
 import { useState, useEffect, useMemo, useCallback } from 'react'
 import { useLocalStorage } from '@/lib/hooks/useLocalStorage'
 import { useAuth } from '@/lib/contexts/AuthContext'
+import { useToast } from '@/lib/hooks/useToast'
+import { ToastContainer } from '@/components/ui/Toast'
 
 interface TimeSlot {
   day: string
@@ -30,6 +32,7 @@ function formatDate(date: Date): string {
 
 export function WeekSchedule({ comparisonMode = false, comparisonName }: WeekScheduleProps) {
   const { user } = useAuth()
+  const { toasts, showToast, removeToast } = useToast()
   const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
   const hours = Array.from({ length: 24 }, (_, i) => i) // 0-23
 
@@ -200,7 +203,7 @@ export function WeekSchedule({ comparisonMode = false, comparisonName }: WeekSch
   const handleSendScheduleBack = async () => {
     try {
       if (selectedSlots.size === 0) {
-        alert('Please mark some times as available first!')
+        showToast('Please mark some times as available first', 'error')
         return
       }
 
@@ -218,10 +221,12 @@ export function WeekSchedule({ comparisonMode = false, comparisonName }: WeekSch
 
       // Copy to clipboard
       await navigator.clipboard.writeText(shareUrl)
-      alert('✓ Link copied! Send it to ' + (comparisonName || 'them') + ' to share your availability')
+      showToast(`Link copied! Send it to ${comparisonName || 'them'} to share your availability`, 'success')
     } catch (err) {
-      console.error('Failed to generate response link:', err)
-      alert('Failed to copy link. Please try again.')
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Failed to generate response link:', err)
+      }
+      showToast('Failed to copy link. Please try again.', 'error')
     }
   }
 
@@ -301,7 +306,7 @@ export function WeekSchedule({ comparisonMode = false, comparisonName }: WeekSch
           {/* Time labels - 8pm through 4am */}
           <div className="space-y-1">
             {[20, 21, 22, 23, 0, 1, 2, 3, 4].map(hour => (
-              <div key={hour} className="w-16 text-xs text-gray-500 text-right pr-2 h-10 flex items-center justify-end">
+              <div key={hour} className="w-16 text-xs text-gray-500 text-right pr-2 h-11 flex items-center justify-end">
                 {formatHour(hour)}
               </div>
             ))}
@@ -346,7 +351,7 @@ export function WeekSchedule({ comparisonMode = false, comparisonName }: WeekSch
                         onTouchStart={() => {
                           toggleSlot(day, hour)
                         }}
-                        className={`flex-1 h-10 min-w-[60px] transition-all rounded-lg mx-0.5 touch-manipulation ${
+                        className={`flex-1 h-11 min-w-[60px] transition-all rounded-lg mx-0.5 touch-manipulation ${
                           isOverlap
                             ? 'bg-teal border-2 border-teal-dark'
                             : isSelected
@@ -463,6 +468,8 @@ export function WeekSchedule({ comparisonMode = false, comparisonName }: WeekSch
           </div>
         )}
       </div>
+
+      <ToastContainer toasts={toasts} removeToast={removeToast} />
     </div>
   )
 }

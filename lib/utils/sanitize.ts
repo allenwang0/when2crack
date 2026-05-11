@@ -40,7 +40,7 @@ export function sanitizeNotes(notes: string): string {
 export function sanitizeScore(score: number): number {
   const num = parseInt(String(score), 10)
   if (isNaN(num)) return 5 // Default to middle
-  return Math.max(0, Math.min(10, num))
+  return Math.max(1, Math.min(10, num))
 }
 
 /**

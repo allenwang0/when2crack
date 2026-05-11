@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { Z_INDEX } from '@/lib/constants'
 
 export function Navigation() {
   const pathname = usePathname()
@@ -10,6 +11,7 @@ export function Navigation() {
     {
       name: 'Roster',
       path: '/roster',
+      ariaLabel: 'View your roster of people',
       icon: (
         <svg
           className="w-6 h-6"
@@ -29,6 +31,7 @@ export function Navigation() {
     {
       name: 'Tonight',
       path: '/tonight',
+      ariaLabel: 'View tonight\'s recommendations and battle',
       icon: (
         <svg
           className="w-6 h-6"
@@ -48,6 +51,7 @@ export function Navigation() {
     {
       name: 'Schedule',
       path: '/schedule',
+      ariaLabel: 'Manage your weekly schedule',
       icon: (
         <svg
           className="w-6 h-6"
@@ -67,6 +71,7 @@ export function Navigation() {
     {
       name: 'Profile',
       path: '/profile',
+      ariaLabel: 'View your profile and settings',
       icon: (
         <svg
           className="w-6 h-6"
@@ -86,7 +91,7 @@ export function Navigation() {
   ]
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-white/80 backdrop-blur-sm border-t border-border shadow-[0_-2px_10px_rgba(0,0,0,0.05)]" style={{ zIndex: 50 }}>
+    <nav className="fixed bottom-0 left-0 right-0 bg-white/80 backdrop-blur-sm border-t border-border shadow-[0_-2px_10px_rgba(0,0,0,0.05)] pb-[env(safe-area-inset-bottom)]" style={{ zIndex: Z_INDEX.navigation }}>
       <div className="max-w-md mx-auto flex justify-around items-center h-20 px-2">
         {navItems.map((item) => {
           const isActive = pathname === item.path
@@ -94,6 +99,8 @@ export function Navigation() {
             <Link
               key={item.path}
               href={item.path}
+              aria-label={item.ariaLabel}
+              aria-current={isActive ? 'page' : undefined}
               className={`flex flex-col items-center justify-center gap-1 transition-all duration-200 min-w-[56px] rounded-2xl py-3 px-2 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-yellow-bright focus-visible:ring-inset active:scale-95 ${
                 isActive
                   ? 'text-white bg-gradient-to-r from-pink to-purple shadow-[0_4px_12px_rgba(255,182,217,0.3)]'

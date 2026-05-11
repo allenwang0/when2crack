@@ -193,7 +193,7 @@ export default function ProfilePage() {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] gap-3">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-pink"></div>
-        <p className="text-gray-400">Loading profile...</p>
+        <p className="text-gray-600">Loading profile...</p>
       </div>
     )
   }
@@ -270,7 +270,7 @@ export default function ProfilePage() {
               </h1>
               <button
                 onClick={handleEditName}
-                className="text-gray-400 hover:text-gray-600 transition-colors"
+                className="text-gray-600 hover:text-gray-600 transition-colors"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />

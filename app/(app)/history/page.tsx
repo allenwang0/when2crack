@@ -194,7 +194,7 @@ export default function HistoryPage() {
         ) : activeTab === 'hangs' ? (
           hangs.length === 0 ? (
             <div className="bg-card border border-border rounded-lg p-12 text-center">
-              <p className="text-gray-400 mb-2">No encounters logged yet</p>
+              <p className="text-gray-600 mb-2">No encounters logged yet</p>
               <p className="text-sm text-gray-500">
                 Start logging hangs from individual profiles
               </p>
@@ -317,7 +317,7 @@ export default function HistoryPage() {
           // When2Cracks Tab
           when2cracks.length === 0 ? (
             <div className="bg-card border border-border rounded-lg p-12 text-center">
-              <p className="text-gray-400 mb-2">No when2cracks sent yet</p>
+              <p className="text-gray-600 mb-2">No when2cracks sent yet</p>
               <p className="text-sm text-gray-500">
                 Share your schedule from the Schedule page or profile pages
               </p>
@@ -357,9 +357,20 @@ export default function HistoryPage() {
                       onClick={async () => {
                         try {
                           await navigator.clipboard.writeText(share.share_url)
-                          alert('Link copied!')
+                          // Note: This page already has useToast imported via tonight page pattern
+                          // Consider adding toast notification here in future iteration
+                          if (typeof window !== 'undefined') {
+                            // Temporary: Use native notification
+                            const toast = document.createElement('div')
+                            toast.textContent = 'Link copied!'
+                            toast.style.cssText = 'position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#10b981;color:white;padding:12px 24px;border-radius:8px;z-index:9999;'
+                            document.body.appendChild(toast)
+                            setTimeout(() => toast.remove(), 2000)
+                          }
                         } catch (err) {
-                          console.error('Failed to copy:', err)
+                          if (process.env.NODE_ENV === 'development') {
+                            console.error('Failed to copy:', err)
+                          }
                         }
                       }}
                       className="flex-1 px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg text-sm font-medium transition-colors"

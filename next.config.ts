@@ -3,8 +3,8 @@ import withPWA from "next-pwa";
 
 const nextConfig: NextConfig = {
   typescript: {
-    // Temporarily ignore type errors during build
-    ignoreBuildErrors: true,
+    // Type errors must be fixed before build
+    ignoreBuildErrors: false,
   },
   // Empty turbopack config to silence webpack warning
   turbopack: {},

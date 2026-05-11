@@ -17,15 +17,25 @@ export function useLocalStorage<T>(key: string, initialValue: T) {
 
   // Ref to store debounce timeout
   const timeoutRef = useRef<NodeJS.Timeout>()
+  // Ref to store the latest value for flushing on unmount
+  const latestValueRef = useRef<T>(storedValue)
 
-  // Cleanup on unmount
+  // Cleanup on unmount - flush any pending writes
   useEffect(() => {
     return () => {
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current)
+        // Flush pending write immediately on unmount
+        if (typeof window !== 'undefined') {
+          try {
+            window.localStorage.setItem(key, JSON.stringify(latestValueRef.current))
+          } catch (error) {
+            console.log('localStorage flush error:', error)
+          }
+        }
       }
     }
-  }, [])
+  }, [key])
 
   // Return a wrapped version of useState's setter function that persists the new value to localStorage
   const setValue = (value: T | ((val: T) => T)) => {
@@ -35,6 +45,8 @@ export function useLocalStorage<T>(key: string, initialValue: T) {
 
       // Update state immediately for responsive UI
       setStoredValue(valueToStore)
+      // Store latest value for potential unmount flush
+      latestValueRef.current = valueToStore
 
       // Debounce localStorage writes to avoid jank
       if (typeof window !== 'undefined') {
@@ -48,7 +60,7 @@ export function useLocalStorage<T>(key: string, initialValue: T) {
           } catch (error) {
             console.log('localStorage write error:', error)
           }
-        }, 100) // 100ms debounce
+        }, 300) // 300ms debounce - increased to reduce event loop blocking
       }
     } catch (error) {
       console.log(error)

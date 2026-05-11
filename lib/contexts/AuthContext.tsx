@@ -1,6 +1,6 @@
 'use client'
 
-import { createContext, useContext, useEffect, useState } from 'react'
+import { createContext, useContext, useEffect, useState, useRef, useCallback } from 'react'
 import { User } from '@supabase/supabase-js'
 import { createClient } from '@/lib/supabase/client'
 
@@ -21,16 +21,56 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true)
   const supabase = createClient()
 
+  // Track user creation attempts to prevent duplicates
+  const userCreationAttempts = useRef<Set<string>>(new Set())
+
+  // Centralized user profile creation function
+  const ensureUserProfile = useCallback(async (userId: string, email: string) => {
+    // Prevent duplicate attempts for the same user
+    if (userCreationAttempts.current.has(userId)) {
+      return
+    }
+
+    userCreationAttempts.current.add(userId)
+
+    try {
+      const { data: existingUser, error: fetchError } = await supabase
+        .from('users')
+        .select('id')
+        .eq('id', userId)
+        .single()
+
+      // If user doesn't exist (PGRST116 is "not found" error), create them
+      if (fetchError && fetchError.code === 'PGRST116') {
+        const { error: insertError } = await supabase.from('users').insert({
+          id: userId,
+          email: email,
+        })
+
+        if (insertError && insertError.code !== '23505') { // Ignore duplicate key errors
+          console.error('Error inserting user profile:', insertError)
+        }
+      }
+    } catch (err) {
+      console.error('Error ensuring user profile:', err)
+    } finally {
+      // Allow retry after 5 seconds if needed
+      setTimeout(() => {
+        userCreationAttempts.current.delete(userId)
+      }, 5000)
+    }
+  }, [supabase])
+
   useEffect(() => {
     let isSubscribed = true
 
-    // Safety timeout to prevent infinite loading (3 seconds)
+    // Safety timeout to prevent infinite loading (5 seconds, increased from 3)
     const timeout = setTimeout(() => {
-      if (isSubscribed) {
-        console.warn('Auth initialization timeout - proceeding')
+      if (isSubscribed && loading) {
+        console.warn('Auth initialization timeout - proceeding with fallback')
         setLoading(false)
       }
-    }, 3000)
+    }, 5000)
 
     // Get initial session
     const initializeAuth = async () => {
@@ -42,9 +82,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
 
         if (isSubscribed) {
-          setUser(session?.user ?? null)
+          const currentUser = session?.user ?? null
+          setUser(currentUser)
           setLoading(false)
           clearTimeout(timeout)
+
+          // Ensure user profile exists
+          if (currentUser?.id && currentUser?.email) {
+            ensureUserProfile(currentUser.id, currentUser.email)
+          }
         }
       } catch (error) {
         console.error('Auth error:', error)
@@ -62,37 +108,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log('Auth event:', event, 'User:', session?.user?.email)
-
       if (isSubscribed) {
-        setUser(session?.user ?? null)
+        const currentUser = session?.user ?? null
+        setUser(currentUser)
         setLoading(false)
-      }
 
-      // Create user profile on sign in if it doesn't exist
-      if (event === 'SIGNED_IN' && session?.user) {
-        try {
-          const { data: existingUser, error: fetchError } = await supabase
-            .from('users')
-            .select('id')
-            .eq('id', session.user.id)
-            .single()
-
-          // If user doesn't exist (PGRST116 is "not found" error), create them
-          if (fetchError && fetchError.code === 'PGRST116') {
-            const { error: insertError } = await supabase.from('users').insert({
-              id: session.user.id,
-              email: session.user.email!,
-            })
-
-            if (insertError) {
-              console.error('Error inserting user profile:', insertError)
-            } else {
-              console.log('User profile created successfully')
-            }
-          }
-        } catch (err) {
-          console.error('Error creating user profile:', err)
+        // Ensure user profile exists on sign in
+        if (event === 'SIGNED_IN' && currentUser?.id && currentUser?.email) {
+          ensureUserProfile(currentUser.id, currentUser.email)
         }
       }
     })
@@ -102,7 +125,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       clearTimeout(timeout)
       subscription.unsubscribe()
     }
-  }, [])
+  }, [supabase, ensureUserProfile, loading])
 
   const signOut = async () => {
     try {

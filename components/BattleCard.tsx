@@ -69,19 +69,19 @@ export const BattleCard = memo(function BattleCard({ person, onClick, disabled }
       {/* Scores */}
       <div className="space-y-1 sm:space-y-2 mb-3 sm:mb-4">
         <div className="flex justify-between text-xs sm:text-sm">
-          <span className="text-gray-400">Composite</span>
+          <span className="text-gray-600">Composite</span>
           <span className="font-semibold text-pink">{compositeScore}</span>
         </div>
         <div className="flex justify-between text-xs sm:text-sm">
-          <span className="text-gray-400">Attraction</span>
+          <span className="text-gray-600">Attraction</span>
           <span className="text-foreground">{person.attraction_score}</span>
         </div>
         <div className="flex justify-between text-xs sm:text-sm">
-          <span className="text-gray-400">Personality</span>
+          <span className="text-gray-600">Personality</span>
           <span className="text-foreground">{person.personality_score}</span>
         </div>
         <div className="flex justify-between text-xs sm:text-sm">
-          <span className="text-gray-400">Reliability</span>
+          <span className="text-gray-600">Reliability</span>
           <span className="text-foreground">{person.reliability_score}</span>
         </div>
       </div>

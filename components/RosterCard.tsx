@@ -51,7 +51,7 @@ export const RosterCard = memo(function RosterCard({ person }: RosterCardProps) 
               <Badge variant="status" status={person.status}>
                 {person.status}
               </Badge>
-              <span className="text-sm text-gray-400">
+              <span className="text-sm text-gray-600">
                 Composite: {compositeScore}
               </span>
             </div>

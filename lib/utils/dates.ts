@@ -4,7 +4,7 @@ export function daysBetween(date1: string | Date, date2: string | Date): number 
   const d1 = typeof date1 === 'string' ? new Date(date1) : date1
   const d2 = typeof date2 === 'string' ? new Date(date2) : date2
   const diffTime = Math.abs(d2.getTime() - d1.getTime())
-  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+  const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24))
   return diffDays
 }
 

@@ -291,7 +291,7 @@ export default function BattlePage() {
       <div className="py-6">
         <h2 className="text-2xl font-serif font-bold mb-4">Battle</h2>
         <div className="bg-card border border-border rounded-lg p-8 text-center">
-          <p className="text-gray-400 mb-2">Not enough people for battles</p>
+          <p className="text-gray-600 mb-2">Not enough people for battles</p>
           <p className="text-sm text-gray-500">
             Add at least 2 people to your roster to start battles
           </p>
@@ -311,7 +311,7 @@ export default function BattlePage() {
 
       <div className="text-center mb-6">
         <h2 className="text-2xl font-serif font-bold mb-2">Battle</h2>
-        <p className="text-sm text-gray-400 mb-1">
+        <p className="text-sm text-gray-600 mb-1">
           Right now, tonight — who would you rather?
         </p>
         {!user && totalPossibleBattles > 0 && (
@@ -325,7 +325,7 @@ export default function BattlePage() {
       {result && (
         <div className="bg-pink/10 border border-pink rounded-lg p-4 mb-6 text-center animate-fade-in">
           <p className="text-pink font-semibold mb-1">Battle Complete!</p>
-          <p className="text-sm text-gray-400">
+          <p className="text-sm text-gray-600">
             Winner: {result.winnerChange > 0 ? '+' : ''}
             {result.winnerChange} Elo
             {' • '}
@@ -351,7 +351,7 @@ export default function BattlePage() {
 
       {/* VS Divider */}
       <div className="text-center mb-6">
-        <span className="inline-block px-4 py-2 bg-card border border-border rounded-full text-sm font-semibold text-gray-400">
+        <span className="inline-block px-4 py-2 bg-card border border-border rounded-full text-sm font-semibold text-gray-600">
           VS
         </span>
       </div>
@@ -370,7 +370,7 @@ export default function BattlePage() {
             user ? fetchBattlePair() : fetchBattlePairGuest()
           }}
           disabled={processing}
-          className="text-gray-400"
+          className="text-gray-600"
         >
           Skip this battle
         </Button>

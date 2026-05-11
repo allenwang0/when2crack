@@ -178,7 +178,7 @@ export default function RosterPage() {
     return (
       <div className="py-6 flex flex-col items-center justify-center min-h-[40vh] gap-3">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-pink"></div>
-        <p className="text-gray-400">{loadingMessage}</p>
+        <p className="text-gray-600">{loadingMessage}</p>
       </div>
     )
   }
