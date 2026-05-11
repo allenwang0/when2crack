@@ -141,7 +141,6 @@ export function WeekSchedule({ comparisonMode = false, comparisonName }: WeekSch
                   return (
                     <button
                       key={key}
-                      onClick={() => !comparisonMode && toggleSlot(day, hour)}
                       onMouseEnter={() => !comparisonMode && isDragging && toggleSlot(day, hour)}
                       onMouseDown={() => {
                         if (!comparisonMode) {
