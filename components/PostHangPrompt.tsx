@@ -46,8 +46,7 @@ export function PostHangPrompt({ person, onClose, onSuccess, showToast }: PostHa
       )
 
       // Log the hang
-      // @ts-ignore
-      const { error: hangError } = await supabase.from('hangs').insert({
+      const { error: hangError } = await supabase.from('hangs').insert([{
         roster_id: person.id,
         user_id: user.id,
         hang_date: new Date().toISOString(),
@@ -55,14 +54,13 @@ export function PostHangPrompt({ person, onClose, onSuccess, showToast }: PostHa
         personality_change: personalityChange,
         reliability_change: reliabilityChange,
         notes: notes || null,
-      })
+      }] as any)
 
       if (hangError) throw hangError
 
       // Update roster scores
-      // @ts-ignore
-      const { error: updateError } = await supabase
-        .from('roster')
+      const { error: updateError } = await (supabase
+        .from('roster') as any)
         .update({
           attraction_score: newAttractionScore,
           personality_score: newPersonalityScore,

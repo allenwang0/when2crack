@@ -10,6 +10,7 @@ import { GuestBanner } from '@/components/GuestBanner'
 import { Button } from '@/components/ui/Button'
 import { useLocalStorage } from '@/lib/hooks/useLocalStorage'
 import { updateLoginStreak } from '@/lib/utils/loginStreak'
+import { logger } from '@/lib/utils/logger'
 import type { RosterPerson, Tier } from '@/lib/types'
 
 export default function RosterPage() {
@@ -28,7 +29,7 @@ export default function RosterPage() {
         setRoster(JSON.parse(storedRoster))
         setLoading(false) // Show content immediately
       } catch (e) {
-        console.error('Error parsing guest roster:', e)
+        logger.error('Error parsing guest roster:', e)
       }
     } else {
       setLoading(false) // Show empty state immediately
@@ -50,7 +51,7 @@ export default function RosterPage() {
         try {
           setRoster(JSON.parse(storedRoster))
         } catch (e) {
-          console.error('Error parsing guest roster:', e)
+          logger.error('Error parsing guest roster:', e)
           setRoster([])
         }
       } else {
@@ -100,11 +101,11 @@ export default function RosterPage() {
         if (!error && data) {
           setRoster(data as RosterPerson[])
         } else {
-          console.error('Roster fetch error:', error)
+          logger.error('Roster fetch error:', error)
           setRoster([])
         }
       } catch (error) {
-        console.error('Error fetching roster:', error)
+        logger.error('Error fetching roster:', error)
         setRoster([])
       } finally {
         setLoading(false)

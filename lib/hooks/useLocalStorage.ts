@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
+import { logger } from '@/lib/utils/logger'
 
 // Check available localStorage space
 function checkStorageQuota(): number {
@@ -46,7 +47,7 @@ export function useLocalStorage<T>(key: string, initialValue: T) {
       const item = window.localStorage.getItem(key)
       return item ? JSON.parse(item) : initialValue
     } catch (error) {
-      console.log(error)
+      logger.debug(error)
       return initialValue
     }
   })
@@ -66,7 +67,7 @@ export function useLocalStorage<T>(key: string, initialValue: T) {
           try {
             window.localStorage.setItem(key, JSON.stringify(latestValueRef.current))
           } catch (error) {
-            console.log('localStorage flush error:', error)
+            logger.debug('localStorage flush error:', error)
           }
         }
       }
@@ -106,20 +107,20 @@ export function useLocalStorage<T>(key: string, initialValue: T) {
             window.localStorage.setItem(key, serialized)
             setError(null)
           } catch (error: any) {
-            console.error('localStorage write error:', error)
+            logger.error('localStorage write error:', error)
 
             // Handle quota exceeded error
             if (error.name === 'QuotaExceededError' || error.code === 22) {
               setError('QUOTA_EXCEEDED')
               showQuotaError()
             } else {
-              console.error('localStorage error:', error)
+              logger.error('localStorage error:', error)
             }
           }
         }, 300) // 300ms debounce - increased to reduce event loop blocking
       }
     } catch (error) {
-      console.log(error)
+      logger.debug(error)
     }
   }
 

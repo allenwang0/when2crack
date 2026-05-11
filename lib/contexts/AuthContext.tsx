@@ -46,7 +46,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const { error: insertError } = await supabase.from('users').insert({
           id: userId,
           email: email,
-        })
+        } as any)
 
         if (insertError && insertError.code !== '23505') { // Ignore duplicate key errors
           logger.error('Error inserting user profile:', insertError)

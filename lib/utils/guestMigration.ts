@@ -3,8 +3,9 @@
  * Handles migration of guest roster data to authenticated user account
  */
 
-import type { RosterPerson } from '@/lib/types'
+import type { RosterPerson, Database } from '@/lib/types'
 import { STORAGE_KEYS } from '@/lib/constants'
+import { logger } from '@/lib/utils/logger'
 
 export interface GuestData {
   roster: RosterPerson[]
@@ -23,7 +24,7 @@ export function hasGuestData(): boolean {
     const roster = localStorage.getItem(STORAGE_KEYS.guestRoster)
     return roster !== null && JSON.parse(roster).length > 0
   } catch (error) {
-    console.error('Error checking guest data:', error)
+    logger.error('Error checking guest data:', error)
     return false
   }
 }
@@ -56,7 +57,7 @@ export function getGuestData(): GuestData | null {
       displayName,
     }
   } catch (error) {
-    console.error('Error getting guest data:', error)
+    logger.error('Error getting guest data:', error)
     return null
   }
 }
@@ -73,7 +74,7 @@ export function clearGuestData(): void {
     localStorage.removeItem(STORAGE_KEYS.skippedBattles)
     // Keep display name for user convenience
   } catch (error) {
-    console.error('Error clearing guest data:', error)
+    logger.error('Error clearing guest data:', error)
   }
 }
 
@@ -86,7 +87,7 @@ export function markMigrationOffered(): void {
   try {
     localStorage.setItem('migration_offered', new Date().toISOString())
   } catch (error) {
-    console.error('Error marking migration offered:', error)
+    logger.error('Error marking migration offered:', error)
   }
 }
 
@@ -107,7 +108,7 @@ export function wasMigrationOffered(): boolean {
 
     return daysSince < 7
   } catch (error) {
-    console.error('Error checking migration offered:', error)
+    logger.error('Error checking migration offered:', error)
     return false
   }
 }
@@ -119,7 +120,7 @@ export function wasMigrationOffered(): boolean {
 export function prepareRosterForMigration(
   guestRoster: RosterPerson[],
   userId: string
-): Omit<RosterPerson, 'id' | 'created_at' | 'updated_at'>[] {
+): Database['public']['Tables']['roster']['Insert'][] {
   return guestRoster.map((person) => ({
     user_id: userId,
     name: person.name,

@@ -144,7 +144,7 @@ export default function ProfilePage() {
         }
 
         if ((userResult as any).data) {
-          setAvatarUrl(((userResult as any).data as any).avatar_url)
+          setAvatarUrl((userResult as any).data.avatar_url)
         }
 
         setLoading(false)
