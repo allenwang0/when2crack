@@ -19,13 +19,31 @@ export default function AddPage() {
   const [localRoster, setLocalRoster] = useLocalStorage<RosterPerson[]>('guest_roster', [])
 
   const [name, setName] = useState('')
-  const [tier, setTier] = useState<Tier>('B')
   const [status, setStatus] = useState<Status>('New')
   const [attractionScore, setAttractionScore] = useState(5)
   const [personalityScore, setPersonalityScore] = useState(5)
   const [reliabilityScore, setReliabilityScore] = useState(5)
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+
+  const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    // Check file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      setError('Image must be less than 5MB')
+      return
+    }
+
+    // Convert to base64
+    const reader = new FileReader()
+    reader.onloadend = () => {
+      setAvatarUrl(reader.result as string)
+    }
+    reader.readAsDataURL(file)
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -42,12 +60,14 @@ export default function AddPage() {
           id: `guest-${Date.now()}-${Math.random().toString(36).substring(7)}`,
           user_id: 'guest',
           name,
-          tier,
+          tier: 'A', // Default tier, not shown in UI
           status,
           attraction_score: attractionScore,
           personality_score: personalityScore,
           reliability_score: reliabilityScore,
           avatar_color: avatarColor,
+          avatar_url: avatarUrl,
+          notes: null,
           last_contact_date: new Date().toISOString(),
           elo_rating: 1000 + (attractionScore + personalityScore + reliabilityScore) * 10,
           created_at: new Date().toISOString(),
@@ -64,12 +84,13 @@ export default function AddPage() {
       const { error: insertError } = await supabase.from('roster').insert({
         user_id: user.id,
         name,
-        tier,
+        tier: 'A', // Default tier, not shown in UI
         status,
         attraction_score: attractionScore,
         personality_score: personalityScore,
         reliability_score: reliabilityScore,
         avatar_color: avatarColor,
+        avatar_url: avatarUrl,
         last_contact_date: new Date().toISOString(),
       })
 
@@ -100,27 +121,43 @@ export default function AddPage() {
           required
         />
 
-        {/* Tier Selection */}
+        {/* Photo Upload */}
         <div>
           <label className="block text-sm font-medium text-foreground mb-2">
-            Tier
+            Photo (optional)
           </label>
-          <div className="grid grid-cols-4 gap-2">
-            {(['S', 'A', 'B', 'C'] as Tier[]).map((t) => (
-              <button
-                key={t}
-                type="button"
-                onClick={() => setTier(t)}
-                className={`py-2 px-4 rounded-lg border-2 font-semibold transition-all ${
-                  tier === t
-                    ? 'border-pink bg-pink/10 text-pink'
-                    : 'border-border text-gray-400 hover:border-pink/50'
-                }`}
-              >
-                {t}
-              </button>
-            ))}
+          <div className="flex items-center gap-4">
+            {avatarUrl ? (
+              <div className="relative w-20 h-20 rounded-full overflow-hidden border-2 border-pink flex-shrink-0">
+                <img src={avatarUrl} alt="Preview" className="w-full h-full object-cover" />
+                <button
+                  type="button"
+                  onClick={() => setAvatarUrl(null)}
+                  className="absolute top-0 right-0 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs"
+                >
+                  ✕
+                </button>
+              </div>
+            ) : (
+              <div className="w-20 h-20 rounded-full bg-gray-200 flex items-center justify-center text-gray-400 flex-shrink-0">
+                <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+              </div>
+            )}
+            <label className="flex-1">
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handlePhotoUpload}
+                className="hidden"
+              />
+              <div className="px-4 py-2 bg-white border-2 border-black rounded-full text-center cursor-pointer hover:bg-gray-50 transition-colors">
+                <span className="text-sm font-semibold">Choose Photo</span>
+              </div>
+            </label>
           </div>
+          <p className="text-xs text-gray-500 mt-2">Max 5MB • JPG, PNG, or GIF</p>
         </div>
 
         {/* Status Selection */}
@@ -141,26 +178,26 @@ export default function AddPage() {
         </div>
 
         {/* Score Sliders */}
-        <div className="space-y-4">
+        <div className="space-y-6">
           <Slider
-            label="Attraction"
+            label="Looks"
             value={attractionScore}
             onChange={setAttractionScore}
-            min={1}
+            min={0}
             max={10}
           />
           <Slider
             label="Personality"
             value={personalityScore}
             onChange={setPersonalityScore}
-            min={1}
+            min={0}
             max={10}
           />
           <Slider
-            label="Reliability"
+            label="Values"
             value={reliabilityScore}
             onChange={setReliabilityScore}
-            min={1}
+            min={0}
             max={10}
           />
         </div>

@@ -24,12 +24,18 @@ export function BattleCard({ person, onClick, disabled }: BattleCardProps) {
       }`}
     >
       {/* Avatar */}
-      <div
-        className="w-24 h-24 rounded-full flex items-center justify-center text-white font-bold text-3xl mx-auto mb-4"
-        style={{ backgroundColor: person.avatar_color }}
-      >
-        {initials}
-      </div>
+      {person.avatar_url ? (
+        <div className="w-24 h-24 rounded-full overflow-hidden mx-auto mb-4 border-2 border-pink">
+          <img src={person.avatar_url} alt={person.name} className="w-full h-full object-cover" />
+        </div>
+      ) : (
+        <div
+          className="w-24 h-24 rounded-full flex items-center justify-center text-white font-bold text-3xl mx-auto mb-4"
+          style={{ backgroundColor: person.avatar_color }}
+        >
+          {initials}
+        </div>
+      )}
 
       {/* Name */}
       <h3 className="text-xl font-serif font-bold text-foreground mb-2">

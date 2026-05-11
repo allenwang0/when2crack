@@ -43,10 +43,19 @@ export default function AuthPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4">
+    <div className="h-screen flex items-center justify-center px-4 overflow-hidden">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <h1 className="font-serif text-4xl font-bold mb-2" style={{ color: '#FF8C69' }}>
+          {/* Big Logo */}
+          <div className="mb-6 flex justify-center">
+            <img
+              src="/icon.jpg"
+              alt="When2Crack"
+              className="w-32 h-32 rounded-full shadow-2xl"
+              style={{ border: '4px solid #FFD93D' }}
+            />
+          </div>
+          <h1 className="font-serif text-4xl font-bold mb-2" style={{ color: '#1A1A1A' }}>
             When2Crack
           </h1>
           <p className="text-foreground/70">Your roster, ranked. Your night, decided.</p>

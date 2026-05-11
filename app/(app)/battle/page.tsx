@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { BattleCard } from '@/components/BattleCard'
 import { Button } from '@/components/ui/Button'
 import { GuestBanner } from '@/components/GuestBanner'
+import { OutOfComparisons } from '@/components/OutOfComparisons'
 import { useAuth } from '@/lib/contexts/AuthContext'
 import { useLocalStorage } from '@/lib/hooks/useLocalStorage'
 import type { RosterPerson } from '@/lib/types'
@@ -11,6 +12,7 @@ import type { RosterPerson } from '@/lib/types'
 export default function BattlePage() {
   const { user } = useAuth()
   const [localRoster, setLocalRoster] = useLocalStorage<RosterPerson[]>('guest_roster', [])
+  const [completedBattles, setCompletedBattles] = useLocalStorage<string[]>('completed_battles', [])
   const [person1, setPerson1] = useState<RosterPerson | null>(null)
   const [person2, setPerson2] = useState<RosterPerson | null>(null)
   const [loading, setLoading] = useState(true)
@@ -21,6 +23,11 @@ export default function BattlePage() {
     loserChange: number
   } | null>(null)
   const [error, setError] = useState('')
+  const [showOutOfComparisons, setShowOutOfComparisons] = useState(false)
+
+  const getBattleKey = (id1: string, id2: string) => {
+    return [id1, id2].sort().join('-')
+  }
 
   const fetchBattlePairGuest = () => {
     setLoading(true)
@@ -34,10 +41,33 @@ export default function BattlePage() {
         return
       }
 
-      // Get two random people from local roster
-      const shuffled = [...localRoster].sort(() => Math.random() - 0.5)
-      setPerson1(shuffled[0])
-      setPerson2(shuffled[1])
+      // Get all possible pairs
+      const allPairs: Array<[RosterPerson, RosterPerson]> = []
+      for (let i = 0; i < localRoster.length; i++) {
+        for (let j = i + 1; j < localRoster.length; j++) {
+          allPairs.push([localRoster[i], localRoster[j]])
+        }
+      }
+
+      // Filter out completed battles
+      const availablePairs = allPairs.filter(([p1, p2]) => {
+        const key = getBattleKey(p1.id, p2.id)
+        return !completedBattles.includes(key)
+      })
+
+      // If all battles completed, show completion screen
+      if (availablePairs.length === 0) {
+        setShowOutOfComparisons(true)
+        setLoading(false)
+        return
+      }
+
+      setShowOutOfComparisons(false)
+
+      // Pick a random available pair
+      const randomPair = availablePairs[Math.floor(Math.random() * availablePairs.length)]
+      setPerson1(randomPair[0])
+      setPerson2(randomPair[1])
     } catch (err) {
       if (err instanceof Error) {
         setError(err.message)
@@ -84,6 +114,12 @@ export default function BattlePage() {
     setError('')
 
     try {
+      // Mark this battle as completed
+      if (person1 && person2) {
+        const battleKey = getBattleKey(person1.id, person2.id)
+        setCompletedBattles([...completedBattles, battleKey])
+      }
+
       // Simple ELO calculation for guest mode
       const K = 32
       const updatedRoster = localRoster.map(person => {
@@ -167,7 +203,26 @@ export default function BattlePage() {
   if (loading) {
     return (
       <div className="py-6 flex items-center justify-center min-h-[60vh]">
-        <p className="text-gray-400">Loading battle...</p>
+        <div className="text-center">
+          <div className="text-4xl mb-4 animate-bounce">⚔️</div>
+          <p className="text-foreground/60">Loading battle...</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (showOutOfComparisons && !user) {
+    return (
+      <div>
+        {!user && <GuestBanner />}
+        <OutOfComparisons
+          onReset={() => {
+            setCompletedBattles([])
+            setShowOutOfComparisons(false)
+            fetchBattlePairGuest()
+          }}
+          totalPeople={localRoster.length}
+        />
       </div>
     )
   }

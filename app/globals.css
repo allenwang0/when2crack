@@ -1,23 +1,32 @@
 @import "tailwindcss";
 
 :root {
-  /* Light warm pastel theme */
-  --background: #FFF8F0;
-  --foreground: #4A3728;
+  /* Egg theme - Black, White, Yellow */
+  --background: #FFFEF8;
+  --foreground: #1A1A1A;
   --card: #FFFFFF;
-  --border: #F0E6D8;
+  --border: #F5F5F0;
 
-  /* Warm accent colors */
-  --orange: #FF8C69;
-  --peach: #FFB088;
-  --terracotta: #E07856;
-  --cream: #FFF5E6;
+  /* Egg colors */
+  --yellow-bright: #FFD93D;
+  --yellow-soft: #FFF4CC;
+  --yellow-gold: #F4C430;
+  --black: #1A1A1A;
+  --white: #FFFFFF;
+  --gray: #E8E8E8;
 
-  /* Tier colors - warm pastels */
-  --tier-s: #FF8C69;
-  --tier-a: #FFB088;
-  --tier-b: #F4A261;
-  --tier-c: #C9ADA7;
+  /* Accent colors */
+  --pink: #FFD93D;
+  --purple: #FFD93D;
+  --yellow: #FFD93D;
+  --blue: #FFD93D;
+  --mint: #FFD93D;
+
+  /* Tier colors - for later */
+  --tier-s: #FFD93D;
+  --tier-a: #F4C430;
+  --tier-b: #E8E8E8;
+  --tier-c: #D3D3D3;
 }
 
 @theme inline {
@@ -27,17 +36,24 @@
   --color-card: var(--card);
   --color-border: var(--border);
 
-  /* Accent colors */
-  --color-orange: var(--orange);
-  --color-peach: var(--peach);
-  --color-terracotta: var(--terracotta);
-  --color-cream: var(--cream);
+  /* Egg colors */
+  --color-yellow-bright: var(--yellow-bright);
+  --color-yellow-soft: var(--yellow-soft);
+  --color-yellow-gold: var(--yellow-gold);
+  --color-black: var(--black);
+  --color-white: var(--white);
+  --color-gray: var(--gray);
 
-  /* Legacy names for compatibility */
-  --color-pink: var(--orange);
-  --color-coral: var(--peach);
-  --color-teal: var(--terracotta);
-  --color-amber: var(--peach);
+  /* Legacy compatibility - all map to yellow */
+  --color-pink: var(--yellow-bright);
+  --color-purple: var(--yellow-bright);
+  --color-yellow: var(--yellow-bright);
+  --color-blue: var(--yellow-bright);
+  --color-mint: var(--yellow-bright);
+  --color-coral: var(--yellow-bright);
+  --color-teal: var(--yellow-bright);
+  --color-amber: var(--yellow-bright);
+  --color-orange: var(--yellow-bright);
 
   /* Tier colors */
   --color-tier-s: var(--tier-s);
@@ -50,8 +66,39 @@
   --font-sans: "DM Sans", sans-serif;
 }
 
-body {
+* {
+  box-sizing: border-box;
+}
+
+html {
   background: var(--background);
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  background: var(--background) !important;
   color: var(--foreground);
   font-family: var(--font-sans);
+  height: 100%;
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+}
+
+/* Fun rounded elements */
+button, .card, input, select {
+  border-radius: 20px;
+}
+
+/* Ensure no scroll anywhere */
+#__next {
+  height: 100%;
+  overflow: hidden;
+}
+
+/* Remove any default margins/padding */
+h1, h2, h3, h4, h5, h6, p {
+  margin: 0;
+  padding: 0;
 }

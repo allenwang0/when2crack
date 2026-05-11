@@ -26,12 +26,18 @@ export function RosterCard({ person }: RosterCardProps) {
       <div className="bg-card border border-border rounded-lg p-4 hover:bg-border transition-colors cursor-pointer">
         <div className="flex items-start gap-3">
           {/* Avatar */}
-          <div
-            className="w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-lg flex-shrink-0"
-            style={{ backgroundColor: person.avatar_color }}
-          >
-            {initials}
-          </div>
+          {person.avatar_url ? (
+            <div className="w-12 h-12 rounded-full overflow-hidden flex-shrink-0 border-2 border-pink">
+              <img src={person.avatar_url} alt={person.name} className="w-full h-full object-cover" />
+            </div>
+          ) : (
+            <div
+              className="w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-lg flex-shrink-0"
+              style={{ backgroundColor: person.avatar_color }}
+            >
+              {initials}
+            </div>
+          )}
 
           {/* Content */}
           <div className="flex-1 min-w-0">
@@ -45,9 +51,6 @@ export function RosterCard({ person }: RosterCardProps) {
                   className={`w-2 h-2 rounded-full ${availabilityColors[availability]}`}
                   title={availability}
                 />
-                <Badge variant="tier" tier={person.tier}>
-                  {person.tier}
-                </Badge>
               </div>
             </div>
 

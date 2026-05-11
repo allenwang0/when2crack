@@ -35,12 +35,18 @@ export function TonightCard({ recommendation, rank, onShootShot }: TonightCardPr
 
       {/* Person Info */}
       <div className="flex items-start gap-3 mb-4">
-        <div
-          className="w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-lg flex-shrink-0"
-          style={{ backgroundColor: person.avatar_color }}
-        >
-          {initials}
-        </div>
+        {person.avatar_url ? (
+          <div className="w-12 h-12 rounded-full overflow-hidden flex-shrink-0 border-2 border-pink">
+            <img src={person.avatar_url} alt={person.name} className="w-full h-full object-cover" />
+          </div>
+        ) : (
+          <div
+            className="w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-lg flex-shrink-0"
+            style={{ backgroundColor: person.avatar_color }}
+          >
+            {initials}
+          </div>
+        )}
 
         <div className="flex-1 min-w-0">
           <h3 className="font-serif font-bold text-lg mb-1">{person.name}</h3>

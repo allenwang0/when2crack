@@ -35,9 +35,13 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${dmSans.variable} ${dmSerifDisplay.variable} h-full antialiased`}
+      className={`${dmSans.variable} ${dmSerifDisplay.variable}`}
+      style={{ height: '100%', overflow: 'hidden' }}
     >
-      <body className="min-h-full flex flex-col bg-background text-foreground font-sans">
+      <body
+        className="bg-background text-foreground font-sans"
+        style={{ height: '100%', overflow: 'hidden', margin: 0, padding: 0 }}
+      >
         <AuthProvider>{children}</AuthProvider>
       </body>
     </html>

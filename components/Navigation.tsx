@@ -86,20 +86,26 @@ export function Navigation() {
   ]
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-card border-t border-border z-50">
-      <div className="max-w-md mx-auto flex justify-around items-center h-16 px-4">
+    <nav className="bg-white/80 backdrop-blur-sm border-t border-border z-50" style={{ boxShadow: '0 -2px 10px rgba(0,0,0,0.05)' }}>
+      <div className="max-w-md mx-auto flex justify-around items-center h-20 px-4">
         {navItems.map((item) => {
           const isActive = pathname === item.path
           return (
             <Link
               key={item.path}
               href={item.path}
-              className={`flex flex-col items-center justify-center gap-1 transition-colors min-w-[60px] ${
-                isActive ? 'text-pink' : 'text-gray-500 hover:text-foreground'
+              className={`flex flex-col items-center justify-center gap-1 transition-all min-w-[60px] rounded-2xl py-2 ${
+                isActive
+                  ? 'text-white scale-105'
+                  : 'text-gray-400 hover:text-pink hover:scale-105'
               }`}
+              style={isActive ? {
+                background: 'linear-gradient(135deg, #FFB6D9 0%, #E4C1F9 100%)',
+                boxShadow: '0 4px 12px rgba(255, 182, 217, 0.3)'
+              } : {}}
             >
               {item.icon}
-              <span className="text-xs font-medium">{item.name}</span>
+              <span className="text-xs font-semibold">{item.name}</span>
             </Link>
           )
         })}

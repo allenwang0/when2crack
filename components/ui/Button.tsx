@@ -14,14 +14,14 @@ export function Button({
   ...props
 }: ButtonProps) {
   const baseStyles =
-    'inline-flex items-center justify-center font-medium rounded-lg transition-all duration-150 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed'
+    'inline-flex items-center justify-center font-semibold rounded-full transition-all duration-150 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg'
 
   const variantStyles = {
-    primary: 'bg-pink text-white hover:bg-pink/90',
-    secondary: 'bg-card border border-border text-foreground hover:bg-border',
-    ghost: 'bg-transparent text-foreground hover:bg-card',
+    primary: 'bg-black text-yellow-bright hover:bg-gray-800',
+    secondary: 'bg-white border-2 border-black text-black hover:bg-gray-50',
+    ghost: 'bg-transparent text-foreground hover:bg-yellow-soft',
     danger: 'bg-red-500 text-white hover:bg-red-600',
-    outline: 'bg-transparent border border-border text-foreground hover:bg-card',
+    outline: 'bg-white border-2 text-black hover:bg-yellow-soft',
   }
 
   const sizeStyles = {

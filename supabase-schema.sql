@@ -43,6 +43,7 @@ CREATE TABLE IF NOT EXISTS public.roster (
   elo_rating INTEGER DEFAULT 1200,
   notes TEXT,
   avatar_color TEXT DEFAULT '#ff6b9d',
+  avatar_url TEXT,
   last_contact_date TIMESTAMPTZ DEFAULT NOW(),
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
