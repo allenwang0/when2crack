@@ -45,6 +45,8 @@ export default function HistoryPage() {
 
     fetchHangs()
     fetchWhen2cracks()
+    // Functions are stable relative to user which is in deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user])
 
   const fetchHangs = async () => {

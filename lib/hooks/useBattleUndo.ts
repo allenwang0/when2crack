@@ -23,7 +23,7 @@ export function useBattleUndo(options: UseBattleUndoOptions = {}) {
 
   const [lastBattle, setLastBattle] = useState<BattleRecord | null>(null)
   const [isUndoable, setIsUndoable] = useState(false)
-  const timeoutRef = useRef<NodeJS.Timeout>()
+  const timeoutRef = useRef<NodeJS.Timeout | undefined>(undefined)
 
   // Clear undo timer on unmount
   useEffect(() => {

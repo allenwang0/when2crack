@@ -55,7 +55,7 @@ export function useRealtimeCleanup(
         }
       }
     }
-  }, [supabase, channelName]) // Dependencies: recreate if these change
+  }, [supabase, channelName, setupChannel]) // Dependencies: recreate if these change
 
   return channelRef
 }

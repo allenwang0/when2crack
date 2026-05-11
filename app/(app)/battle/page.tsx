@@ -10,6 +10,9 @@ import { useAuth } from '@/lib/contexts/AuthContext'
 import { useLocalStorage } from '@/lib/hooks/useLocalStorage'
 import { useBattleUndo } from '@/lib/hooks/useBattleUndo'
 import { BattleUndoButton } from '@/components/BattleUndoButton'
+import { Confetti } from '@/components/ui/Confetti'
+import { useSwipe } from '@/lib/hooks/useSwipe'
+import { triggerHaptic } from '@/lib/utils/haptics'
 import type { RosterPerson } from '@/lib/types'
 import { calculateEloChanges, calculateInitialElo } from '@/lib/algorithms/elo'
 import { API_SAFETY_TIMEOUT, BATTLE_RESULT_DISPLAY_DURATION } from '@/lib/constants'
@@ -32,6 +35,7 @@ export default function BattlePage() {
   } | null>(null)
   const [error, setError] = useState('')
   const [showOutOfComparisons, setShowOutOfComparisons] = useState(false)
+  const [showConfetti, setShowConfetti] = useState(false)
 
   // Battle undo functionality
   const { recordBattle, undo, isUndoable, getRemainingTime } = useBattleUndo({
@@ -39,6 +43,25 @@ export default function BattlePage() {
     onUndo: () => {
       logger.info('Battle undo triggered')
     },
+  })
+
+  // Swipe handlers for both cards
+  const swipePerson1 = useSwipe({
+    onSwipe: (direction) => {
+      if (direction === 'right' && person1 && person2 && !processing) {
+        handleBattle(person1.id, person2.id) // Vote for person1
+      }
+    },
+    threshold: 50,
+  })
+
+  const swipePerson2 = useSwipe({
+    onSwipe: (direction) => {
+      if (direction === 'left' && person1 && person2 && !processing) {
+        handleBattle(person2.id, person1.id) // Vote for person2
+      }
+    },
+    threshold: 50,
   })
 
   const getBattleKey = (id1: string, id2: string) => {
@@ -144,6 +167,8 @@ export default function BattlePage() {
     }
 
     return () => clearTimeout(safetyTimeout)
+    // fetchBattlePairGuest is stable relative to localRoster which is in deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, authLoading, localRoster])
 
   const handleUndo = () => {
@@ -221,6 +246,11 @@ export default function BattlePage() {
         loserChange,
       })
 
+      // Trigger haptic and confetti
+      triggerHaptic('success')
+      setShowConfetti(true)
+      setTimeout(() => setShowConfetti(false), 2000)
+
       // Auto-load next battle
       setTimeout(() => {
         fetchBattlePairGuest()
@@ -262,6 +292,11 @@ export default function BattlePage() {
         winnerChange: data.winner.change,
         loserChange: data.loser.change,
       })
+
+      // Trigger haptic and confetti
+      triggerHaptic('success')
+      setShowConfetti(true)
+      setTimeout(() => setShowConfetti(false), 2000)
 
       // Auto-load next battle
       setTimeout(() => {
@@ -396,18 +431,56 @@ export default function BattlePage() {
       )}
 
       {/* Battle Cards */}
-      <div className="grid grid-cols-2 gap-2 sm:gap-4 mb-6">
-        <BattleCard
-          person={person1}
-          onClick={() => handleBattle(person1.id, person2.id)}
-          disabled={processing}
-        />
-        <BattleCard
-          person={person2}
-          onClick={() => handleBattle(person2.id, person1.id)}
-          disabled={processing}
-        />
+      <div className="grid grid-cols-2 gap-2 sm:gap-4 mb-6 relative">
+        <div
+          className="relative"
+          {...swipePerson1}
+          style={{
+            transform: swipePerson1.swiping
+              ? `translateX(${swipePerson1.swipeOffset.x}px) rotate(${swipePerson1.swipeOffset.x / 10}deg)`
+              : 'none',
+            transition: swipePerson1.swiping ? 'none' : 'transform 0.2s ease-out',
+          }}
+        >
+          <BattleCard
+            person={person1}
+            onClick={() => handleBattle(person1.id, person2.id)}
+            disabled={processing}
+          />
+          {swipePerson1.swipeOffset.x > 30 && (
+            <div className="absolute top-4 right-4 bg-teal text-white px-4 py-2 rounded-full font-bold text-sm shadow-lg z-10 animate-fade-in">
+              VOTE ✓
+            </div>
+          )}
+        </div>
+
+        <div
+          className="relative"
+          {...swipePerson2}
+          style={{
+            transform: swipePerson2.swiping
+              ? `translateX(${swipePerson2.swipeOffset.x}px) rotate(${swipePerson2.swipeOffset.x / 10}deg)`
+              : 'none',
+            transition: swipePerson2.swiping ? 'none' : 'transform 0.2s ease-out',
+          }}
+        >
+          <BattleCard
+            person={person2}
+            onClick={() => handleBattle(person2.id, person1.id)}
+            disabled={processing}
+          />
+          {swipePerson2.swipeOffset.x < -30 && (
+            <div className="absolute top-4 left-4 bg-teal text-white px-4 py-2 rounded-full font-bold text-sm shadow-lg z-10 animate-fade-in">
+              VOTE ✓
+            </div>
+          )}
+        </div>
       </div>
+
+      {/* Swipe instruction */}
+      <p className="text-center text-xs text-gray-500 dark:text-gray-400 mb-4">
+        💡 Swipe right on left card or left on right card to vote
+      </p>
 
       {/* VS Divider */}
       <div className="text-center mb-6">

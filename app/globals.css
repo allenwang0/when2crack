@@ -180,3 +180,90 @@ h1, h2, h3, h4, h5, h6, p {
     animation: none;
   }
 }
+
+/* Dark mode colors */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0F0F0F;
+    --foreground: #FAFAFA;
+    --card: #1A1A1A;
+    --border: #2A2A2A;
+
+    --yellow-soft: #332A0F;
+    --gray: #2A2A2A;
+
+    /* Adjust accent colors for dark mode */
+    --pink: #FF9EC8;
+    --purple: #D4B0F5;
+    --teal: #00F0A0;
+  }
+}
+
+/* Force dark mode when data-theme attribute is present */
+[data-theme="dark"] {
+  --background: #0F0F0F;
+  --foreground: #FAFAFA;
+  --card: #1A1A1A;
+  --border: #2A2A2A;
+  --yellow-soft: #332A0F;
+  --gray: #2A2A2A;
+  --pink: #FF9EC8;
+  --purple: #D4B0F5;
+  --teal: #00F0A0;
+}
+
+[data-theme="light"] {
+  --background: #FFFEF8;
+  --foreground: #1A1A1A;
+  --card: #FFFFFF;
+  --border: #F5F5F0;
+  --yellow-soft: #FFF4CC;
+  --gray: #E8E8E8;
+  --pink: #FFB6D9;
+  --purple: #E4C1F9;
+  --teal: #00D084;
+}
+
+/* Animations */
+@keyframes bounce-slow {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.animate-bounce-slow {
+  animation: bounce-slow 3s ease-in-out infinite;
+}
+
+@keyframes confetti {
+  0% {
+    transform: translateY(0) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100vh) rotate(720deg);
+    opacity: 0;
+  }
+}
+
+.animate-confetti {
+  animation: confetti 1.5s ease-out forwards;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.2s ease-out;
+}

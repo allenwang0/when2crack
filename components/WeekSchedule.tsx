@@ -30,11 +30,15 @@ function formatDate(date: Date): string {
   return date.toISOString().split('T')[0]
 }
 
+// Constants
+const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+const HOURS = Array.from({ length: 24 }, (_, i) => i) // 0-23
+
 export function WeekSchedule({ comparisonMode = false, comparisonName }: WeekScheduleProps) {
   const { user } = useAuth()
   const { toasts, showToast, removeToast } = useToast()
-  const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
-  const hours = Array.from({ length: 24 }, (_, i) => i) // 0-23
+  const days = DAYS
+  const hours = HOURS
 
   // Week selection state
   const [selectedWeekStart, setSelectedWeekStart] = useState<Date>(getMonday(new Date()))
@@ -164,8 +168,8 @@ export function WeekSchedule({ comparisonMode = false, comparisonName }: WeekSch
     const sorted = [...overlappingSlots].sort((a, b) => {
       const [dayA, hourA] = a.split('-')
       const [dayB, hourB] = b.split('-')
-      const dayIndexA = days.indexOf(dayA)
-      const dayIndexB = days.indexOf(dayB)
+      const dayIndexA = DAYS.indexOf(dayA)
+      const dayIndexB = DAYS.indexOf(dayB)
       if (dayIndexA !== dayIndexB) return dayIndexA - dayIndexB
       return parseInt(hourA) - parseInt(hourB)
     })
@@ -398,7 +402,7 @@ export function WeekSchedule({ comparisonMode = false, comparisonName }: WeekSch
                           if (!isTouchDragging) return
                           e.preventDefault() // Prevent scrolling while dragging
                           const touch = e.touches[0]
-                          const slot = getSlotAtTouch(touch)
+                          const slot = getSlotAtTouch(touch as any)
                           if (slot && slot.key !== key) {
                             toggleSlot(slot.day, slot.hour)
                           }

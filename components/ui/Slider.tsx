@@ -48,14 +48,15 @@ export function Slider({
     <div className="w-full">
       <div className="mb-3">
         <div className="flex items-center justify-center gap-2 mb-2">
-          <span className="text-purple-400">{getIcon()}</span>
-          <label className="text-sm font-medium text-foreground">{label}</label>
+          <span className="text-purple-400" aria-hidden="true">{getIcon()}</span>
+          <label htmlFor={`slider-${label.toLowerCase().replace(/\s+/g, '-')}`} className="text-sm font-medium text-foreground">{label}</label>
         </div>
         {showValue && (
-          <div className="text-center text-3xl font-bold" style={{ color: '#FFB6C1' }}>{value}/10</div>
+          <div className="text-center text-3xl font-bold" style={{ color: '#FFB6C1' }} aria-live="polite" aria-atomic="true">{value}/10</div>
         )}
       </div>
       <input
+        id={`slider-${label.toLowerCase().replace(/\s+/g, '-')}`}
         type="range"
         min={min}
         max={max}
@@ -63,6 +64,11 @@ export function Slider({
         value={value}
         onChange={(e) => onChange(parseInt(e.target.value))}
         className="w-full h-2 bg-border rounded-lg appearance-none cursor-pointer slider"
+        aria-label={`${label} score`}
+        aria-valuemin={min}
+        aria-valuemax={max}
+        aria-valuenow={value}
+        aria-valuetext={`${value} out of ${max}`}
         style={{
           background: `linear-gradient(to right, #FFB6C1 0%, #FFB6C1 ${
             ((value - min) / (max - min)) * 100
