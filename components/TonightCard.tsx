@@ -40,8 +40,8 @@ export const TonightCard = memo(function TonightCard({ recommendation, rank, onS
 
       {/* Person Info */}
       <div className="flex items-start gap-4 mb-4">
-        {person.avatar_url && person.avatar_url.trim() !== '' ? (
-          <div className="w-16 h-16 rounded-full overflow-hidden flex-shrink-0 border-2 border-pink">
+        {person.avatar_url && person.avatar_url.trim() !== '' && person.avatar_url !== 'null' && person.avatar_url !== 'undefined' ? (
+          <div className="w-16 h-16 rounded-full overflow-hidden flex-shrink-0 border-2 border-pink bg-white">
             <img
               src={person.avatar_url}
               alt={person.name}
@@ -49,6 +49,10 @@ export const TonightCard = memo(function TonightCard({ recommendation, rank, onS
               loading="lazy"
               width={64}
               height={64}
+              onError={(e) => {
+                // Fallback to initials on error
+                e.currentTarget.style.display = 'none'
+              }}
             />
           </div>
         ) : (

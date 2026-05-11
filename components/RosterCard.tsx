@@ -24,14 +24,19 @@ export const RosterCard = memo(function RosterCard({ person }: RosterCardProps) 
       <div className="bg-white border-2 border-gray-200 rounded-2xl p-5 hover:border-yellow-400 hover:shadow-lg hover:scale-[1.01] transition-all duration-200 cursor-pointer focus-within:ring-4 focus-within:ring-yellow-bright focus-within:ring-offset-2">
         <div className="flex items-start gap-4">
           {/* Avatar - Increased to 64px */}
-          {person.avatar_url && person.avatar_url.trim() !== '' ? (
-            <div className="w-16 h-16 rounded-full overflow-hidden flex-shrink-0 border-2 border-pink relative">
+          {person.avatar_url && person.avatar_url.trim() !== '' && person.avatar_url !== 'null' && person.avatar_url !== 'undefined' ? (
+            <div className="w-16 h-16 rounded-full overflow-hidden flex-shrink-0 border-2 border-pink relative bg-white">
               <Image
                 src={person.avatar_url}
                 alt={`${person.name}'s profile photo`}
                 fill
                 sizes="64px"
                 className="object-cover"
+                onError={(e) => {
+                  // Fallback to initials on error
+                  const target = e.target as HTMLImageElement
+                  target.style.display = 'none'
+                }}
               />
             </div>
           ) : (

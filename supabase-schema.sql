@@ -8,6 +8,7 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 CREATE TABLE IF NOT EXISTS public.users (
   id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
   email TEXT NOT NULL,
+  avatar_url TEXT,
   availability_window_start TIME DEFAULT '18:00:00',
   availability_window_end TIME DEFAULT '23:00:00',
   panic_mode BOOLEAN DEFAULT FALSE,

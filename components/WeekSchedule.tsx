@@ -256,14 +256,17 @@ export function WeekSchedule({ comparisonMode = false, comparisonName }: WeekSch
       const baseUrl = process.env.NEXT_PUBLIC_APP_URL || (typeof window !== 'undefined' ? window.location.origin : '')
       const shareUrl = `${baseUrl}/schedule?for=${encodeURIComponent(displayName)}&schedule=${encodedSchedule}`
 
-      // Copy to clipboard
-      await navigator.clipboard.writeText(shareUrl)
+      // Copy to clipboard with fallback support
+      const { copyToClipboard } = require('@/lib/utils/clipboard')
+      await copyToClipboard(shareUrl)
       showToast(`Link copied! Send it to ${comparisonName || 'them'} to share your availability`, 'success')
     } catch (err) {
       if (process.env.NODE_ENV === 'development') {
         console.error('Failed to generate response link:', err)
       }
-      showToast('Failed to copy link. Please try again.', 'error')
+      const { getClipboardErrorMessage } = require('@/lib/utils/clipboard')
+      const errorMessage = getClipboardErrorMessage(err)
+      showToast(errorMessage, 'error')
     }
   }
 

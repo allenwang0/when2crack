@@ -60,8 +60,9 @@ export default function SchedulePage() {
       const baseUrl = process.env.NEXT_PUBLIC_APP_URL || window.location.origin
       const shareUrl = `${baseUrl}/schedule?for=${encodeURIComponent(cleanName)}&schedule=${encodedSchedule}`
 
-      // Copy to clipboard
-      await navigator.clipboard.writeText(shareUrl)
+      // Copy to clipboard with fallback support
+      const { copyToClipboard, getClipboardErrorMessage } = await import('@/lib/utils/clipboard')
+      await copyToClipboard(shareUrl)
 
       setLinkCopied(true)
       showToast('Link copied! Send it to coordinate a time', 'success')
@@ -69,7 +70,9 @@ export default function SchedulePage() {
       setTimeout(() => setLinkCopied(false), 3000)
     } catch (err) {
       console.error('Failed to share schedule:', err)
-      showToast('Failed to copy link. Please try again.', 'error')
+      const { getClipboardErrorMessage } = await import('@/lib/utils/clipboard')
+      const errorMessage = getClipboardErrorMessage(err)
+      showToast(errorMessage, 'error')
     }
   }
 

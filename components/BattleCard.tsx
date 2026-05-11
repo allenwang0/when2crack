@@ -33,8 +33,8 @@ export const BattleCard = memo(function BattleCard({ person, onClick, disabled }
       aria-label={`Choose ${person.name} as winner. Composite score: ${compositeScore}, ELO: ${person.elo_rating}`}
     >
       {/* Avatar */}
-      {person.avatar_url && person.avatar_url.trim() !== '' ? (
-        <div className="w-16 h-16 sm:w-24 sm:h-24 rounded-full overflow-hidden mx-auto mb-4 sm:mb-5 border-2 border-pink relative">
+      {person.avatar_url && person.avatar_url.trim() !== '' && person.avatar_url !== 'null' && person.avatar_url !== 'undefined' ? (
+        <div className="w-16 h-16 sm:w-24 sm:h-24 rounded-full overflow-hidden mx-auto mb-4 sm:mb-5 border-2 border-pink relative bg-white">
           <Image
             src={person.avatar_url}
             alt={`${person.name}'s profile photo`}
@@ -42,6 +42,11 @@ export const BattleCard = memo(function BattleCard({ person, onClick, disabled }
             sizes="(max-width: 640px) 64px, 96px"
             className="object-cover"
             priority
+            onError={(e) => {
+              // Fallback to initials on error
+              const target = e.target as HTMLImageElement
+              target.style.display = 'none'
+            }}
           />
         </div>
       ) : (

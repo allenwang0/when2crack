@@ -18,7 +18,7 @@ import type { RosterPerson } from '@/lib/types'
 export default function ProfilePage() {
   const router = useRouter()
   const { user, loading: authLoading, signOut } = useAuth()
-  const { startTour } = useOnboarding()
+  const { startTour, nextStep } = useOnboarding()
   const supabase = createClient()
   const { toasts, showToast, removeToast } = useToast()
   const [localRoster] = useLocalStorage<RosterPerson[]>('guest_roster', [])
@@ -206,9 +206,21 @@ export default function ProfilePage() {
       {/* Header */}
       <div className="text-center mb-8">
         <div className="relative inline-block group">
-          {avatarUrl && avatarUrl.trim() !== '' ? (
-            <div className="w-24 h-24 rounded-full overflow-hidden border-4 border-pink shadow-lg">
-              <img src={avatarUrl} alt="Profile" className="w-full h-full object-cover" />
+          {avatarUrl && avatarUrl.trim() !== '' && avatarUrl !== 'null' && avatarUrl !== 'undefined' ? (
+            <div className="w-24 h-24 rounded-full overflow-hidden border-4 border-pink shadow-lg bg-white">
+              <img
+                src={avatarUrl}
+                alt="Profile"
+                className="w-full h-full object-cover"
+                onError={(e) => {
+                  // Fallback to default if image fails to load
+                  const target = e.target as HTMLImageElement
+                  const parent = target.parentElement
+                  if (parent) {
+                    parent.innerHTML = '<img src="/egg.png" alt="Default Profile" class="w-20 h-20 object-contain m-auto" />'
+                  }
+                }}
+              />
             </div>
           ) : (
             <div className="w-24 h-24 bg-white rounded-full flex items-center justify-center shadow-lg border-4 border-pink/20">
@@ -373,6 +385,7 @@ export default function ProfilePage() {
             localStorage.removeItem('onboarding_completed')
             localStorage.removeItem('onboarding_skipped')
             startTour()
+            nextStep() // Move to step 1 to start the tour
             router.push('/roster')
           }}
           className="w-full"

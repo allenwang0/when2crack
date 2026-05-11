@@ -119,11 +119,15 @@ export function TonightSwipeStack({
 
           {/* Avatar and name */}
           <div className="flex flex-col items-center mb-6">
-            {person.avatar_url && person.avatar_url.trim() !== '' ? (
+            {person.avatar_url && person.avatar_url.trim() !== '' && person.avatar_url !== 'null' && person.avatar_url !== 'undefined' ? (
               <img
                 src={person.avatar_url}
                 alt={person.name}
-                className="w-32 h-32 rounded-full border-4 border-pink mb-4 object-cover"
+                className="w-32 h-32 rounded-full border-4 border-pink mb-4 object-cover bg-white"
+                onError={(e) => {
+                  // Fallback to initials on error
+                  e.currentTarget.style.display = 'none'
+                }}
               />
             ) : (
               <div
@@ -180,9 +184,9 @@ export function TonightSwipeStack({
 
           {/* Instructions */}
           <div className="mt-auto text-center text-sm text-gray-500 dark:text-gray-400 space-y-2">
-            <p>👉 Swipe right to shoot your shot</p>
-            <p>👈 Swipe left to skip</p>
-            <p>👆 Swipe up to schedule</p>
+            <p>👉 Swipe or drag right to shoot your shot</p>
+            <p>👈 Swipe or drag left to skip</p>
+            <p>👆 Swipe or drag up to schedule</p>
           </div>
         </div>
       </div>

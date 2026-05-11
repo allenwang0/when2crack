@@ -235,13 +235,34 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
   }
 
   const handleShareLink = async () => {
+    // Get current week's Monday date
+    const getMonday = (date: Date): Date => {
+      const d = new Date(date)
+      const day = d.getDay()
+      const diff = d.getDate() - day + (day === 0 ? -6 : 1)
+      return new Date(d.setDate(diff))
+    }
+
+    const formatDate = (date: Date): string => {
+      return date.toISOString().split('T')[0]
+    }
+
+    const currentWeekStart = getMonday(new Date())
+    const weekKey = `week_schedule_${formatDate(currentWeekStart)}`
+
     // Get user's current schedule from localStorage
-    const storedSchedule = localStorage.getItem('week_schedule')
+    const storedSchedule = localStorage.getItem(weekKey)
     let mySchedule: string[] = []
     try {
       mySchedule = storedSchedule ? JSON.parse(storedSchedule) : []
     } catch (e) {
       logger.error('Failed to parse schedule:', e)
+    }
+
+    // Check if schedule is empty
+    if (mySchedule.length === 0) {
+      showToast('Set your availability in the Schedule tab first!', 'error')
+      return
     }
 
     // Encode schedule with timezone information
@@ -252,11 +273,17 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
     const shareUrl = `${baseUrl}/schedule?for=${encodeURIComponent(person?.name || '')}&schedule=${encodedSchedule}`
 
     try {
-      await navigator.clipboard.writeText(shareUrl)
+      // Copy to clipboard with fallback support
+      const { copyToClipboard } = await import('@/lib/utils/clipboard')
+      await copyToClipboard(shareUrl)
       setLinkCopied(true)
+      showToast('Link copied! Send it to coordinate a time', 'success')
       setTimeout(() => setLinkCopied(false), 2000)
     } catch (err) {
       logger.error('Failed to copy:', err)
+      const { getClipboardErrorMessage } = await import('@/lib/utils/clipboard')
+      const errorMessage = getClipboardErrorMessage(err)
+      showToast(errorMessage, 'error')
     }
   }
 
@@ -379,12 +406,36 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
     <div className="py-6">
       {!user && !authLoading && <GuestBanner />}
 
+      {/* Back Button */}
+      <button
+        onClick={() => router.push('/roster')}
+        className="flex items-center gap-2 text-gray-600 hover:text-black transition-colors mb-4"
+      >
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+        </svg>
+        <span className="text-sm font-medium">Back to Roster</span>
+      </button>
+
       {/* Header */}
       <div className="flex items-start gap-4 mb-6">
         <div className="relative flex-shrink-0">
-          {avatarUrl && avatarUrl.trim() !== '' ? (
-            <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-pink">
-              <img src={avatarUrl} alt={person.name} className="w-full h-full object-cover" />
+          {avatarUrl && avatarUrl.trim() !== '' && avatarUrl !== 'null' && avatarUrl !== 'undefined' ? (
+            <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-pink bg-white">
+              <img
+                src={avatarUrl}
+                alt={person.name}
+                className="w-full h-full object-cover"
+                onError={(e) => {
+                  // Fallback to initials if image fails to load
+                  const target = e.target as HTMLImageElement
+                  const parent = target.parentElement
+                  if (parent) {
+                    parent.innerHTML = `<div class="w-full h-full rounded-full flex items-center justify-center text-white font-bold text-2xl" style="background-color: ${person.avatar_color}">${initials}</div>`
+                    parent.className = 'w-16 h-16'
+                  }
+                }}
+              />
             </div>
           ) : (
             <div
