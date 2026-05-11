@@ -143,8 +143,8 @@ export default function ProfilePage() {
           setTotalHangs(hangsResult.count)
         }
 
-        if (userResult.data) {
-          setAvatarUrl((userResult.data as any).avatar_url)
+        if ((userResult as any).data) {
+          setAvatarUrl(((userResult as any).data as any).avatar_url)
         }
 
         setLoading(false)

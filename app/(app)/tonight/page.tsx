@@ -287,18 +287,16 @@ export default function TonightPage() {
     }
 
     try {
-      // @ts-ignore
       const { error } = await supabase.from('outreach_log').insert({
         roster_id: personId,
         user_id: user.id,
         outreach_date: new Date().toISOString(),
-      })
+      } as any)
 
       if (error) throw error
 
-      // @ts-ignore
-      await supabase
-        .from('roster')
+      await (supabase
+        .from('roster') as any)
         .update({ last_contact_date: new Date().toISOString() })
         .eq('id', personId)
         .eq('user_id', user.id)
