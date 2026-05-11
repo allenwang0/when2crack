@@ -57,12 +57,20 @@ export function OnboardingController({ children }: OnboardingControllerProps) {
     // Handle tab state for Tonight page via custom event
     if (step.tabState) {
       // Small delay to ensure route has loaded before forcing tab
-      setTimeout(() => {
+      // Retry mechanism to ensure the event is dispatched after listener is ready
+      const dispatchTabEvent = (retries = 0) => {
         const event = new CustomEvent('onboarding:forceTab', {
           detail: { tab: step.tabState!.activeTab }
         })
         window.dispatchEvent(event)
-      }, 300)
+
+        // Retry up to 3 times if page might still be loading
+        if (retries < 3) {
+          setTimeout(() => dispatchTabEvent(retries + 1), 200)
+        }
+      }
+
+      setTimeout(() => dispatchTabEvent(), 300)
     }
   }, [state.currentStep, state.isActive, pathname, router])
 
