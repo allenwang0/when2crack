@@ -20,8 +20,23 @@ export default function SchedulePage() {
 
   const handleShareSchedule = async () => {
     try {
-      // Get user's schedule from localStorage
-      const storedSchedule = localStorage.getItem('week_schedule')
+      // Get current week's Monday date
+      const getMonday = (date: Date): Date => {
+        const d = new Date(date)
+        const day = d.getDay()
+        const diff = d.getDate() - day + (day === 0 ? -6 : 1)
+        return new Date(d.setDate(diff))
+      }
+
+      const formatDate = (date: Date): string => {
+        return date.toISOString().split('T')[0]
+      }
+
+      const currentWeekStart = getMonday(new Date())
+      const weekKey = `week_schedule_${formatDate(currentWeekStart)}`
+
+      // Get user's schedule from localStorage for current week
+      const storedSchedule = localStorage.getItem(weekKey)
       let mySchedule: string[] = []
 
       try {

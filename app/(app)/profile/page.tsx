@@ -211,8 +211,8 @@ export default function ProfilePage() {
               <img src={avatarUrl} alt="Profile" className="w-full h-full object-cover" />
             </div>
           ) : (
-            <div className="w-24 h-24 bg-gradient-to-br from-pink to-purple rounded-full flex items-center justify-center shadow-lg">
-              <span className="text-5xl">🥚</span>
+            <div className="w-24 h-24 bg-white rounded-full flex items-center justify-center shadow-lg border-4 border-pink/20">
+              <img src="/egg.png" alt="Default Profile" className="w-20 h-20 object-contain" />
             </div>
           )}
 

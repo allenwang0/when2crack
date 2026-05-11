@@ -337,18 +337,14 @@ export function WeekSchedule({ comparisonMode = false, comparisonName }: WeekSch
                     return (
                       <button
                         key={key}
-                        onMouseEnter={() => !comparisonMode && isDragging && toggleSlot(day, hour)}
+                        onMouseEnter={() => isDragging && toggleSlot(day, hour)}
                         onMouseDown={() => {
-                          if (!comparisonMode) {
-                            setIsDragging(true)
-                            toggleSlot(day, hour)
-                          }
+                          setIsDragging(true)
+                          toggleSlot(day, hour)
                         }}
                         onMouseUp={() => setIsDragging(false)}
                         onTouchStart={() => {
-                          if (!comparisonMode) {
-                            toggleSlot(day, hour)
-                          }
+                          toggleSlot(day, hour)
                         }}
                         className={`flex-1 h-10 min-w-[60px] transition-all rounded-lg mx-0.5 touch-manipulation ${
                           isOverlap
@@ -358,7 +354,7 @@ export function WeekSchedule({ comparisonMode = false, comparisonName }: WeekSch
                             : isComparison
                             ? 'bg-pink border-2 border-foreground'
                             : 'bg-background border border-gray-200'
-                        } ${comparisonMode ? 'cursor-default' : 'cursor-pointer active:scale-95'}`}
+                        } cursor-pointer active:scale-95`}
                       />
                     )
                   })}
