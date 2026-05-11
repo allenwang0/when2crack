@@ -230,8 +230,11 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
       console.error('Failed to parse schedule:', e)
     }
 
+    // Encode schedule with timezone information
+    const { encodeScheduleWithTimezone } = await import('@/lib/utils/timezone')
+    const encodedSchedule = encodeScheduleWithTimezone(mySchedule)
+
     const baseUrl = window.location.origin
-    const encodedSchedule = encodeURIComponent(JSON.stringify(mySchedule))
     const shareUrl = `${baseUrl}/schedule?for=${encodeURIComponent(person?.name || '')}&schedule=${encodedSchedule}`
 
     try {

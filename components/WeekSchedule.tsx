@@ -35,10 +35,18 @@ export function WeekSchedule({ comparisonMode = false, comparisonName }: WeekSch
       const encodedSchedule = params.get('schedule')
       if (encodedSchedule) {
         try {
-          const decoded = JSON.parse(decodeURIComponent(encodedSchedule))
-          setComparisonSlots(new Set(decoded))
+          // Try new timezone-aware format first
+          const { decodeScheduleWithTimezone } = require('@/lib/utils/timezone')
+          const { convertedSlots } = decodeScheduleWithTimezone(encodedSchedule)
+          setComparisonSlots(new Set(convertedSlots))
         } catch (e) {
-          console.error('Failed to decode shared schedule:', e)
+          // Fallback to old format (plain array)
+          try {
+            const decoded = JSON.parse(decodeURIComponent(encodedSchedule))
+            setComparisonSlots(new Set(decoded))
+          } catch (fallbackError) {
+            console.error('Failed to decode shared schedule:', fallbackError)
+          }
         }
       }
     }
