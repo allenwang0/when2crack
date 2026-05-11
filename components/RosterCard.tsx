@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import Link from 'next/link'
 import type { RosterPerson } from '@/lib/types'
 import { Badge } from '@/components/ui/Badge'
@@ -9,7 +10,7 @@ interface RosterCardProps {
   person: RosterPerson
 }
 
-export function RosterCard({ person }: RosterCardProps) {
+export const RosterCard = memo(function RosterCard({ person }: RosterCardProps) {
   const initials = getInitials(person.name)
   const compositeScore = calculateCompositeScore(person)
 
@@ -57,4 +58,4 @@ export function RosterCard({ person }: RosterCardProps) {
       </div>
     </Link>
   )
-}
+})

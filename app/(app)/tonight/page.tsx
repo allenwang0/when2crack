@@ -119,17 +119,19 @@ export default function TonightPage() {
         return
       }
 
-      const allPairs: Array<[RosterPerson, RosterPerson]> = []
+      // Convert completed battles to Set for O(1) lookups
+      const completedSet = new Set(completedBattles)
+
+      // Find available pairs without generating all pairs upfront
+      const availablePairs: Array<[RosterPerson, RosterPerson]> = []
       for (let i = 0; i < localRoster.length; i++) {
         for (let j = i + 1; j < localRoster.length; j++) {
-          allPairs.push([localRoster[i], localRoster[j]])
+          const key = getBattleKey(localRoster[i].id, localRoster[j].id)
+          if (!completedSet.has(key)) {
+            availablePairs.push([localRoster[i], localRoster[j]])
+          }
         }
       }
-
-      const availablePairs = allPairs.filter(([p1, p2]) => {
-        const key = getBattleKey(p1.id, p2.id)
-        return !completedBattles.includes(key)
-      })
 
       if (availablePairs.length === 0) {
         setShowOutOfComparisons(true)

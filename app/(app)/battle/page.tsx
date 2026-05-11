@@ -43,19 +43,20 @@ export default function BattlePage() {
         return
       }
 
-      // Get all possible pairs
-      const allPairs: Array<[RosterPerson, RosterPerson]> = []
+      // Convert completed/skipped battles to Sets for O(1) lookups
+      const completedSet = new Set(completedBattles)
+      const skippedSet = new Set(skippedBattles)
+
+      // Find available pairs without generating all pairs upfront
+      const availablePairs: Array<[RosterPerson, RosterPerson]> = []
       for (let i = 0; i < localRoster.length; i++) {
         for (let j = i + 1; j < localRoster.length; j++) {
-          allPairs.push([localRoster[i], localRoster[j]])
+          const key = getBattleKey(localRoster[i].id, localRoster[j].id)
+          if (!completedSet.has(key) && !skippedSet.has(key)) {
+            availablePairs.push([localRoster[i], localRoster[j]])
+          }
         }
       }
-
-      // Filter out completed and skipped battles
-      const availablePairs = allPairs.filter(([p1, p2]) => {
-        const key = getBattleKey(p1.id, p2.id)
-        return !completedBattles.includes(key) && !skippedBattles.includes(key)
-      })
 
       // If all battles completed, show completion screen
       if (availablePairs.length === 0) {
@@ -325,7 +326,7 @@ export default function BattlePage() {
       )}
 
       {/* Battle Cards */}
-      <div className="grid grid-cols-2 gap-4 mb-6">
+      <div className="grid grid-cols-2 gap-2 sm:gap-4 mb-6">
         <BattleCard
           person={person1}
           onClick={() => handleBattle(person1.id, person2.id)}

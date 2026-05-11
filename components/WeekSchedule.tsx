@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo, useCallback } from 'react'
 import { useLocalStorage } from '@/lib/hooks/useLocalStorage'
 import { useAuth } from '@/lib/contexts/AuthContext'
 
@@ -125,8 +125,9 @@ export function WeekSchedule({ comparisonMode = false, comparisonName }: WeekSch
 
   const isThisWeek = formatDate(selectedWeekStart) === formatDate(getMonday(new Date()))
 
-  // Calculate overlapping slots
-  const getOverlappingSlots = () => {
+  // Memoize overlapping slots calculation
+  const overlappingSlots = useMemo(() => {
+    if (!comparisonMode) return []
     const overlaps: string[] = []
     selectedSlots.forEach(slot => {
       if (comparisonSlots.has(slot)) {
@@ -134,14 +135,14 @@ export function WeekSchedule({ comparisonMode = false, comparisonName }: WeekSch
       }
     })
     return overlaps
-  }
+  }, [comparisonMode, selectedSlots, comparisonSlots])
 
-  // Find best consecutive time blocks
-  const getBestTimeBlocks = (overlaps: string[]) => {
-    if (overlaps.length === 0) return []
+  // Memoize best time blocks calculation
+  const bestBlocks = useMemo(() => {
+    if (!comparisonMode || overlappingSlots.length === 0) return []
 
     // Sort by day and hour
-    const sorted = [...overlaps].sort((a, b) => {
+    const sorted = [...overlappingSlots].sort((a, b) => {
       const [dayA, hourA] = a.split('-')
       const [dayB, hourB] = b.split('-')
       const dayIndexA = days.indexOf(dayA)
@@ -172,14 +173,11 @@ export function WeekSchedule({ comparisonMode = false, comparisonName }: WeekSch
 
     // Sort by count (longest blocks first)
     return blocks.sort((a, b) => b.count - a.count)
-  }
+  }, [comparisonMode, overlappingSlots])
 
-  const overlappingSlots = comparisonMode ? getOverlappingSlots() : []
-  const bestBlocks = comparisonMode ? getBestTimeBlocks(overlappingSlots) : []
+  const getSlotKey = useCallback((day: string, hour: number) => `${day}-${hour}`, [])
 
-  const getSlotKey = (day: string, hour: number) => `${day}-${hour}`
-
-  const toggleSlot = (day: string, hour: number) => {
+  const toggleSlot = useCallback((day: string, hour: number) => {
     const key = getSlotKey(day, hour)
     const newSlots = new Set(selectedSlots)
 
@@ -190,7 +188,7 @@ export function WeekSchedule({ comparisonMode = false, comparisonName }: WeekSch
     }
 
     setSelectedSlots(newSlots)
-  }
+  }, [selectedSlots, setSelectedSlots, getSlotKey])
 
   const formatHour = (hour: number) => {
     if (hour === 0) return '12am'
@@ -228,11 +226,11 @@ export function WeekSchedule({ comparisonMode = false, comparisonName }: WeekSch
   }
 
   return (
-    <div className="bg-white rounded-3xl p-6 shadow-lg border-[3px] border-yellow-bright">
+    <div className="bg-white rounded-3xl p-3 sm:p-6 shadow-lg border-[3px] border-yellow-bright">
       {/* Header */}
-      <div className="mb-6 text-center">
-        <div className="inline-block bg-black text-yellow-bright px-6 py-2 rounded-full mb-3">
-          <span className="font-bold text-lg">📅 This Week's Availability</span>
+      <div className="mb-4 sm:mb-6 text-center">
+        <div className="inline-block bg-black text-yellow-bright px-4 sm:px-6 py-2 rounded-full mb-3">
+          <span className="font-bold text-base sm:text-lg">📅 This Week's Availability</span>
         </div>
 
         {/* Week Picker - Only show when NOT in comparison mode */}
@@ -347,7 +345,12 @@ export function WeekSchedule({ comparisonMode = false, comparisonName }: WeekSch
                           }
                         }}
                         onMouseUp={() => setIsDragging(false)}
-                        className={`flex-1 h-10 min-w-[60px] transition-all rounded-lg mx-0.5 ${
+                        onTouchStart={() => {
+                          if (!comparisonMode) {
+                            toggleSlot(day, hour)
+                          }
+                        }}
+                        className={`flex-1 h-10 min-w-[60px] transition-all rounded-lg mx-0.5 touch-manipulation ${
                           isOverlap
                             ? 'bg-teal border-2 border-teal-dark'
                             : isSelected
@@ -355,7 +358,7 @@ export function WeekSchedule({ comparisonMode = false, comparisonName }: WeekSch
                             : isComparison
                             ? 'bg-pink border-2 border-foreground'
                             : 'bg-background border border-gray-200'
-                        } ${comparisonMode ? 'cursor-default' : 'cursor-pointer'}`}
+                        } ${comparisonMode ? 'cursor-default' : 'cursor-pointer active:scale-95'}`}
                       />
                     )
                   })}
@@ -367,7 +370,7 @@ export function WeekSchedule({ comparisonMode = false, comparisonName }: WeekSch
       </div>
 
       {/* Legend */}
-      <div className="mt-6 flex items-center justify-center gap-4 text-sm flex-wrap">
+      <div className="mt-4 sm:mt-6 flex items-center justify-center gap-3 sm:gap-4 text-xs sm:text-sm flex-wrap">
         {comparisonMode ? (
           <>
             <div className="flex items-center gap-2">

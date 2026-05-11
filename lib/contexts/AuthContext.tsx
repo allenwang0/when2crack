@@ -107,25 +107,38 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const signOut = async () => {
     try {
       console.log('Signing out...')
-      await supabase.auth.signOut()
+
+      // Clear any local storage (except guest data) FIRST
+      const guestRoster = localStorage.getItem('guest_roster')
+      const guestSchedule = localStorage.getItem('week_schedule')
+      const displayName = localStorage.getItem('display_name')
+
+      localStorage.clear()
+
+      // Restore guest data
+      if (guestRoster) localStorage.setItem('guest_roster', guestRoster)
+      if (guestSchedule) localStorage.setItem('week_schedule', guestSchedule)
+      if (displayName) localStorage.setItem('display_name', displayName)
+
+      // Sign out from Supabase and wait for it to complete
+      await supabase.auth.signOut({ scope: 'local' })
+
+      // Update state
       setUser(null)
 
-      // Clear any local storage (except guest data)
-      const guestRoster = localStorage.getItem('guest_roster')
-      localStorage.clear()
-      if (guestRoster) {
-        localStorage.setItem('guest_roster', guestRoster)
-      }
+      // Small delay to ensure signout completes
+      await new Promise(resolve => setTimeout(resolve, 100))
 
       // Force redirect to home page
       if (typeof window !== 'undefined') {
-        window.location.replace('/')
+        window.location.href = '/'
       }
     } catch (error) {
       console.error('Sign out error:', error)
-      // Force redirect even if there's an error
+      // Clear user and redirect even if there's an error
+      setUser(null)
       if (typeof window !== 'undefined') {
-        window.location.replace('/')
+        window.location.href = '/'
       }
     }
   }

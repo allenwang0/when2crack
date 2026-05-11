@@ -45,17 +45,19 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     <div className="flex flex-col" style={{ height: '100vh', overflow: 'hidden' }}>
       {/* Header */}
       <header className="flex-shrink-0 bg-white/80 backdrop-blur-sm border-b z-40" style={{ borderColor: '#F5F5F0', boxShadow: '0 2px 10px rgba(0,0,0,0.05)' }}>
-        <div className="max-w-md mx-auto flex items-center justify-between h-16 px-4">
-          <div className="flex items-center gap-2">
+        <div className="max-w-md mx-auto flex items-center justify-between h-16 px-3 sm:px-4">
+          <div className="flex items-center gap-2 min-w-0 flex-1">
             <img
               src="/icon.jpg"
               alt="When2Crack"
-              className="w-10 h-10 rounded-full"
+              className="w-9 h-9 sm:w-10 sm:h-10 rounded-full flex-shrink-0"
               style={{ border: '2px solid #FFD93D' }}
             />
-            <h1 className="font-serif text-lg font-bold" style={{ color: '#1A1A1A' }}>when2crack: organize your roster</h1>
+            <h1 className="font-serif text-base sm:text-lg font-bold truncate" style={{ color: '#1A1A1A' }}>
+              when2crack<span className="hidden sm:inline">: organize your roster</span>
+            </h1>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-shrink-0">
             {user ? (
               <button
                 onClick={handleSignOut}

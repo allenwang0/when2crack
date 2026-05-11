@@ -19,16 +19,27 @@ export default function RosterPage() {
   const [loading, setLoading] = useState(true)
   const [loadingMessage, setLoadingMessage] = useState('Loading...')
 
+  // Load guest roster immediately on mount (optimistic loading)
   useEffect(() => {
-    // Update login streak (roster is main entry point)
-    if (typeof window !== 'undefined') {
-      updateLoginStreak()
+    const storedRoster = localStorage.getItem('guest_roster')
+    if (storedRoster) {
+      try {
+        setRoster(JSON.parse(storedRoster))
+        setLoading(false) // Show content immediately
+      } catch (e) {
+        console.error('Error parsing guest roster:', e)
+      }
+    } else {
+      setLoading(false) // Show empty state immediately
     }
 
-    // If auth is still loading, wait
+    // Update login streak
+    updateLoginStreak()
+  }, [])
+
+  useEffect(() => {
+    // Wait for auth to complete
     if (authLoading) {
-      setLoadingMessage('Checking authentication...')
-      setLoading(true)
       return
     }
 
@@ -44,13 +55,12 @@ export default function RosterPage() {
       } else {
         setRoster([])
       }
+      setLoading(false)
     }
 
     // Guest mode: Use localStorage
     if (!user) {
-      setLoadingMessage('Loading roster...')
       loadGuestRoster()
-      setLoading(false)
 
       // Listen for storage changes (when other tabs/windows update)
       const handleStorageChange = (e: StorageEvent) => {
