@@ -52,13 +52,48 @@ export default function AuthPage() {
     }
   }
 
-  // Show loading spinner while checking auth status
+  // Show loading skeleton while checking auth status
   if (authLoading) {
     return (
-      <div className="h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading...</p>
+      <div className="h-screen flex items-center justify-center px-4 overflow-hidden">
+        <div className="w-full max-w-md">
+          <div className="text-center mb-8">
+            {/* Logo skeleton */}
+            <div className="mb-6 flex justify-center">
+              <div className="w-32 h-32 rounded-full skeleton" style={{ border: '4px solid #FFD93D' }} />
+            </div>
+            {/* Title skeleton */}
+            <div className="flex justify-center mb-4">
+              <div className="w-48 h-10 skeleton rounded-lg" />
+            </div>
+            {/* Subtitle skeleton */}
+            <div className="flex justify-center">
+              <div className="w-64 h-5 skeleton rounded-lg" />
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            {/* Google button skeleton */}
+            <div className="w-full h-12 skeleton rounded-2xl" />
+
+            {/* Divider */}
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-border"></div>
+              </div>
+              <div className="relative flex justify-center text-sm">
+                <span className="px-3 bg-background text-gray-400">or</span>
+              </div>
+            </div>
+
+            {/* Guest button skeleton */}
+            <div className="w-full h-12 skeleton rounded-2xl" />
+
+            {/* Footer text skeleton */}
+            <div className="flex justify-center mt-2">
+              <div className="w-3/4 h-4 skeleton rounded-lg" />
+            </div>
+          </div>
         </div>
       </div>
     )

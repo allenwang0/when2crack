@@ -60,7 +60,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
               style={{ border: '2px solid #FFD93D' }}
             />
             <h1 className="font-serif text-base sm:text-lg font-bold truncate text-gray-900 dark:text-gray-100">
-              when2crack<span className="hidden sm:inline">: organize your roster</span>
+              when2crack
             </h1>
           </div>
           <div className="flex items-center gap-2 flex-shrink-0">

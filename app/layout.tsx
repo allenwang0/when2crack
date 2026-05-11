@@ -19,13 +19,13 @@ const dmSerifDisplay = DM_Serif_Display({
 });
 
 export const metadata: Metadata = {
-  title: "when2crack: organize your roster",
+  title: "when2crack",
   description: "Your roster, ranked. Your night, decided.",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
-    title: "when2crack: organize your roster",
+    title: "when2crack",
   },
 };
 
