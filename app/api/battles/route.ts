@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
-import { updateElo } from '@/lib/algorithms/elo'
 
 export async function POST(request: NextRequest) {
   const supabase = await createClient()
@@ -25,75 +24,20 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Get current Elo ratings in parallel
-    const [winnerResult, loserResult] = await Promise.all([
-      // @ts-ignore
-      supabase
-        .from('roster')
-        .select('elo_rating')
-        .eq('id', winner_id)
-        .eq('user_id', user.id)
-        .single(),
-      // @ts-ignore
-      supabase
-        .from('roster')
-        .select('elo_rating')
-        .eq('id', loser_id)
-        .eq('user_id', user.id)
-        .single(),
-    ])
-
-    if (winnerResult.error) throw winnerResult.error
-    if (loserResult.error) throw loserResult.error
-
-    const winner = winnerResult.data
-    const loser = loserResult.data
-
-    // Calculate new Elo ratings
-    const [newWinnerRating, newLoserRating] = updateElo(
-      winner.elo_rating,
-      loser.elo_rating
-    )
-
-    // Update both ratings AND log battle in parallel
-    const [, , battleResult] = await Promise.all([
-      // @ts-ignore
-      supabase
-        .from('roster')
-        .update({ elo_rating: newWinnerRating })
-        .eq('id', winner_id)
-        .eq('user_id', user.id),
-      // @ts-ignore
-      supabase
-        .from('roster')
-        .update({ elo_rating: newLoserRating })
-        .eq('id', loser_id)
-        .eq('user_id', user.id),
-      // @ts-ignore
-      supabase.from('battles').insert({
-        user_id: user.id,
-        winner_id,
-        loser_id,
-      }),
-    ])
-
-    if (battleResult.error) throw battleResult.error
-
-    return NextResponse.json({
-      success: true,
-      winner: {
-        id: winner_id,
-        old_rating: winner.elo_rating,
-        new_rating: newWinnerRating,
-        change: newWinnerRating - winner.elo_rating,
-      },
-      loser: {
-        id: loser_id,
-        old_rating: loser.elo_rating,
-        new_rating: newLoserRating,
-        change: newLoserRating - loser.elo_rating,
-      },
+    // Call atomic RPC function that handles everything in a single transaction
+    const { data, error } = await supabase.rpc('process_battle', {
+      p_user_id: user.id,
+      p_winner_id: winner_id,
+      p_loser_id: loser_id,
     })
+
+    if (error) {
+      console.error('Battle RPC error:', error)
+      throw error
+    }
+
+    // The RPC function returns the result in the correct format
+    return NextResponse.json(data)
   } catch (error) {
     console.error('Error processing battle:', error)
     return NextResponse.json(

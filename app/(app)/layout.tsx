@@ -43,8 +43,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="flex flex-col" style={{ height: '100vh', overflow: 'hidden' }}>
-      {/* Header */}
-      <header className="flex-shrink-0 bg-white/80 backdrop-blur-sm border-b z-40" style={{ borderColor: '#F5F5F0', boxShadow: '0 2px 10px rgba(0,0,0,0.05)' }}>
+      {/* Header - fixed */}
+      <header className="fixed top-0 left-0 right-0 bg-white/80 backdrop-blur-sm border-b z-40" style={{ borderColor: '#F5F5F0', boxShadow: '0 2px 10px rgba(0,0,0,0.05)' }}>
         <div className="max-w-md mx-auto flex items-center justify-between h-16 px-3 sm:px-4">
           <div className="flex items-center gap-2 min-w-0 flex-1">
             <img
@@ -93,17 +93,15 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         </div>
       </header>
 
-      {/* Main content - scrollable */}
-      <main className="flex-1 overflow-y-auto" style={{ height: 'calc(100vh - 144px)' }}>
+      {/* Main content - scrollable with padding for fixed header and nav */}
+      <main className="flex-1 overflow-y-auto pt-16 pb-20">
         <div className="max-w-md mx-auto w-full px-4">
           {children}
         </div>
       </main>
 
-      {/* Bottom navigation - fixed */}
-      <div className="flex-shrink-0">
-        <Navigation />
-      </div>
+      {/* Bottom navigation - now rendered via fixed positioning in Navigation component */}
+      <Navigation />
 
       {/* Help FAQ - persistent */}
       <HelpFAQ />

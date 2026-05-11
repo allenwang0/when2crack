@@ -184,7 +184,7 @@ export default function RosterPage() {
   }
 
   return (
-    <div className="py-6 pb-28">
+    <div className="py-6">
       {!user && !authLoading && <GuestBanner />}
 
       <div className="flex items-center justify-between mb-6">

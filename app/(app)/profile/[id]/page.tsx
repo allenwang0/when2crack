@@ -74,11 +74,17 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
         setPerson({ ...person, avatar_url: compressedBase64 })
       } else {
         // Authenticated mode: Update Supabase
-          await supabase
+        const { error: updateError } = await supabase
           .from('roster')
           .update({ avatar_url: compressedBase64 })
           .eq('id', person.id)
           .eq('user_id', user.id)
+
+        if (updateError) {
+          console.error('Failed to update avatar:', updateError)
+          showToast('Failed to save photo. Please try again.', 'error')
+          return
+        }
 
         setPerson({ ...person, avatar_url: compressedBase64 })
       }
@@ -104,11 +110,19 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
       setPerson({ ...person, avatar_url: null })
     } else {
       // Authenticated mode: Update Supabase
-      await supabase
+      const { error: updateError } = await supabase
         .from('roster')
         .update({ avatar_url: null })
         .eq('id', person.id)
         .eq('user_id', user.id)
+
+      if (updateError) {
+        console.error('Failed to remove avatar:', updateError)
+        showToast('Failed to remove photo. Please try again.', 'error')
+        // Restore the avatar in UI
+        setAvatarUrl(person.avatar_url)
+        return
+      }
 
       setPerson({ ...person, avatar_url: null })
     }
@@ -268,7 +282,7 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
       setPerson(updatedPerson)
     } else {
       // Authenticated mode: Update Supabase
-      await supabase
+      const { error: updateError } = await supabase
         .from('roster')
         .update({
           name: editedName,
@@ -280,11 +294,19 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
         .eq('id', person.id)
         .eq('user_id', user.id)
 
+      if (updateError) {
+        console.error('Failed to save changes:', updateError)
+        showToast('Failed to save changes. Please try again.', 'error')
+        setSaving(false)
+        return
+      }
+
       setPerson(updatedPerson)
     }
 
     setIsEditing(false)
     setSaving(false)
+    showToast('Changes saved!', 'success')
   }
 
   const handleDelete = async () => {
@@ -297,11 +319,17 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
       router.push('/roster')
     } else {
       // Authenticated mode: Delete from Supabase
-      await supabase
+      const { error: deleteError } = await supabase
         .from('roster')
         .delete()
         .eq('id', person.id)
         .eq('user_id', user.id)
+
+      if (deleteError) {
+        console.error('Failed to delete person:', deleteError)
+        showToast('Failed to delete. Please try again.', 'error')
+        return
+      }
 
       router.push('/roster')
     }

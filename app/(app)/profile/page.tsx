@@ -87,10 +87,18 @@ export default function ProfilePage() {
       setUserAvatar(null)
     } else {
       // Authenticated mode: Update Supabase
-      await supabase
+      const { error } = await supabase
         .from('users')
         .update({ avatar_url: null })
         .eq('id', user.id)
+
+      if (error) {
+        console.error('Error removing avatar:', error)
+        showToast('Failed to remove photo', 'error')
+        // Restore the avatar in UI
+        setAvatarUrl(userAvatar)
+        return
+      }
     }
 
     showToast('Photo removed', 'success')
@@ -189,7 +197,7 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="py-6 pb-28">
+    <div className="py-6">
       <ToastContainer toasts={toasts} removeToast={removeToast} />
       {!user && !authLoading && <GuestBanner />}
 

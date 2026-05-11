@@ -368,7 +368,7 @@ export default function TonightPage() {
   const battlesCompleted = completedBattles.length
 
   return (
-    <div className="pb-28">
+    <div className="py-6">
       {!user && !authLoading && <GuestBanner />}
 
       {/* Tabs */}
