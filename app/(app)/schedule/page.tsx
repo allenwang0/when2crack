@@ -59,7 +59,7 @@ export default function SchedulePage() {
   }
 
   return (
-    <div className="py-6 pb-28">
+    <div className="py-6">
       {!user && !authLoading && <GuestBanner />}
 
       <Button

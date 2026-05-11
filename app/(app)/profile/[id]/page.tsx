@@ -351,7 +351,7 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
   const compositeScore = calculateCompositeScore(person)
 
   return (
-    <div className="max-w-2xl mx-auto px-4 py-6 pb-28">
+    <div className="py-6">
       {!user && !authLoading && <GuestBanner />}
 
       {/* Header */}

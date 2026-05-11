@@ -3,6 +3,7 @@
 import { useAuth } from '@/lib/contexts/AuthContext'
 import { Navigation } from '@/components/Navigation'
 import { HelpFAQ } from '@/components/HelpFAQ'
+import { OnboardingController } from '@/components/Onboarding'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
@@ -42,7 +43,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <div className="flex flex-col" style={{ height: '100vh', overflow: 'hidden' }}>
+    <OnboardingController>
+      <div className="flex flex-col" style={{ height: '100vh', overflow: 'hidden' }}>
       {/* Header - fixed */}
       <header className="fixed top-0 left-0 right-0 bg-white/80 backdrop-blur-sm border-b z-40" style={{ borderColor: '#F5F5F0', boxShadow: '0 2px 10px rgba(0,0,0,0.05)' }}>
         <div className="max-w-md mx-auto flex items-center justify-between h-16 px-3 sm:px-4">
@@ -106,32 +108,33 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       {/* Help FAQ - persistent */}
       <HelpFAQ />
 
-      {/* Logout Confirmation Modal */}
-      {showLogoutConfirm && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl p-6 max-w-sm w-full shadow-2xl">
-            <h3 className="text-xl font-bold text-foreground mb-3">Sign Out?</h3>
-            <p className="text-sm text-gray-600 mb-6">
-              Your local guest data will remain on this device, but you'll need to sign in again to sync across devices.
-            </p>
-            <div className="flex gap-3">
-              <button
-                onClick={() => setShowLogoutConfirm(false)}
-                className="flex-1 px-4 py-2.5 rounded-full border-2 border-gray-300 font-semibold text-gray-700 hover:bg-gray-50 transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={confirmSignOut}
-                disabled={signingOut}
-                className="flex-1 px-4 py-2.5 rounded-full bg-gradient-to-r from-pink to-purple text-white font-semibold hover:opacity-90 transition-opacity disabled:opacity-50"
-              >
-                {signingOut ? 'Signing Out...' : 'Sign Out'}
-              </button>
+        {/* Logout Confirmation Modal */}
+        {showLogoutConfirm && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-2xl p-6 max-w-sm w-full shadow-2xl">
+              <h3 className="text-xl font-bold text-foreground mb-3">Sign Out?</h3>
+              <p className="text-sm text-gray-600 mb-6">
+                Your local guest data will remain on this device, but you'll need to sign in again to sync across devices.
+              </p>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setShowLogoutConfirm(false)}
+                  className="flex-1 px-4 py-2.5 rounded-full border-2 border-gray-300 font-semibold text-gray-700 hover:bg-gray-50 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={confirmSignOut}
+                  disabled={signingOut}
+                  className="flex-1 px-4 py-2.5 rounded-full bg-gradient-to-r from-pink to-purple text-white font-semibold hover:opacity-90 transition-opacity disabled:opacity-50"
+                >
+                  {signingOut ? 'Signing Out...' : 'Sign Out'}
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      )}
-    </div>
+        )}
+      </div>
+    </OnboardingController>
   )
 }

@@ -1,0 +1,6 @@
+export { OnboardingController } from './OnboardingController'
+export { WelcomeModal } from './WelcomeModal'
+export { SpotlightOverlay } from './SpotlightOverlay'
+export { OnboardingTooltip } from './OnboardingTooltip'
+export { ProgressIndicator } from './ProgressIndicator'
+export { ConfettiAnimation } from './ConfettiAnimation'

@@ -7,7 +7,7 @@ export default function PrivacyPage() {
   const router = useRouter()
 
   return (
-    <div className="max-w-2xl mx-auto px-4 py-6 pb-28">
+    <div className="py-6">
       <Button
         variant="ghost"
         onClick={() => router.back()}
@@ -83,7 +83,7 @@ export default function PrivacyPage() {
             <li>Withdraw consent at any time</li>
           </ul>
           <p className="text-gray-700 mt-3">
-            To exercise these rights, you can delete your account from the Profile page or contact us at privacy@when2crack.com (if applicable).
+            To exercise these rights, you can delete your account from the Profile page or contact us at privacy@when2crack.app.
           </p>
         </section>
 
@@ -121,7 +121,7 @@ export default function PrivacyPage() {
             If you have questions about this Privacy Policy, please contact us at:
           </p>
           <p className="text-gray-700">
-            Email: privacy@when2crack.com (or your contact email)
+            Email: privacy@when2crack.app
           </p>
         </section>
       </div>

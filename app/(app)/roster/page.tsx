@@ -88,11 +88,11 @@ export default function RosterPage() {
       try {
         setLoadingMessage('Loading your roster...')
 
-        // Fetch roster
+        // Fetch roster with only needed columns
         // @ts-ignore
         const { data, error } = await supabase
           .from('roster')
-          .select('*')
+          .select('id, name, status, tier, elo_rating, avatar_url, avatar_color, last_contact_date, reliability_score')
           .eq('user_id', user.id)
           .neq('status', 'Archived')
           .order('elo_rating', { ascending: false })
@@ -184,7 +184,7 @@ export default function RosterPage() {
   }
 
   return (
-    <div className="py-6">
+    <div className="py-6 roster-section">
       {!user && !authLoading && <GuestBanner />}
 
       <div className="flex items-center justify-between mb-6">
@@ -192,7 +192,7 @@ export default function RosterPage() {
           <h2 className="text-3xl font-serif font-bold text-gray-800">Your Roster</h2>
           <span className="text-sm text-gray-500 mt-1 block">{roster.length} {roster.length === 1 ? 'person' : 'people'}</span>
         </div>
-        <Button onClick={() => router.push('/add')} className="flex items-center gap-2 shadow-md">
+        <Button onClick={() => router.push('/add')} className="flex items-center gap-2 shadow-md onboarding-add-button">
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
           </svg>
@@ -207,7 +207,7 @@ export default function RosterPage() {
           <p className="text-sm text-gray-500 mb-6">
             Add your first person to get started
           </p>
-          <Button onClick={() => router.push('/add')} className="shadow-md">
+          <Button onClick={() => router.push('/add')} className="shadow-md onboarding-add-button">
             <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
             </svg>

@@ -1,7 +1,7 @@
 // Elo rating system for pairwise battle comparisons
 // Based on the Elo algorithm used in chess, adapted for roster ranking
 
-const K = 32 // K-factor: determines rating volatility
+import { ELO_K_FACTOR, ELO_DEFAULT_RATING, ELO_SCORE_MULTIPLIER } from '@/lib/constants'
 
 /**
  * Calculate expected score for a player
@@ -26,10 +26,45 @@ export function updateElo(
   const expectedWinner = calculateExpectedScore(winnerRating, loserRating)
   const expectedLoser = calculateExpectedScore(loserRating, winnerRating)
 
-  const newWinnerRating = winnerRating + K * (1 - expectedWinner)
-  const newLoserRating = loserRating + K * (0 - expectedLoser)
+  const newWinnerRating = winnerRating + ELO_K_FACTOR * (1 - expectedWinner)
+  const newLoserRating = loserRating + ELO_K_FACTOR * (0 - expectedLoser)
 
   return [Math.round(newWinnerRating), Math.round(newLoserRating)]
+}
+
+/**
+ * Calculate Elo rating changes for a battle
+ * @param winnerRating - Current Elo rating of the winner
+ * @param loserRating - Current Elo rating of the loser
+ * @returns Object with winner/loser rating changes
+ */
+export function calculateEloChanges(
+  winnerRating: number,
+  loserRating: number
+): { winnerChange: number; loserChange: number; newWinnerRating: number; newLoserRating: number } {
+  const [newWinnerRating, newLoserRating] = updateElo(winnerRating, loserRating)
+
+  return {
+    winnerChange: newWinnerRating - winnerRating,
+    loserChange: newLoserRating - loserRating,
+    newWinnerRating,
+    newLoserRating,
+  }
+}
+
+/**
+ * Calculate initial Elo rating from composite scores
+ * @param attractionScore - Attraction score (1-10)
+ * @param personalityScore - Personality score (1-10)
+ * @param reliabilityScore - Reliability score (1-10)
+ * @returns Initial Elo rating
+ */
+export function calculateInitialElo(
+  attractionScore: number,
+  personalityScore: number,
+  reliabilityScore: number
+): number {
+  return ELO_DEFAULT_RATING + (attractionScore + personalityScore + reliabilityScore) * ELO_SCORE_MULTIPLIER
 }
 
 /**

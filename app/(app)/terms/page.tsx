@@ -7,7 +7,7 @@ export default function TermsPage() {
   const router = useRouter()
 
   return (
-    <div className="max-w-2xl mx-auto px-4 py-6 pb-28">
+    <div className="py-6">
       <Button
         variant="ghost"
         onClick={() => router.back()}

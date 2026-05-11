@@ -226,7 +226,7 @@ export function WeekSchedule({ comparisonMode = false, comparisonName }: WeekSch
   }
 
   return (
-    <div className="bg-white rounded-3xl p-3 sm:p-6 shadow-lg border-[3px] border-yellow-bright">
+    <div className="bg-white rounded-3xl p-3 sm:p-6 shadow-lg border-[3px] border-yellow-bright schedule-grid">
       {/* Header */}
       <div className="mb-4 sm:mb-6 text-center">
         <div className="inline-block bg-black text-yellow-bright px-4 sm:px-6 py-2 rounded-full mb-3">

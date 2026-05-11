@@ -35,7 +35,7 @@ export default function AchievementsPage() {
   }, [user, localRoster, completedBattles, weekSchedule])
 
   return (
-    <div className="py-6 pb-28">
+    <div className="py-6">
       {!user && !authLoading && <GuestBanner />}
 
       <Button

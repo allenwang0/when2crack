@@ -47,8 +47,11 @@ export function HelpFAQ() {
   const [isOpen, setIsOpen] = useState(false)
   const [expandedItem, setExpandedItem] = useState<number | null>(null)
 
-  // Auto-show on first visit
+  // Auto-show on first visit (but not if onboarding hasn't been completed)
   useEffect(() => {
+    const onboardingCompleted = localStorage.getItem('onboarding_completed')
+    if (!onboardingCompleted) return // Don't auto-show during/before onboarding
+
     if (!hasSeen) {
       setIsOpen(true)
       setHasSeen(true)

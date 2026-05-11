@@ -51,10 +51,10 @@ export default function HistoryPage() {
 
     setLoading(true)
 
-    // Fetch all hangs
+    // Fetch all hangs - only needed columns
     const { data: hangsData, error: hangsError } = await supabase
       .from('hangs')
-      .select('*')
+      .select('id, roster_id, hang_date, attraction_change, personality_change, reliability_change, notes, created_at')
       .eq('user_id', user.id)
       .order('hang_date', { ascending: false })
 
@@ -64,10 +64,10 @@ export default function HistoryPage() {
       return
     }
 
-    // Fetch all roster people
+    // Fetch all roster people - only name and avatar needed for display
     const { data: rosterData, error: rosterError } = await supabase
       .from('roster')
-      .select('*')
+      .select('id, name, avatar_url, avatar_color')
       .eq('user_id', user.id)
 
     if (rosterError) {
@@ -140,7 +140,7 @@ export default function HistoryPage() {
 
   if (!user && !authLoading) {
     return (
-      <div className="min-h-screen bg-background pb-20">
+      <div className="py-6">
         <div className="max-w-md mx-auto px-4 py-8">
           <div className="text-center mb-8">
             <h1 className="text-3xl font-bold mb-2 bg-gradient-to-r from-pink to-purple bg-clip-text text-transparent">
@@ -155,8 +155,7 @@ export default function HistoryPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background pb-20">
-      <div className="max-w-md mx-auto px-4 py-8">
+    <div className="py-6">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold mb-2 bg-gradient-to-r from-pink to-purple bg-clip-text text-transparent">
             History
@@ -385,7 +384,6 @@ export default function HistoryPage() {
             </div>
           )
         )}
-      </div>
     </div>
   )
 }

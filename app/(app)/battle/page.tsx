@@ -8,6 +8,8 @@ import { OutOfComparisons } from '@/components/OutOfComparisons'
 import { useAuth } from '@/lib/contexts/AuthContext'
 import { useLocalStorage } from '@/lib/hooks/useLocalStorage'
 import type { RosterPerson } from '@/lib/types'
+import { calculateEloChanges, calculateInitialElo } from '@/lib/algorithms/elo'
+import { API_SAFETY_TIMEOUT, BATTLE_RESULT_DISPLAY_DURATION } from '@/lib/constants'
 
 export default function BattlePage() {
   const { user, loading: authLoading } = useAuth()
@@ -114,9 +116,11 @@ export default function BattlePage() {
 
     // Set a safety timeout
     const safetyTimeout = setTimeout(() => {
-      console.warn('Battle loading timeout - forcing completion')
+      if (process.env.NODE_ENV === 'development') {
+        console.warn('Battle loading timeout - forcing completion')
+      }
       setLoading(false)
-    }, 8000)
+    }, API_SAFETY_TIMEOUT)
 
     setLoadingMessage('Loading battle...')
 
@@ -141,40 +145,42 @@ export default function BattlePage() {
         setCompletedBattles([...completedBattles, battleKey])
       }
 
-      // Simple ELO calculation for guest mode
-      const K = 32
-      let actualWinnerChange = 0
-      let actualLoserChange = 0
+      // Calculate ELO changes
+      const winner = localRoster.find(p => p.id === winnerId)
+      const loser = localRoster.find(p => p.id === loserId)
+
+      if (!winner || !loser) {
+        throw new Error('Person not found')
+      }
+
+      const { winnerChange, loserChange, newWinnerRating, newLoserRating } = calculateEloChanges(
+        winner.elo_rating,
+        loser.elo_rating
+      )
 
       const updatedRoster = localRoster.map(person => {
         if (person.id === winnerId) {
-          const expectedScore = 1 / (1 + Math.pow(10, ((person2?.elo_rating || 1000) - person.elo_rating) / 400))
-          const change = Math.round(K * (1 - expectedScore))
-          actualWinnerChange = change
-          return { ...person, elo_rating: person.elo_rating + change }
+          return { ...person, elo_rating: newWinnerRating }
         }
         if (person.id === loserId) {
-          const expectedScore = 1 / (1 + Math.pow(10, ((person1?.elo_rating || 1000) - person.elo_rating) / 400))
-          const change = Math.round(K * (0 - expectedScore))
-          actualLoserChange = change
-          return { ...person, elo_rating: person.elo_rating + change }
+          return { ...person, elo_rating: newLoserRating }
         }
         return person
       })
 
       setLocalRoster(updatedRoster)
 
-      // Show result with actual calculated changes
+      // Show result
       setResult({
         winner: winnerId,
-        winnerChange: actualWinnerChange,
-        loserChange: actualLoserChange,
+        winnerChange,
+        loserChange,
       })
 
-      // Auto-load next battle after 2 seconds
+      // Auto-load next battle
       setTimeout(() => {
         fetchBattlePairGuest()
-      }, 2000)
+      }, BATTLE_RESULT_DISPLAY_DURATION)
     } catch (err) {
       if (err instanceof Error) {
         setError(err.message)
@@ -213,10 +219,10 @@ export default function BattlePage() {
         loserChange: data.loser.change,
       })
 
-      // Auto-load next battle after 2 seconds
+      // Auto-load next battle
       setTimeout(() => {
         fetchBattlePair()
-      }, 2000)
+      }, BATTLE_RESULT_DISPLAY_DURATION)
     } catch (err) {
       if (err instanceof Error) {
         setError(err.message)
@@ -248,10 +254,14 @@ export default function BattlePage() {
             setCompletedBattles([])
             setSkippedBattles([])
 
-            // Reset all ELO ratings to default (initial formula from add page)
+            // Reset all ELO ratings to default
             const resetRoster = localRoster.map(person => ({
               ...person,
-              elo_rating: 1000 + (person.attraction_score + person.personality_score + person.reliability_score) * 10
+              elo_rating: calculateInitialElo(
+                person.attraction_score,
+                person.personality_score,
+                person.reliability_score
+              )
             }))
             setLocalRoster(resetRoster)
 

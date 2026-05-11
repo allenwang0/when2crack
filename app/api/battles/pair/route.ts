@@ -16,21 +16,21 @@ export async function GET() {
   }
 
   try {
-    // Fetch user's roster (active only)
+    // Fetch user's roster (active only) - only columns needed for battles
     // @ts-ignore
     const { data: roster, error: rosterError } = await supabase
       .from('roster')
-      .select('*')
+      .select('id, name, status, tier, elo_rating, avatar_url, avatar_color, attraction_score, personality_score, reliability_score')
       .eq('user_id', user.id)
       .neq('status', 'Archived')
 
     if (rosterError) throw rosterError
 
-    // Fetch battle history
+    // Fetch battle history - only columns needed for algorithm
     // @ts-ignore
     const { data: battles, error: battlesError } = await supabase
       .from('battles')
-      .select('*')
+      .select('id, winner_id, loser_id, created_at')
       .eq('user_id', user.id)
       .order('created_at', { ascending: false })
       .limit(50)

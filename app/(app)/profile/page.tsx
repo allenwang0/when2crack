@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { useAuth } from '@/lib/contexts/AuthContext'
+import { useOnboarding } from '@/lib/contexts/OnboardingContext'
 import { GuestBanner } from '@/components/GuestBanner'
 import { Achievements } from '@/components/Achievements'
 import { Button } from '@/components/ui/Button'
@@ -17,6 +18,7 @@ import type { RosterPerson } from '@/lib/types'
 export default function ProfilePage() {
   const router = useRouter()
   const { user, loading: authLoading, signOut } = useAuth()
+  const { startTour } = useOnboarding()
   const supabase = createClient()
   const { toasts, showToast, removeToast } = useToast()
   const [localRoster] = useLocalStorage<RosterPerson[]>('guest_roster', [])
@@ -283,7 +285,7 @@ export default function ProfilePage() {
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-2 gap-3 mb-6">
+      <div className="grid grid-cols-2 gap-3 mb-6 profile-stats">
         <div className="bg-white border-2 border-pink/20 rounded-2xl p-5 text-center hover:border-pink/40 transition-colors">
           <div className="text-4xl font-bold text-pink mb-2">{totalPeople}</div>
           <div className="text-sm font-medium text-gray-600">Total People</div>
@@ -359,6 +361,23 @@ export default function ProfilePage() {
       {/* Achievements Section */}
       <div className="mb-6">
         <Achievements achievements={achievements} />
+      </div>
+
+      {/* Restart Tour Button */}
+      <div className="mb-6">
+        <Button
+          variant="ghost"
+          onClick={() => {
+            localStorage.removeItem('onboarding_seen')
+            localStorage.removeItem('onboarding_completed')
+            localStorage.removeItem('onboarding_skipped')
+            startTour()
+            router.push('/roster')
+          }}
+          className="w-full"
+        >
+          🎓 Restart App Tour
+        </Button>
       </div>
 
       {/* Sign Out Button */}

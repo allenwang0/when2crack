@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { DM_Sans, DM_Serif_Display } from "next/font/google";
 import { AuthProvider } from "@/lib/contexts/AuthContext";
+import { OnboardingProvider } from "@/lib/contexts/OnboardingContext";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import "./globals.css";
 
@@ -51,7 +52,11 @@ export default function RootLayout({
         style={{ height: '100%', overflow: 'hidden', margin: 0, padding: 0 }}
       >
         <ErrorBoundary>
-          <AuthProvider>{children}</AuthProvider>
+          <AuthProvider>
+            <OnboardingProvider>
+              {children}
+            </OnboardingProvider>
+          </AuthProvider>
         </ErrorBoundary>
       </body>
     </html>

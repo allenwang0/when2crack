@@ -399,7 +399,7 @@ export default function TonightPage() {
 
       {/* Tonight Tab */}
       {activeTab === 'tonight' && (
-        <>
+        <div className="tonight-recommendations">
           <div className="text-center mb-8">
             <h2 className="text-3xl font-serif font-bold mb-3 text-gray-800">Tonight's Top Picks</h2>
             <p className="text-sm text-gray-600">
@@ -444,12 +444,12 @@ export default function TonightPage() {
               </Button>
             </div>
           )}
-        </>
+        </div>
       )}
 
       {/* Battle Tab */}
       {activeTab === 'battle' && (
-        <>
+        <div className="battle-section">
           <div className="text-center mb-8">
             <h2 className="text-3xl font-serif font-bold mb-3 text-gray-800">Battle Mode</h2>
             <p className="text-sm text-gray-600 mb-2">
@@ -523,7 +523,7 @@ export default function TonightPage() {
               </div>
             </>
           )}
-        </>
+        </div>
       )}
 
       <ToastContainer toasts={toasts} removeToast={removeToast} />
