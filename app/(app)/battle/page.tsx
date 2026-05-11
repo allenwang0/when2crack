@@ -515,6 +515,9 @@ export default function BattlePage() {
         onUndo={handleUndo}
         getRemainingTime={getRemainingTime}
       />
+
+      {/* Confetti */}
+      <Confetti trigger={showConfetti} />
     </div>
   )
 }

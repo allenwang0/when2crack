@@ -69,7 +69,7 @@ export function HelpFAQ({ isOpen, onClose }: HelpFAQProps) {
             <div className="flex items-center gap-3">
               <span className="text-2xl">💡</span>
               <h3 className="font-bold text-lg text-yellow-bright">
-                Help & FAQ
+                Guide
               </h3>
             </div>
             <button

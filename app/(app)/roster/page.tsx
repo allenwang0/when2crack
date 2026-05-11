@@ -10,6 +10,7 @@ import { GuestBanner } from '@/components/GuestBanner'
 import { Button } from '@/components/ui/Button'
 import { useLocalStorage } from '@/lib/hooks/useLocalStorage'
 import { updateLoginStreak } from '@/lib/utils/loginStreak'
+import { sortByDiscover, sortByRecent, filterNeedsTLC } from '@/lib/algorithms/discover'
 import { logger } from '@/lib/utils/logger'
 import type { RosterPerson, Tier } from '@/lib/types'
 
@@ -20,6 +21,7 @@ export default function RosterPage() {
   const [roster, setRoster] = useState<RosterPerson[]>([])
   const [loading, setLoading] = useState(true)
   const [loadingMessage, setLoadingMessage] = useState('Loading...')
+  const [viewMode, setViewMode] = useState<'ranked' | 'discover' | 'recent' | 'tlc'>('ranked')
 
   // Load guest roster immediately on mount (optimistic loading)
   useEffect(() => {
@@ -175,6 +177,23 @@ export default function RosterPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, authLoading])
 
+  // Get sorted roster based on view mode
+  const getSortedRoster = () => {
+    switch (viewMode) {
+      case 'discover':
+        return sortByDiscover(roster)
+      case 'recent':
+        return sortByRecent(roster)
+      case 'tlc':
+        return filterNeedsTLC(roster)
+      case 'ranked':
+      default:
+        return [...roster].sort((a, b) => b.elo_rating - a.elo_rating)
+    }
+  }
+
+  const displayRoster = getSortedRoster()
+
   if (loading) {
     return (
       <div className="py-6 roster-section" aria-label="Loading roster" aria-busy="true">
@@ -195,10 +214,14 @@ export default function RosterPage() {
     <div className="py-6 roster-section">
       {!user && !authLoading && <GuestBanner />}
 
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-4">
         <div>
-          <h2 className="text-2xl sm:text-3xl font-serif font-bold text-gray-900">Your Roster</h2>
-          <span className="text-sm text-gray-600 mt-1 block">{roster.length} {roster.length === 1 ? 'person' : 'people'}</span>
+          <h2 className="text-2xl sm:text-3xl font-serif font-bold text-gray-900 dark:text-gray-100">
+            Your Roster
+          </h2>
+          <span className="text-sm text-gray-600 dark:text-gray-400 mt-1 block">
+            {roster.length} {roster.length === 1 ? 'person' : 'people'}
+          </span>
         </div>
         <Button
           onClick={() => router.push('/add')}
@@ -214,19 +237,73 @@ export default function RosterPage() {
         </Button>
       </div>
 
+      {/* View mode tabs */}
+      {roster.length > 0 && (
+        <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
+          <button
+            onClick={() => setViewMode('ranked')}
+            className={`px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition-all ${
+              viewMode === 'ranked'
+                ? 'bg-pink text-white shadow-md'
+                : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-2 border-gray-200 dark:border-gray-700 hover:border-pink'
+            }`}
+          >
+            🏆 Ranked
+          </button>
+          <button
+            onClick={() => setViewMode('discover')}
+            className={`px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition-all ${
+              viewMode === 'discover'
+                ? 'bg-purple text-white shadow-md'
+                : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-2 border-gray-200 dark:border-gray-700 hover:border-purple'
+            }`}
+          >
+            ✨ Discover
+          </button>
+          <button
+            onClick={() => setViewMode('recent')}
+            className={`px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition-all ${
+              viewMode === 'recent'
+                ? 'bg-teal text-white shadow-md'
+                : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-2 border-gray-200 dark:border-gray-700 hover:border-teal'
+            }`}
+          >
+            🕐 Recent
+          </button>
+          <button
+            onClick={() => setViewMode('tlc')}
+            className={`px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition-all ${
+              viewMode === 'tlc'
+                ? 'bg-amber text-white shadow-md'
+                : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-2 border-gray-200 dark:border-gray-700 hover:border-amber'
+            }`}
+          >
+            💛 Needs TLC
+          </button>
+        </div>
+      )}
+
       {roster.length === 0 ? (
-        <div className="bg-white border-2 border-dashed border-gray-300 rounded-2xl p-8 sm:p-12 text-center">
+        <div className="bg-white dark:bg-gray-800 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-2xl p-8 sm:p-12 text-center">
           <div className="text-5xl sm:text-6xl mb-4 sm:mb-6">👥</div>
-          <p className="text-gray-900 font-semibold text-base sm:text-lg mb-2">
+          <p className="text-gray-900 dark:text-gray-100 font-semibold text-base sm:text-lg mb-2">
             Add your first person to start
           </p>
-          <p className="text-sm text-gray-600 mb-6">
+          <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
             Build your roster and rank them with battles
+          </p>
+        </div>
+      ) : displayRoster.length === 0 && viewMode === 'tlc' ? (
+        <div className="bg-teal/10 dark:bg-teal/20 border-2 border-teal rounded-2xl p-6 text-center">
+          <div className="text-4xl mb-3">✅</div>
+          <p className="font-semibold text-teal-dark dark:text-teal mb-1">All caught up!</p>
+          <p className="text-sm text-gray-600 dark:text-gray-400">
+            You've been in touch with everyone recently
           </p>
         </div>
       ) : (
         <div className="space-y-6">
-          {roster.map((person) => (
+          {displayRoster.map((person) => (
             <RosterCard key={person.id} person={person} />
           ))}
         </div>

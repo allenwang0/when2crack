@@ -67,7 +67,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             <div className="relative">
               <button
                 onClick={() => setShowThemeMenu(!showThemeMenu)}
-                className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                className="p-3 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
                 title="Theme"
                 aria-label="Change theme"
                 style={{ color: '#C4B5FD' }}
@@ -123,9 +123,9 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             </div>
             <button
               onClick={() => setShowFAQ(true)}
-              className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-              title="Help & FAQ"
-              aria-label="Open help and frequently asked questions"
+              className="p-3 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+              title="Guide"
+              aria-label="Open guide"
               style={{ color: '#C4B5FD' }}
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24" aria-hidden="true">
@@ -136,7 +136,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
               <button
                 onClick={handleSignOut}
                 disabled={signingOut}
-                className="p-2 rounded-full hover:bg-pink/10 transition-colors disabled:opacity-50"
+                className="p-3 rounded-full hover:bg-pink/10 transition-colors disabled:opacity-50"
                 title="Sign Out"
                 aria-label={signingOut ? 'Signing out' : 'Sign out of your account'}
                 style={{ color: '#FFB6D9' }}

@@ -323,7 +323,7 @@ export function WeekSchedule({ comparisonMode = false, comparisonName }: WeekSch
           </div>
         )}
         {userTimezone && (
-          <div className="mt-4 text-xs text-gray-500">
+          <div className="mt-4 text-xs text-gray-600">
             {comparisonMode && comparisonTimezone && comparisonTimezone !== userTimezone ? (
               <>
                 <span className="font-medium">Your timezone:</span> {userTimezone}
@@ -350,7 +350,7 @@ export function WeekSchedule({ comparisonMode = false, comparisonName }: WeekSch
           {/* Time labels - 8pm through 4am */}
           <div className="space-y-1">
             {[20, 21, 22, 23, 0, 1, 2, 3, 4].map(hour => (
-              <div key={hour} className="w-16 text-xs text-gray-500 text-right pr-2 h-11 flex items-center justify-end">
+              <div key={hour} className="w-16 text-xs text-gray-600 text-right pr-2 h-11 flex items-center justify-end">
                 {formatHour(hour)}
               </div>
             ))}
@@ -479,7 +479,7 @@ export function WeekSchedule({ comparisonMode = false, comparisonName }: WeekSch
                     <span className="font-semibold text-foreground">
                       {block.day} {formatHour(block.startHour)}-{formatHour(block.endHour)}
                     </span>
-                    <span className="text-xs text-gray-500 ml-2">
+                    <span className="text-xs text-gray-600 ml-2">
                       ({block.count}hr{block.count !== 1 ? 's' : ''})
                     </span>
                   </div>
@@ -508,7 +508,7 @@ export function WeekSchedule({ comparisonMode = false, comparisonName }: WeekSch
         )}
 
         {!user && !comparisonMode && (
-          <div className="text-xs text-gray-500 max-w-sm mx-auto">
+          <div className="text-xs text-gray-600 max-w-sm mx-auto">
             Note: Your schedule is saved locally. Sign in to sync across devices.
           </div>
         )}
@@ -522,7 +522,7 @@ export function WeekSchedule({ comparisonMode = false, comparisonName }: WeekSch
             >
               📤 Send Your Schedule to {comparisonName || 'Them'}
             </button>
-            <p className="text-xs text-gray-500 mt-3">
+            <p className="text-xs text-gray-600 mt-3">
               Share your availability so {comparisonName || 'they'} can see when you're both free
             </p>
           </div>

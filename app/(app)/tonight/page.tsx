@@ -1,9 +1,11 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { useAuth } from '@/lib/contexts/AuthContext'
 import { TonightCard } from '@/components/TonightCard'
+import { TonightSwipeStack } from '@/components/TonightSwipeStack'
 import { BattleCard } from '@/components/BattleCard'
 import { SkeletonTonightCard } from '@/components/skeletons/SkeletonTonightCard'
 import { SkeletonBattleCard } from '@/components/skeletons/SkeletonBattleCard'
@@ -20,11 +22,13 @@ import { API_SAFETY_TIMEOUT, BATTLE_RESULT_DISPLAY_DURATION } from '@/lib/consta
 export default function TonightPage() {
   const { user, loading: authLoading } = useAuth()
   const supabase = createClient()
+  const router = useRouter()
   const { toasts, showToast, removeToast } = useToast()
   const [localRoster, setLocalRoster] = useLocalStorage<RosterPerson[]>('guest_roster', [])
   const [completedBattles, setCompletedBattles] = useLocalStorage<string[]>('completed_battles', [])
 
   const [activeTab, setActiveTab] = useState<'tonight' | 'battle'>('tonight')
+  const [viewMode, setViewMode] = useState<'list' | 'stack'>('stack')
   const [recommendations, setRecommendations] = useState<TonightRecommendation[]>([])
   const [loading, setLoading] = useState(true)
   const [loadingMessage, setLoadingMessage] = useState('Loading...')
@@ -309,6 +313,17 @@ export default function TonightPage() {
     }
   }
 
+  const handleSchedule = (personId: string) => {
+    router.push(`/schedule?person=${personId}`)
+  }
+
+  const handleSkip = (personId: string) => {
+    // Just visual feedback for now
+    if (process.env.NODE_ENV === 'development') {
+      console.log('Skipped:', personId)
+    }
+  }
+
   useEffect(() => {
     if (authLoading) {
       setLoadingMessage('Checking authentication...')
@@ -435,29 +450,71 @@ export default function TonightPage() {
       {activeTab === 'tonight' && (
         <div className="tonight-recommendations">
           <div className="text-center mb-6">
-            <h2 className="text-2xl sm:text-3xl font-serif font-bold mb-2 text-gray-900">Tonight's Top Picks</h2>
-            <p className="text-sm text-gray-600">
+            <h2 className="text-2xl sm:text-3xl font-serif font-bold mb-2 text-gray-900 dark:text-gray-100">
+              Tonight's Top Picks
+            </h2>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
               Weighted by reliability, recency, and vibe
             </p>
+
+            {/* View toggle */}
+            {recommendations.length > 0 && (
+              <div className="flex gap-2 justify-center mb-4">
+                <button
+                  onClick={() => setViewMode('stack')}
+                  className={`px-4 py-2 rounded-full text-sm font-semibold transition-colors ${
+                    viewMode === 'stack'
+                      ? 'bg-pink text-white'
+                      : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
+                  }`}
+                >
+                  🎴 Swipe Mode
+                </button>
+                <button
+                  onClick={() => setViewMode('list')}
+                  className={`px-4 py-2 rounded-full text-sm font-semibold transition-colors ${
+                    viewMode === 'list'
+                      ? 'bg-pink text-white'
+                      : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
+                  }`}
+                >
+                  📋 List Mode
+                </button>
+              </div>
+            )}
           </div>
 
           {error && (
             <div className="bg-red-500/10 border border-red-500/50 rounded-xl p-4 mb-6 text-center">
               <p className="text-red-500 text-sm font-medium">{error}</p>
-              <Button onClick={user ? fetchRecommendations : fetchRecommendationsGuest} variant="tertiary" size="sm" className="mt-3">
+              <Button
+                onClick={user ? fetchRecommendations : fetchRecommendationsGuest}
+                variant="tertiary"
+                size="sm"
+                className="mt-3"
+              >
                 Try Again
               </Button>
             </div>
           )}
 
           {recommendations.length === 0 ? (
-            <div className="bg-white border-2 border-dashed border-gray-300 rounded-2xl p-8 sm:p-12 text-center">
+            <div className="bg-white dark:bg-gray-800 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-2xl p-8 sm:p-12 text-center">
               <div className="text-5xl sm:text-6xl mb-4 sm:mb-6">📅</div>
-              <p className="text-gray-900 font-semibold text-base sm:text-lg mb-2">No recommendations yet</p>
-              <p className="text-sm text-gray-600">
+              <p className="text-gray-900 dark:text-gray-100 font-semibold text-base sm:text-lg mb-2">
+                No recommendations yet
+              </p>
+              <p className="text-sm text-gray-600 dark:text-gray-400">
                 Add people to your roster and run some battles to get personalized picks
               </p>
             </div>
+          ) : viewMode === 'stack' ? (
+            <TonightSwipeStack
+              recommendations={recommendations}
+              onShootShot={handleShootShot}
+              onSchedule={handleSchedule}
+              onSkip={handleSkip}
+            />
           ) : (
             <div className="space-y-6">
               {recommendations.map((recommendation, index) => (
@@ -471,7 +528,7 @@ export default function TonightPage() {
             </div>
           )}
 
-          {recommendations.length > 0 && (
+          {recommendations.length > 0 && viewMode === 'list' && (
             <div className="mt-6 text-center">
               <Button variant="tertiary" onClick={user ? fetchRecommendations : fetchRecommendationsGuest}>
                 Refresh Recommendations
