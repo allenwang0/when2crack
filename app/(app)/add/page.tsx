@@ -115,7 +115,6 @@ export default function AddPage() {
       // Authenticated mode: Use Supabase
 
       // First, ensure user profile exists in public.users
-      // @ts-ignore
       const { data: userProfile, error: userCheckError } = await supabase
         .from('users')
         .select('id')
@@ -125,7 +124,6 @@ export default function AddPage() {
       // If user profile doesn't exist, create it
       if (userCheckError && userCheckError.code === 'PGRST116') {
         console.log('User profile not found, creating...')
-        // @ts-ignore
         const { error: createUserError } = await supabase.from('users').insert({
           id: user.id,
           email: user.email!,

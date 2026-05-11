@@ -74,8 +74,7 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
         setPerson({ ...person, avatar_url: compressedBase64 })
       } else {
         // Authenticated mode: Update Supabase
-        // @ts-ignore
-        await supabase
+          await supabase
           .from('roster')
           .update({ avatar_url: compressedBase64 })
           .eq('id', person.id)
@@ -105,7 +104,6 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
       setPerson({ ...person, avatar_url: null })
     } else {
       // Authenticated mode: Update Supabase
-      // @ts-ignore
       await supabase
         .from('roster')
         .update({ avatar_url: null })
@@ -140,7 +138,6 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
     // Authenticated mode: Load from Supabase
     const fetchProfile = async () => {
       // Fetch person
-      // @ts-ignore
       const { data: personData, error: personError } = await supabase
         .from('roster')
         .select('*')
@@ -165,7 +162,6 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
       setEditedReliabilityScore(personData.reliability_score)
 
       // Fetch hangs
-      // @ts-ignore
       const { data: hangsData } = await supabase
         .from('hangs')
         .select('*')
@@ -270,7 +266,6 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
       setPerson(updatedPerson)
     } else {
       // Authenticated mode: Update Supabase
-      // @ts-ignore
       await supabase
         .from('roster')
         .update({
@@ -300,7 +295,6 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
       router.push('/roster')
     } else {
       // Authenticated mode: Delete from Supabase
-      // @ts-ignore
       await supabase
         .from('roster')
         .delete()

@@ -38,9 +38,25 @@ export function BattleCard({ person, onClick, disabled }: BattleCardProps) {
       )}
 
       {/* Name */}
-      <h3 className="text-xl font-serif font-bold text-foreground mb-2">
-        {person.name}
-      </h3>
+      <div className="mb-2 text-center">
+        {person.name.split(' ').map((part, index, array) => {
+          if (index === array.length - 1 && array.length > 1) {
+            // Last name - slightly larger
+            return (
+              <h3 key={index} className="text-2xl font-serif font-bold text-foreground leading-tight">
+                {part}
+              </h3>
+            )
+          } else {
+            // First/middle names
+            return (
+              <h3 key={index} className="text-xl font-serif font-bold text-foreground leading-tight">
+                {part}
+              </h3>
+            )
+          }
+        })}
+      </div>
 
       {/* Scores */}
       <div className="space-y-2 mb-4">

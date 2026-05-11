@@ -9,6 +9,8 @@ import { Achievements } from '@/components/Achievements'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { useLocalStorage } from '@/lib/hooks/useLocalStorage'
+import { useToast } from '@/lib/hooks/useToast'
+import { ToastContainer } from '@/components/ui/Toast'
 import { calculateAchievements } from '@/lib/utils/achievements'
 import type { RosterPerson } from '@/lib/types'
 
@@ -16,63 +18,134 @@ export default function ProfilePage() {
   const router = useRouter()
   const { user, signOut } = useAuth()
   const supabase = createClient()
+  const { toasts, showToast, removeToast } = useToast()
   const [localRoster] = useLocalStorage<RosterPerson[]>('guest_roster', [])
   const [completedBattles] = useLocalStorage<string[]>('completed_battles', [])
   const [weekSchedule] = useLocalStorage<string[]>('week_schedule', [])
   const [displayName, setDisplayName] = useLocalStorage<string>('display_name', '')
+  const [userAvatar, setUserAvatar] = useLocalStorage<string | null>('user_avatar', null)
 
   const [roster, setRoster] = useState<RosterPerson[]>([])
   const [totalHangs, setTotalHangs] = useState(0)
   const [loading, setLoading] = useState(true)
   const [isEditingName, setIsEditingName] = useState(false)
   const [tempName, setTempName] = useState('')
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null)
+
+  const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    // Check file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      showToast('Image must be less than 5MB', 'error')
+      return
+    }
+
+    // Check file type
+    if (!file.type.startsWith('image/')) {
+      showToast('Please upload an image file', 'error')
+      return
+    }
+
+    try {
+      // Compress and resize image
+      const { compressImage } = await import('@/lib/utils/imageCompression')
+      const compressedBase64 = await compressImage(file)
+      setAvatarUrl(compressedBase64)
+
+      // Save immediately
+      if (!user) {
+        // Guest mode: Update localStorage
+        setUserAvatar(compressedBase64)
+      } else {
+        // Authenticated mode: Update Supabase
+        const { error } = await supabase
+          .from('users')
+          .update({ avatar_url: compressedBase64 })
+          .eq('id', user.id)
+
+        if (error) {
+          console.error('Error updating avatar:', error)
+          showToast('Failed to update photo', 'error')
+          return
+        }
+      }
+
+      showToast('Profile photo updated!', 'success')
+    } catch (err) {
+      console.error('Image compression error:', err)
+      showToast('Failed to process image. Please try another.', 'error')
+    }
+  }
+
+  const handleRemovePhoto = async () => {
+    setAvatarUrl(null)
+
+    if (!user) {
+      // Guest mode: Update localStorage
+      setUserAvatar(null)
+    } else {
+      // Authenticated mode: Update Supabase
+      await supabase
+        .from('users')
+        .update({ avatar_url: null })
+        .eq('id', user.id)
+    }
+
+    showToast('Photo removed', 'success')
+  }
 
   useEffect(() => {
     const fetchStats = async () => {
       if (!user) {
         setRoster(localRoster)
+        setAvatarUrl(userAvatar)
         setLoading(false)
         return
       }
 
-      const safetyTimeout = setTimeout(() => {
-        console.warn('Profile loading timeout - forcing completion')
-        setLoading(false)
-      }, 3000)
-
       try {
-        // @ts-ignore
-        const { data: rosterData } = await supabase
-          .from('roster')
-          .select('*')
-          .eq('user_id', user.id)
-          .neq('status', 'Archived')
+        // Run all queries in parallel for faster loading
+        const [rosterResult, hangsResult, userResult] = await Promise.all([
+          supabase
+            .from('roster')
+            .select('*')
+            .eq('user_id', user.id)
+            .neq('status', 'Archived'),
+          // Use count instead of fetching all records for better performance
+          supabase
+            .from('hangs')
+            .select('*', { count: 'exact', head: true })
+            .eq('user_id', user.id),
+          supabase
+            .from('users')
+            .select('avatar_url')
+            .eq('id', user.id)
+            .single()
+        ])
 
-        if (rosterData) {
-          setRoster(rosterData as RosterPerson[])
+        if (rosterResult.data) {
+          setRoster(rosterResult.data as RosterPerson[])
         }
 
-        // @ts-ignore
-        const { data: hangsData } = await supabase
-          .from('hangs')
-          .select('id')
-          .eq('user_id', user.id)
-
-        if (hangsData) {
-          setTotalHangs(hangsData.length)
+        if (hangsResult.count !== null) {
+          setTotalHangs(hangsResult.count)
         }
 
-        clearTimeout(safetyTimeout)
+        if (userResult.data) {
+          setAvatarUrl(userResult.data.avatar_url)
+        }
+
         setLoading(false)
       } catch (error) {
         console.error('Error fetching stats:', error)
-        clearTimeout(safetyTimeout)
         setLoading(false)
       }
     }
 
     fetchStats()
-  }, [user, localRoster, supabase])
+  }, [user, localRoster, supabase, userAvatar])
 
   const handleSignOut = async () => {
     await signOut()
@@ -115,15 +188,54 @@ export default function ProfilePage() {
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-6 pb-28">
+      <ToastContainer toasts={toasts} removeToast={removeToast} />
       {!user && <GuestBanner />}
 
       {/* Header */}
       <div className="text-center mb-8">
-        <div className="w-24 h-24 bg-gradient-to-br from-pink to-purple rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
-          <svg className="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-          </svg>
+        <div className="relative inline-block group">
+          {avatarUrl ? (
+            <div className="w-24 h-24 rounded-full overflow-hidden border-4 border-pink shadow-lg">
+              <img src={avatarUrl} alt="Profile" className="w-full h-full object-cover" />
+            </div>
+          ) : (
+            <div className="w-24 h-24 bg-gradient-to-br from-pink to-purple rounded-full flex items-center justify-center shadow-lg">
+              <span className="text-5xl">🥚</span>
+            </div>
+          )}
+
+          {/* Photo upload overlay */}
+          <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-40 rounded-full transition-all duration-200 flex items-center justify-center">
+            <label htmlFor="avatar-upload" className="cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity">
+              <div className="bg-white rounded-full p-2 shadow-lg">
+                <svg className="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+              </div>
+            </label>
+            <input
+              id="avatar-upload"
+              type="file"
+              accept="image/*"
+              onChange={handlePhotoUpload}
+              className="hidden"
+            />
+          </div>
+
+          {/* Remove photo button */}
+          {avatarUrl && (
+            <button
+              onClick={handleRemovePhoto}
+              className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full p-1.5 shadow-lg hover:bg-red-600 transition-colors"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          )}
         </div>
+        <div className="mb-4"></div>
 
         {isEditingName ? (
           <div className="max-w-xs mx-auto mb-4">

@@ -82,7 +82,7 @@ export default function RosterPage() {
         // @ts-ignore
         const { data, error } = await supabase
           .from('roster')
-          .select('id, user_id, name, tier, status, attraction_score, personality_score, reliability_score, elo_rating, notes, avatar_color, last_contact_date, created_at, updated_at')
+          .select('*')
           .eq('user_id', user.id)
           .neq('status', 'Archived')
           .order('elo_rating', { ascending: false })
@@ -101,16 +101,7 @@ export default function RosterPage() {
       }
     }
 
-    // Set a safety timeout to prevent infinite loading
-    const safetyTimeout = setTimeout(() => {
-      console.warn('Roster loading timeout - forcing completion')
-      setLoading(false)
-      setRoster([])
-    }, 3000) // 3 second max wait
-
-    fetchRoster().finally(() => {
-      clearTimeout(safetyTimeout)
-    })
+    fetchRoster()
 
     // Subscribe to realtime changes
     const channel = supabase
@@ -130,7 +121,6 @@ export default function RosterPage() {
       .subscribe()
 
     return () => {
-      clearTimeout(safetyTimeout)
       supabase.removeChannel(channel)
     }
   }, [user, authLoading, supabase])
@@ -166,7 +156,7 @@ export default function RosterPage() {
           <div className="text-6xl mb-4">👥</div>
           <p className="text-gray-800 font-semibold text-lg mb-2">Your roster is empty</p>
           <p className="text-sm text-gray-500 mb-6">
-            Add your first person to get started with when2crack
+            Add your first person to get started
           </p>
           <Button onClick={() => router.push('/add')} className="shadow-md">
             <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">

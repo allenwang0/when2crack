@@ -104,65 +104,78 @@ export function WeekSchedule({ comparisonMode = false, comparisonName }: WeekSch
           <span className="font-bold text-lg">📅 This Week's Availability</span>
         </div>
         <p className="text-sm text-gray-600">
-          Tap times when you're free to hang
+          Tap times when you're free to hang (8pm-4am)
         </p>
       </div>
 
       {/* Calendar Grid */}
-      <div className="overflow-x-auto">
-        <div className="inline-block min-w-full">
-          {/* Days header */}
-          <div className="flex">
-            <div className="w-16 flex-shrink-0"></div>
-            {days.map(day => (
-              <div
-                key={day}
-                className="flex-1 text-center font-bold py-2 min-w-[60px] text-foreground"
-              >
-                {day}
+      <div className="flex">
+        {/* Time labels column - fixed */}
+        <div className="flex-shrink-0">
+          {/* Empty space for header alignment */}
+          <div className="w-16 py-2 h-[42px]"></div>
+          {/* Time labels - 8pm through 4am */}
+          <div className="space-y-1">
+            {[20, 21, 22, 23, 0, 1, 2, 3, 4].map(hour => (
+              <div key={hour} className="w-16 text-xs text-gray-500 text-right pr-2 h-10 flex items-center justify-end">
+                {formatHour(hour)}
               </div>
             ))}
           </div>
+        </div>
 
-          {/* Time slots - Only show prime hours (6pm - 2am) */}
-          <div className="space-y-1">
-            {[18, 19, 20, 21, 22, 23, 0, 1].map(hour => (
-              <div key={hour} className="flex items-center">
-                <div className="w-16 text-xs text-gray-500 text-right pr-2 flex-shrink-0">
-                  {formatHour(hour)}
+        {/* Scrollable calendar grid */}
+        <div className="flex-1 overflow-x-auto">
+          <div className="inline-block min-w-full">
+            {/* Days header */}
+            <div className="flex">
+              {days.map(day => (
+                <div
+                  key={day}
+                  className="flex-1 text-center font-bold py-2 min-w-[60px] text-foreground"
+                >
+                  {day}
                 </div>
-                {days.map(day => {
-                  const key = getSlotKey(day, hour)
-                  const isSelected = selectedSlots.has(key)
+              ))}
+            </div>
 
-                  const isComparison = comparisonSlots.has(key)
-                  const isOverlap = comparisonMode && isSelected && isComparison
+            {/* Time slots - 8pm through 4am */}
+            <div className="space-y-1">
+              {[20, 21, 22, 23, 0, 1, 2, 3, 4].map(hour => (
+                <div key={hour} className="flex items-center">
+                  {days.map(day => {
+                    const key = getSlotKey(day, hour)
+                    const isSelected = selectedSlots.has(key)
 
-                  return (
-                    <button
-                      key={key}
-                      onMouseEnter={() => !comparisonMode && isDragging && toggleSlot(day, hour)}
-                      onMouseDown={() => {
-                        if (!comparisonMode) {
-                          setIsDragging(true)
-                          toggleSlot(day, hour)
-                        }
-                      }}
-                      onMouseUp={() => setIsDragging(false)}
-                      className={`flex-1 h-10 min-w-[60px] transition-all rounded-lg mx-0.5 ${
-                        isOverlap
-                          ? 'bg-teal border-2 border-teal-dark'
-                          : isSelected
-                          ? 'bg-yellow-bright border-2 border-foreground'
-                          : isComparison
-                          ? 'bg-pink border-2 border-foreground'
-                          : 'bg-background border border-gray-200'
-                      } ${comparisonMode ? 'cursor-default' : 'cursor-pointer'}`}
-                    />
-                  )
-                })}
-              </div>
-            ))}
+                    const isComparison = comparisonSlots.has(key)
+                    const isOverlap = comparisonMode && isSelected && isComparison
+
+                    return (
+                      <button
+                        key={key}
+                        onMouseEnter={() => !comparisonMode && isDragging && toggleSlot(day, hour)}
+                        onMouseDown={() => {
+                          if (!comparisonMode) {
+                            setIsDragging(true)
+                            toggleSlot(day, hour)
+                          }
+                        }}
+                        onMouseUp={() => setIsDragging(false)}
+                        className={`flex-1 h-10 min-w-[60px] transition-all rounded-lg mx-0.5 ${
+                          isOverlap
+                            ? 'bg-teal border-2 border-teal-dark'
+                            : isSelected
+                            ? 'bg-yellow-bright border-2 border-foreground'
+                            : isComparison
+                            ? 'bg-pink border-2 border-foreground'
+                            : 'bg-background border border-gray-200'
+                        } ${comparisonMode ? 'cursor-default' : 'cursor-pointer'}`}
+                      />
+                    )
+                  })}
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>

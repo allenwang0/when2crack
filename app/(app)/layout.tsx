@@ -53,7 +53,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
               className="w-10 h-10 rounded-full"
               style={{ border: '2px solid #FFD93D' }}
             />
-            <h1 className="font-serif text-lg font-bold" style={{ color: '#1A1A1A' }}>When2Crack</h1>
+            <h1 className="font-serif text-lg font-bold" style={{ color: '#1A1A1A' }}>when2crack: organize your roster</h1>
           </div>
           <div className="flex items-center gap-2">
             {user ? (

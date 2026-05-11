@@ -86,7 +86,7 @@ export default function SchedulePage() {
           <span className="font-bold text-xl">📅 {sharedFor ? 'Your Availability' : 'My Schedule'}</span>
         </div>
         <p className="text-sm text-gray-600">
-          Mark when you're free this week (6pm-2am)
+          Mark when you're free this week (8pm-4am)
         </p>
       </div>
 
