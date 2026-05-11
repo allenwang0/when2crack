@@ -249,9 +249,17 @@ export function WeekSchedule({ comparisonMode = false, comparisonName }: WeekSch
       const encodedSchedule = encodeScheduleWithTimezone(Array.from(selectedSlots))
 
       // Get display name
-      const displayName = typeof window !== 'undefined'
-        ? JSON.parse(localStorage.getItem('display_name') || '"Someone"')
-        : 'Someone'
+      let displayName = 'Someone'
+      if (typeof window !== 'undefined') {
+        const stored = localStorage.getItem('display_name')
+        if (stored) {
+          try {
+            displayName = JSON.parse(stored)
+          } catch {
+            displayName = stored // Use as-is if it's not JSON
+          }
+        }
+      }
 
       const baseUrl = process.env.NEXT_PUBLIC_APP_URL || (typeof window !== 'undefined' ? window.location.origin : '')
       const shareUrl = `${baseUrl}/schedule?for=${encodeURIComponent(displayName)}&schedule=${encodedSchedule}`
