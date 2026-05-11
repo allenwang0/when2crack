@@ -14,6 +14,15 @@ export default function AuthPage() {
   const supabase = createClient()
   const { user, loading: authLoading } = useAuth()
 
+  // Check for auth errors in URL
+  useEffect(() => {
+    const searchParams = new URLSearchParams(window.location.search)
+    const urlError = searchParams.get('error')
+    if (urlError === 'auth_error') {
+      setError('Authentication failed. Please try again.')
+    }
+  }, [])
+
   // Auto-redirect authenticated users to roster
   useEffect(() => {
     if (!authLoading && user) {
@@ -27,10 +36,18 @@ export default function AuthPage() {
 
     try {
       const appUrl = process.env.NEXT_PUBLIC_APP_URL || window.location.origin
-      const { error } = await supabase.auth.signInWithOAuth({
+      const redirectUrl = `${appUrl}/auth/callback`
+
+      console.log('Starting Google OAuth flow with redirect:', redirectUrl)
+
+      const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${appUrl}/auth/callback`,
+          redirectTo: redirectUrl,
+          queryParams: {
+            access_type: 'offline',
+            prompt: 'consent',
+          },
         },
       })
 
@@ -38,6 +55,8 @@ export default function AuthPage() {
         console.error('Google Sign-In error:', error)
         throw error
       }
+
+      console.log('OAuth initiated, redirecting to:', data.url)
       // Google will handle the redirect
     } catch (err: unknown) {
       console.error('Auth error:', err)

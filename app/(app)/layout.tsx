@@ -40,8 +40,57 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
   if (loading) {
     return (
-      <div className="h-screen flex items-center justify-center overflow-hidden">
-        <div className="text-gray-600">Loading...</div>
+      <div className="flex flex-col" style={{ height: '100vh', overflow: 'hidden' }}>
+        {/* Header skeleton */}
+        <header className="fixed top-0 left-0 right-0 bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm border-b border-gray-200 dark:border-gray-800 z-40" style={{ boxShadow: '0 2px 10px rgba(0,0,0,0.05)' }}>
+          <div className="max-w-md mx-auto flex items-center justify-between h-14 px-3 sm:px-4">
+            <div className="flex items-center gap-2 flex-1">
+              <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full skeleton" style={{ border: '2px solid #FFD93D' }} />
+              <div className="w-48 h-6 skeleton rounded-lg" />
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-10 h-10 skeleton rounded-full" />
+              <div className="w-10 h-10 skeleton rounded-full" />
+              <div className="w-20 h-10 skeleton rounded-full" />
+            </div>
+          </div>
+        </header>
+
+        {/* Main content skeleton */}
+        <main className="flex-1 overflow-y-auto pt-16 pb-28">
+          <div className="max-w-md mx-auto w-full px-4 py-6">
+            <div className="flex items-center justify-between mb-8">
+              <div className="w-48 h-10 skeleton rounded-2xl" />
+              <div className="w-20 h-10 skeleton rounded-2xl" />
+            </div>
+            <div className="space-y-4">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-2xl p-4">
+                  <div className="flex items-start gap-3">
+                    <div className="w-12 h-12 rounded-full skeleton" />
+                    <div className="flex-1">
+                      <div className="w-32 h-5 skeleton rounded mb-2" />
+                      <div className="w-24 h-4 skeleton rounded mb-3" />
+                      <div className="flex justify-between">
+                        <div className="w-16 h-3 skeleton rounded" />
+                        <div className="w-28 h-3 skeleton rounded" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </main>
+
+        {/* Bottom nav skeleton */}
+        <nav className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 z-50">
+          <div className="max-w-md mx-auto flex justify-around items-center h-20 px-4">
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="w-12 h-12 skeleton rounded-full" />
+            ))}
+          </div>
+        </nav>
       </div>
     )
   }
