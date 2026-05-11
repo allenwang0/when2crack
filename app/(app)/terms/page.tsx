@@ -9,7 +9,7 @@ export default function TermsPage() {
   return (
     <div className="py-6">
       <Button
-        variant="ghost"
+        variant="tertiary"
         onClick={() => router.back()}
         className="mb-4"
       >

@@ -366,7 +366,7 @@ export default function ProfilePage() {
       {/* Restart Tour Button */}
       <div className="mb-6">
         <Button
-          variant="ghost"
+          variant="tertiary"
           onClick={() => {
             localStorage.removeItem('onboarding_seen')
             localStorage.removeItem('onboarding_completed')

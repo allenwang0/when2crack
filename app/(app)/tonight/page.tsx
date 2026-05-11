@@ -408,60 +408,58 @@ export default function TonightPage() {
       {!user && !authLoading && <GuestBanner />}
 
       {/* Tabs */}
-      <div className="flex gap-2 sm:gap-3 mb-6 sm:mb-8 touch-manipulation">
+      <div className="flex gap-3 mb-6 touch-manipulation">
         <button
           onClick={() => setActiveTab('tonight')}
-          className={`flex-1 py-3 sm:py-4 px-3 sm:px-4 rounded-2xl font-bold transition-all text-base sm:text-lg active:scale-95 ${
+          className={`flex-1 py-3 px-4 rounded-2xl font-bold transition-all text-base active:scale-95 ${
             activeTab === 'tonight'
-              ? 'bg-gradient-to-r from-pink to-purple text-white shadow-xl'
-              : 'bg-white border-2 border-gray-200 text-gray-600 hover:border-pink/30 hover:bg-pink/5 hover:shadow-md'
+              ? 'bg-gray-900 text-yellow-bright shadow-lg border-2 border-gray-900'
+              : 'bg-white border-2 border-gray-300 text-gray-700 hover:border-yellow-bright hover:bg-yellow-soft hover:shadow-md'
           }`}
         >
-          <span className="hidden sm:inline">📅 Tonight</span>
-          <span className="sm:hidden">📅 Tonight</span>
+          Tonight
         </button>
         <button
           onClick={() => setActiveTab('battle')}
-          className={`flex-1 py-3 sm:py-4 px-3 sm:px-4 rounded-2xl font-bold transition-all text-base sm:text-lg active:scale-95 ${
+          className={`flex-1 py-3 px-4 rounded-2xl font-bold transition-all text-base active:scale-95 ${
             activeTab === 'battle'
-              ? 'bg-gradient-to-r from-pink to-purple text-white shadow-xl'
-              : 'bg-white border-2 border-gray-200 text-gray-600 hover:border-purple/30 hover:bg-purple/5 hover:shadow-md'
+              ? 'bg-gray-900 text-yellow-bright shadow-lg border-2 border-gray-900'
+              : 'bg-white border-2 border-gray-300 text-gray-700 hover:border-yellow-bright hover:bg-yellow-soft hover:shadow-md'
           }`}
         >
-          <span className="hidden sm:inline">⚔️ Battle</span>
-          <span className="sm:hidden">⚔️ Battle</span>
+          Battle
         </button>
       </div>
 
       {/* Tonight Tab */}
       {activeTab === 'tonight' && (
         <div className="tonight-recommendations">
-          <div className="text-center mb-8">
-            <h2 className="text-3xl font-serif font-bold mb-5 text-gray-800">Tonight's Top Picks</h2>
+          <div className="text-center mb-6">
+            <h2 className="text-2xl sm:text-3xl font-serif font-bold mb-2 text-gray-900">Tonight's Top Picks</h2>
             <p className="text-sm text-gray-600">
               Weighted by reliability, recency, and vibe
             </p>
           </div>
 
           {error && (
-            <div className="bg-red-500/10 border border-red-500/50 rounded-lg p-4 mb-6 text-center">
-              <p className="text-red-500 text-sm">{error}</p>
-              <Button onClick={user ? fetchRecommendations : fetchRecommendationsGuest} variant="ghost" size="sm" className="mt-3">
+            <div className="bg-red-500/10 border border-red-500/50 rounded-xl p-4 mb-6 text-center">
+              <p className="text-red-500 text-sm font-medium">{error}</p>
+              <Button onClick={user ? fetchRecommendations : fetchRecommendationsGuest} variant="tertiary" size="sm" className="mt-3">
                 Try Again
               </Button>
             </div>
           )}
 
           {recommendations.length === 0 ? (
-            <div className="bg-white border-2 border-dashed border-gray-300 rounded-2xl p-12 text-center">
-              <div className="text-6xl mb-6">📅</div>
-              <p className="text-gray-800 font-semibold text-lg mb-4">No recommendations yet</p>
+            <div className="bg-white border-2 border-dashed border-gray-300 rounded-2xl p-8 sm:p-12 text-center">
+              <div className="text-5xl sm:text-6xl mb-4 sm:mb-6">📅</div>
+              <p className="text-gray-900 font-semibold text-base sm:text-lg mb-2">No recommendations yet</p>
               <p className="text-sm text-gray-600">
                 Add people to your roster and run some battles to get personalized picks
               </p>
             </div>
           ) : (
-            <div className="space-y-4">
+            <div className="space-y-6">
               {recommendations.map((recommendation, index) => (
                 <TonightCard
                   key={recommendation.person.id}
@@ -475,7 +473,7 @@ export default function TonightPage() {
 
           {recommendations.length > 0 && (
             <div className="mt-6 text-center">
-              <Button variant="ghost" onClick={user ? fetchRecommendations : fetchRecommendationsGuest}>
+              <Button variant="tertiary" onClick={user ? fetchRecommendations : fetchRecommendationsGuest}>
                 Refresh Recommendations
               </Button>
             </div>
@@ -486,9 +484,9 @@ export default function TonightPage() {
       {/* Battle Tab */}
       {activeTab === 'battle' && (
         <div className="battle-section">
-          <div className="text-center mb-8">
-            <h2 className="text-3xl font-serif font-bold mb-5 text-gray-800">Battle Mode</h2>
-            <p className="text-sm text-gray-600 mb-4">
+          <div className="text-center mb-6">
+            <h2 className="text-2xl sm:text-3xl font-serif font-bold mb-2 text-gray-900">Battle Mode</h2>
+            <p className="text-sm text-gray-600 mb-3">
               Right now, tonight — who would you rather?
             </p>
             {!user && totalPossibleBattles > 0 && (
@@ -499,16 +497,16 @@ export default function TonightPage() {
           </div>
 
           {error && (
-            <div className="bg-card border border-border rounded-lg p-6 text-center">
-              <p className="text-red-500 mb-4">{error}</p>
-              <Button onClick={user ? fetchBattlePair : fetchBattlePairGuest}>Try Again</Button>
+            <div className="bg-red-500/10 border border-red-500/50 rounded-xl p-4 mb-6 text-center">
+              <p className="text-red-500 text-sm font-medium mb-3">{error}</p>
+              <Button onClick={user ? fetchBattlePair : fetchBattlePairGuest} variant="secondary">Try Again</Button>
             </div>
           )}
 
           {!person1 || !person2 ? (
-            <div className="bg-white border-2 border-dashed border-gray-300 rounded-2xl p-12 text-center">
-              <div className="text-6xl mb-6">⚔️</div>
-              <p className="text-gray-800 font-semibold text-lg mb-4">Need more people</p>
+            <div className="bg-white border-2 border-dashed border-gray-300 rounded-2xl p-8 sm:p-12 text-center">
+              <div className="text-5xl sm:text-6xl mb-4 sm:mb-6">⚔️</div>
+              <p className="text-gray-900 font-semibold text-base sm:text-lg mb-2">Need more people</p>
               <p className="text-sm text-gray-600">
                 Add at least 2 people to your roster to start battles
               </p>
@@ -516,9 +514,9 @@ export default function TonightPage() {
           ) : (
             <>
               {battleResult && (
-                <div className="bg-pink/10 border border-pink rounded-lg p-4 mb-6 text-center animate-fade-in">
+                <div className="bg-pink/10 border border-pink rounded-xl p-4 mb-6 text-center animate-fade-in">
                   <p className="text-pink font-semibold mb-2">Battle Complete!</p>
-                  <p className="text-sm text-gray-600">
+                  <p className="text-sm text-gray-700">
                     Winner: {battleResult.winnerChange > 0 ? '+' : ''}
                     {battleResult.winnerChange} Elo
                     {' • '}
@@ -528,31 +526,33 @@ export default function TonightPage() {
                 </div>
               )}
 
-              <div className="grid grid-cols-2 gap-4 mb-6">
-                <BattleCard
-                  person={person1}
-                  onClick={() => handleBattle(person1.id, person2.id)}
-                  disabled={processing}
-                />
-                <BattleCard
-                  person={person2}
-                  onClick={() => handleBattle(person2.id, person1.id)}
-                  disabled={processing}
-                />
+              <div className="relative">
+                <div className="grid grid-cols-2 gap-4 sm:gap-6">
+                  <BattleCard
+                    person={person1}
+                    onClick={() => handleBattle(person1.id, person2.id)}
+                    disabled={processing}
+                  />
+                  <BattleCard
+                    person={person2}
+                    onClick={() => handleBattle(person2.id, person1.id)}
+                    disabled={processing}
+                  />
+                </div>
+
+                {/* VS Badge - Positioned between cards */}
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10">
+                  <span className="inline-block px-4 py-2 bg-gray-900 text-yellow-bright rounded-full text-sm font-bold shadow-lg">
+                    VS
+                  </span>
+                </div>
               </div>
 
-              <div className="text-center mb-6">
-                <span className="inline-block px-4 py-2 bg-card border border-border rounded-full text-sm font-semibold text-gray-600">
-                  VS
-                </span>
-              </div>
-
-              <div className="text-center">
+              <div className="text-center mt-6">
                 <Button
-                  variant="ghost"
+                  variant="tertiary"
                   onClick={user ? fetchBattlePair : fetchBattlePairGuest}
                   disabled={processing}
-                  className="text-gray-600"
                 >
                   Skip this battle
                 </Button>

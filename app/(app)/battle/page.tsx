@@ -5,6 +5,7 @@ import { BattleCard } from '@/components/BattleCard'
 import { Button } from '@/components/ui/Button'
 import { GuestBanner } from '@/components/GuestBanner'
 import { OutOfComparisons } from '@/components/OutOfComparisons'
+import { SkeletonBattleCard } from '@/components/skeletons/SkeletonBattleCard'
 import { useAuth } from '@/lib/contexts/AuthContext'
 import { useLocalStorage } from '@/lib/hooks/useLocalStorage'
 import { useBattleUndo } from '@/lib/hooks/useBattleUndo'
@@ -277,11 +278,27 @@ export default function BattlePage() {
 
   if (loading) {
     return (
-      <div className="py-6 flex items-center justify-center min-h-[60vh]">
+      <div className="py-6">
+        <div className="text-center mb-6">
+          <div className="h-8 w-32 bg-border/50 animate-pulse rounded mx-auto mb-4" />
+          <div className="h-4 w-64 bg-border/50 animate-pulse rounded mx-auto mb-3" />
+          <div className="h-3 w-40 bg-border/50 animate-pulse rounded mx-auto" />
+        </div>
+
+        {/* Battle Cards Skeleton */}
+        <div className="grid grid-cols-2 gap-2 sm:gap-4 mb-6">
+          <SkeletonBattleCard />
+          <SkeletonBattleCard />
+        </div>
+
+        {/* VS Divider Skeleton */}
+        <div className="text-center mb-6">
+          <div className="inline-block h-10 w-20 bg-border/50 animate-pulse rounded-full" />
+        </div>
+
+        {/* Skip Button Skeleton */}
         <div className="text-center">
-          <div className="text-4xl mb-4 animate-bounce">⚔️</div>
-          <p className="text-foreground/60 mb-4">{loadingMessage}</p>
-          <div className="w-8 h-8 border-b-2 border-pink animate-spin rounded-full mx-auto"></div>
+          <div className="h-10 w-32 bg-border/50 animate-pulse rounded mx-auto" />
         </div>
       </div>
     )
@@ -402,7 +419,7 @@ export default function BattlePage() {
       {/* Skip Button */}
       <div className="text-center">
         <Button
-          variant="ghost"
+          variant="tertiary"
           onClick={() => {
             // Mark this pair as skipped (guest mode only)
             if (!user && person1 && person2) {

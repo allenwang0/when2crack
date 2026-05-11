@@ -215,9 +215,9 @@ export default function AddPage() {
     <div className="py-6">
       {!user && !authLoading && <GuestBanner />}
 
-      <h2 className="text-2xl font-serif font-bold mb-8">Add Person</h2>
+      <h2 className="text-2xl sm:text-3xl font-serif font-bold mb-6 text-gray-900">Add Person</h2>
 
-      <form onSubmit={handleSubmit} className="space-y-8">
+      <form onSubmit={handleSubmit} className="space-y-6">
         <Input
           label="Name"
           value={name}
@@ -228,24 +228,24 @@ export default function AddPage() {
 
         {/* Photo Upload */}
         <div>
-          <label className="block text-sm font-medium text-foreground mb-3">
+          <label className="block text-sm font-semibold text-gray-900 mb-3">
             Photo (optional)
           </label>
           <div className="flex items-center gap-4">
             {avatarUrl ? (
-              <div className="relative w-20 h-20 rounded-full overflow-hidden border-2 border-pink flex-shrink-0">
+              <div className="relative w-24 h-24 rounded-full overflow-hidden border-2 border-pink flex-shrink-0">
                 <img src={avatarUrl} alt="Preview" className="w-full h-full object-cover" />
                 <button
                   type="button"
                   onClick={() => setAvatarUrl(null)}
-                  className="absolute top-0 right-0 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs"
+                  className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-7 h-7 flex items-center justify-center text-sm shadow-md hover:bg-red-600 transition-colors"
                 >
                   ✕
                 </button>
               </div>
             ) : (
-              <div className="w-20 h-20 rounded-full bg-gray-200 flex items-center justify-center text-gray-600 flex-shrink-0">
-                <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="w-24 h-24 rounded-full bg-gray-200 flex items-center justify-center text-gray-600 flex-shrink-0">
+                <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                 </svg>
               </div>
@@ -257,23 +257,27 @@ export default function AddPage() {
                 onChange={handlePhotoUpload}
                 className="hidden"
               />
-              <div className="px-4 py-2 bg-white border-2 border-black rounded-full text-center cursor-pointer hover:bg-gray-50 transition-colors">
-                <span className="text-sm font-semibold">Choose Photo</span>
-              </div>
+              <Button type="button" variant="secondary" className="w-full">
+                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+                Choose Photo
+              </Button>
             </label>
           </div>
-          <p className="text-xs text-gray-500 mt-3">Max 5MB • JPG, PNG, or GIF</p>
+          <p className="text-xs text-gray-600 mt-2">Max 5MB • JPG, PNG, or GIF</p>
         </div>
 
         {/* Status Selection */}
         <div>
-          <label className="block text-sm font-medium text-foreground mb-3">
+          <label className="block text-sm font-semibold text-gray-900 mb-3">
             Status
           </label>
           <select
             value={status}
             onChange={(e) => setStatus(e.target.value as Status)}
-            className="w-full px-4 py-2 bg-card border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-pink"
+            className="w-full px-4 py-3 bg-white border-2 border-gray-300 rounded-2xl text-gray-900 font-medium focus:outline-none focus:ring-4 focus:ring-yellow-bright focus:border-yellow-bright transition-all"
           >
             <option value="New">New</option>
             <option value="Chatting">Chatting</option>
@@ -283,9 +287,9 @@ export default function AddPage() {
         </div>
 
         {/* Score Sliders */}
-        <div className="space-y-8">
+        <div className="space-y-6">
           <Slider
-            label="Looks"
+            label="Attraction"
             value={attractionScore}
             onChange={setAttractionScore}
             min={1}
@@ -299,7 +303,7 @@ export default function AddPage() {
             max={10}
           />
           <Slider
-            label="Values"
+            label="Reliability"
             value={reliabilityScore}
             onChange={setReliabilityScore}
             min={1}
@@ -308,13 +312,13 @@ export default function AddPage() {
         </div>
 
         {error && (
-          <div className="p-4 bg-red-500/10 border border-red-500/50 rounded-lg text-red-500 text-sm">
+          <div className="p-4 bg-red-500/10 border-2 border-red-500/50 rounded-2xl text-red-600 text-sm font-medium">
             {error}
           </div>
         )}
 
-        <div className="flex gap-4 pb-6">
-          <Button type="submit" className="flex-1" disabled={loading || authLoading}>
+        <div className="flex gap-3 pt-2">
+          <Button type="submit" variant="primary" className="flex-1" disabled={loading || authLoading}>
             {loading ? 'Adding...' : authLoading ? 'Loading...' : 'Add to Roster'}
           </Button>
           <Button

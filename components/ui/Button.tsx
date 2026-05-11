@@ -1,7 +1,7 @@
 import React from 'react'
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'secondary' | 'ghost' | 'danger' | 'outline'
+  variant?: 'primary' | 'secondary' | 'tertiary' | 'danger'
   size?: 'sm' | 'md' | 'lg'
   children: React.ReactNode
 }
@@ -14,20 +14,19 @@ export function Button({
   ...props
 }: ButtonProps) {
   const baseStyles =
-    'inline-flex items-center justify-center font-semibold rounded-full transition-all duration-200 active:scale-98 disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-yellow-bright focus-visible:ring-offset-2'
+    'inline-flex items-center justify-center font-semibold rounded-2xl transition-all duration-200 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-yellow-bright focus-visible:ring-offset-2'
 
   const variantStyles = {
-    primary: 'bg-black text-yellow-bright hover:bg-gray-800 hover:shadow-yellow-bright/20',
-    secondary: 'bg-white border-2 border-black text-black hover:bg-gray-50 hover:border-pink',
-    ghost: 'bg-transparent text-foreground hover:bg-yellow-soft shadow-none hover:shadow-md',
-    danger: 'bg-red-500 text-white hover:bg-red-600 hover:shadow-red-500/30',
-    outline: 'bg-white border-2 text-black hover:bg-yellow-soft hover:border-yellow-bright',
+    primary: 'bg-gradient-to-r from-pink to-purple text-white shadow-md hover:shadow-lg hover:opacity-90',
+    secondary: 'bg-white border-2 border-gray-800 text-gray-800 shadow-sm hover:bg-yellow-soft hover:border-pink hover:shadow-md',
+    tertiary: 'bg-transparent text-gray-700 hover:bg-yellow-soft shadow-none hover:shadow-sm',
+    danger: 'bg-red-500 text-white shadow-md hover:bg-red-600 hover:shadow-lg',
   }
 
   const sizeStyles = {
-    sm: 'px-4 py-2.5 text-sm',
-    md: 'px-5 py-3 text-base',
-    lg: 'px-8 py-4 text-lg',
+    sm: 'px-4 py-2 text-sm min-h-[36px]',
+    md: 'px-6 py-3 text-base min-h-[44px]',
+    lg: 'px-8 py-4 text-lg min-h-[52px]',
   }
 
   return (

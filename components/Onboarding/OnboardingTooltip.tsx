@@ -166,7 +166,7 @@ export function OnboardingTooltip({
       <div className="flex flex-col gap-2">
         {step > 1 && onPrevious && (
           <Button
-            variant="ghost"
+            variant="tertiary"
             size="sm"
             onClick={onPrevious}
             className="mb-2"

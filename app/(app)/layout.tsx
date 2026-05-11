@@ -47,8 +47,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     <OnboardingController>
       <div className="flex flex-col" style={{ height: '100vh', overflow: 'hidden' }}>
       {/* Header - fixed */}
-      <header className="fixed top-0 left-0 right-0 bg-white/80 backdrop-blur-sm border-b z-40" style={{ borderColor: '#F5F5F0', boxShadow: '0 2px 10px rgba(0,0,0,0.05)' }}>
-        <div className="max-w-md mx-auto flex items-center justify-between h-16 px-3 sm:px-4">
+      <header className="fixed top-0 left-0 right-0 bg-white/90 backdrop-blur-sm border-b border-gray-200 z-40" style={{ boxShadow: '0 2px 10px rgba(0,0,0,0.05)' }}>
+        <div className="max-w-md mx-auto flex items-center justify-between h-14 px-3 sm:px-4">
           <div className="flex items-center gap-2 min-w-0 flex-1">
             <img
               src="/icon.jpg"
@@ -107,7 +107,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       </header>
 
       {/* Main content - scrollable with padding for fixed header and nav */}
-      <main className="flex-1 overflow-y-auto pt-20 pb-24">
+      <main className="flex-1 overflow-y-auto pt-16 pb-28">
         <div className="max-w-md mx-auto w-full px-4">
           {children}
         </div>

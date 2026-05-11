@@ -39,7 +39,7 @@ export default function AchievementsPage() {
       {!user && !authLoading && <GuestBanner />}
 
       <Button
-        variant="ghost"
+        variant="tertiary"
         onClick={() => router.back()}
         className="mb-4"
       >

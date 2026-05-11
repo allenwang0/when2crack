@@ -44,7 +44,7 @@ export function BattleUndoButton({
       <div className="bg-white rounded-full shadow-2xl border-2 border-pink p-2 flex items-center gap-3">
         <Button
           onClick={onUndo}
-          variant="ghost"
+          variant="tertiary"
           className="flex items-center gap-2 text-pink hover:bg-pink/10"
         >
           <svg
