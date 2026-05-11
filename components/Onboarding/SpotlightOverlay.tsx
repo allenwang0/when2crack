@@ -33,6 +33,8 @@ export function SpotlightOverlay({
   const retryCountRef = useRef(0)
   const previousTargetRef = useRef<string | null>(null)
   const observerRef = useRef<MutationObserver | null>(null)
+  const retryTimeoutRef = useRef<NodeJS.Timeout>()
+  const resizeTimeoutRef = useRef<NodeJS.Timeout>()
 
   useEffect(() => {
     if (!targetSelector) return
@@ -49,6 +51,12 @@ export function SpotlightOverlay({
         observerRef.current.disconnect()
         observerRef.current = null
       }
+
+      // Clear any pending retry timeouts
+      if (retryTimeoutRef.current) {
+        clearTimeout(retryTimeoutRef.current)
+        retryTimeoutRef.current = undefined
+      }
     }
 
     const calculatePosition = () => {
@@ -57,7 +65,7 @@ export function SpotlightOverlay({
         // Retry logic for missing elements
         if (retryCountRef.current < MAX_RETRIES) {
           retryCountRef.current++
-          setTimeout(calculatePosition, RETRY_DELAY)
+          retryTimeoutRef.current = setTimeout(calculatePosition, RETRY_DELAY)
           return
         }
         console.warn(`Spotlight target not found after ${MAX_RETRIES} attempts: ${targetSelector}`)
@@ -86,18 +94,21 @@ export function SpotlightOverlay({
     const initialTimeout = setTimeout(calculatePosition, 100)
 
     // Recalculate on resize (debounced)
-    let resizeTimeout: NodeJS.Timeout
     const handleResize = () => {
-      clearTimeout(resizeTimeout)
-      resizeTimeout = setTimeout(calculatePosition, 200)
+      if (resizeTimeoutRef.current) {
+        clearTimeout(resizeTimeoutRef.current)
+      }
+      resizeTimeoutRef.current = setTimeout(calculatePosition, 200)
     }
 
     window.addEventListener('resize', handleResize)
 
     // Optimized MutationObserver - only watch the likely container
     const observer = new MutationObserver(() => {
-      clearTimeout(resizeTimeout)
-      resizeTimeout = setTimeout(calculatePosition, 500) // Increased from 300ms to 500ms
+      if (resizeTimeoutRef.current) {
+        clearTimeout(resizeTimeoutRef.current)
+      }
+      resizeTimeoutRef.current = setTimeout(calculatePosition, 500) // Increased from 300ms to 500ms
     })
 
     // Store observer ref for cleanup on target change
@@ -117,7 +128,12 @@ export function SpotlightOverlay({
       if (observerRef.current === observer) {
         observerRef.current = null
       }
-      clearTimeout(resizeTimeout)
+      if (resizeTimeoutRef.current) {
+        clearTimeout(resizeTimeoutRef.current)
+      }
+      if (retryTimeoutRef.current) {
+        clearTimeout(retryTimeoutRef.current)
+      }
       clearTimeout(initialTimeout)
     }
   }, [targetSelector, padding])

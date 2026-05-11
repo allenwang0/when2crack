@@ -53,20 +53,41 @@ export function isValidEmail(email: string): boolean {
 
 /**
  * Sanitize URL to prevent javascript: and data: protocols
+ * Handles encoded dangerous protocols and mixed case
  */
 export function sanitizeUrl(url: string): string {
   if (!url) return ''
 
-  const lower = url.toLowerCase().trim()
+  // Normalize: decode, trim, lowercase for checking
+  let normalized = url.trim()
 
-  // Block dangerous protocols
-  if (
-    lower.startsWith('javascript:') ||
-    lower.startsWith('data:') ||
-    lower.startsWith('vbscript:') ||
-    lower.startsWith('file:')
-  ) {
-    return ''
+  // Decode URL-encoded characters (handles %09, %0A, etc.)
+  try {
+    normalized = decodeURIComponent(normalized)
+  } catch (e) {
+    // If decoding fails, use original
+    normalized = url.trim()
+  }
+
+  const lower = normalized.toLowerCase()
+
+  // Remove all whitespace and control characters for checking
+  const stripped = lower.replace(/[\s\x00-\x1F\x7F]/g, '')
+
+  // Block dangerous protocols (after stripping whitespace/control chars)
+  const dangerousProtocols = [
+    'javascript:',
+    'data:',
+    'vbscript:',
+    'file:',
+    'about:',
+    'blob:',
+  ]
+
+  for (const protocol of dangerousProtocols) {
+    if (stripped.startsWith(protocol)) {
+      return ''
+    }
   }
 
   // Only allow http, https, or relative URLs
@@ -75,8 +96,8 @@ export function sanitizeUrl(url: string): string {
     !lower.startsWith('https://') &&
     !lower.startsWith('/')
   ) {
-    return `https://${url}`
+    return `https://${url.trim()}`
   }
 
-  return url
+  return url.trim()
 }

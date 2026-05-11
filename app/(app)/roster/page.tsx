@@ -88,11 +88,10 @@ export default function RosterPage() {
       try {
         setLoadingMessage('Loading your roster...')
 
-        // Fetch roster with only needed columns
-        // @ts-ignore
+        // Fetch roster with only needed columns for RosterCard display
         const { data, error } = await supabase
           .from('roster')
-          .select('id, name, status, tier, elo_rating, avatar_url, avatar_color, last_contact_date, reliability_score')
+          .select('id, name, status, elo_rating, avatar_url, avatar_color, last_contact_date, attraction_score, personality_score, reliability_score')
           .eq('user_id', user.id)
           .neq('status', 'Archived')
           .order('elo_rating', { ascending: false })
@@ -203,9 +202,8 @@ export default function RosterPage() {
       {roster.length === 0 ? (
         <div className="bg-white border-2 border-dashed border-gray-300 rounded-2xl p-12 text-center">
           <div className="text-6xl mb-4">👥</div>
-          <p className="text-gray-800 font-semibold text-lg mb-2">Your roster is empty</p>
-          <p className="text-sm text-gray-500 mb-6">
-            Add your first person to get started
+          <p className="text-gray-800 font-semibold text-lg mb-6">
+            Add your first person to start
           </p>
           <Button onClick={() => router.push('/add')} className="shadow-md onboarding-add-button">
             <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -17,12 +17,12 @@ export async function GET() {
 
   try {
     // Fetch user's roster (active only) - only columns needed for recommendations
-    // @ts-ignore
     const { data: roster, error: rosterError } = await supabase
       .from('roster')
       .select('id, name, status, tier, elo_rating, avatar_url, avatar_color, last_contact_date, reliability_score, attraction_score, personality_score')
       .eq('user_id', user.id)
       .neq('status', 'Archived')
+      .returns<RosterPerson[]>()
 
     if (rosterError) throw rosterError
 
@@ -35,7 +35,7 @@ export async function GET() {
 
     // Get top 3 recommendations
     const recommendations = getTonightRecommendations(
-      roster as RosterPerson[],
+      roster || [],
       3
     )
 

@@ -1,5 +1,6 @@
 import { memo } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import type { RosterPerson } from '@/lib/types'
 import { Badge } from '@/components/ui/Badge'
 import { getInitials } from '@/lib/utils/colors'
@@ -11,6 +12,10 @@ interface RosterCardProps {
 }
 
 export const RosterCard = memo(function RosterCard({ person }: RosterCardProps) {
+  if (!person || !person.name) {
+    return null // Don't render if person data is invalid
+  }
+
   const initials = getInitials(person.name)
   const compositeScore = calculateCompositeScore(person)
 
@@ -20,14 +25,13 @@ export const RosterCard = memo(function RosterCard({ person }: RosterCardProps) 
         <div className="flex items-start gap-3">
           {/* Avatar */}
           {person.avatar_url ? (
-            <div className="w-12 h-12 rounded-full overflow-hidden flex-shrink-0 border-2 border-pink">
-              <img
+            <div className="w-12 h-12 rounded-full overflow-hidden flex-shrink-0 border-2 border-pink relative">
+              <Image
                 src={person.avatar_url}
-                alt={person.name}
-                className="w-full h-full object-cover"
-                loading="lazy"
-                width={48}
-                height={48}
+                alt={`${person.name}'s profile photo`}
+                fill
+                sizes="48px"
+                className="object-cover"
               />
             </div>
           ) : (

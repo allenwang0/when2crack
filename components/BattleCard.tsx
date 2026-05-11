@@ -1,4 +1,5 @@
 import { memo } from 'react'
+import Image from 'next/image'
 import type { RosterPerson } from '@/lib/types'
 import { Badge } from '@/components/ui/Badge'
 import { getInitials } from '@/lib/utils/colors'
@@ -26,14 +27,14 @@ export const BattleCard = memo(function BattleCard({ person, onClick, disabled }
     >
       {/* Avatar */}
       {person.avatar_url ? (
-        <div className="w-16 h-16 sm:w-24 sm:h-24 rounded-full overflow-hidden mx-auto mb-3 sm:mb-4 border-2 border-pink">
-          <img
+        <div className="w-16 h-16 sm:w-24 sm:h-24 rounded-full overflow-hidden mx-auto mb-3 sm:mb-4 border-2 border-pink relative">
+          <Image
             src={person.avatar_url}
-            alt={person.name}
-            className="w-full h-full object-cover"
-            loading="lazy"
-            width={96}
-            height={96}
+            alt={`${person.name}'s profile photo`}
+            fill
+            sizes="(max-width: 640px) 64px, 96px"
+            className="object-cover"
+            priority
           />
         </div>
       ) : (
@@ -87,16 +88,9 @@ export const BattleCard = memo(function BattleCard({ person, onClick, disabled }
       </div>
 
       {/* Elo Rating */}
-      <div className="text-xs text-gray-500 mb-2">
+      <div className="text-xs text-gray-500">
         Elo: {person.elo_rating}
       </div>
-
-      {/* Tap instruction */}
-      {!disabled && (
-        <div className="mt-2 sm:mt-4 text-xs sm:text-sm text-pink font-medium">
-          Tap to choose
-        </div>
-      )}
     </button>
   )
 })

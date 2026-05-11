@@ -49,6 +49,7 @@ export function WeekSchedule({ comparisonMode = false, comparisonName }: WeekSch
   const [comparisonSlots, setComparisonSlots] = useState<Set<string>>(new Set<string>())
   const [comparisonTimezone, setComparisonTimezone] = useState<string>('')
   const [userTimezone, setUserTimezone] = useState<string>('')
+  const [scheduleDecodeError, setScheduleDecodeError] = useState<string>('')
 
   // Get user's timezone on mount
   useEffect(() => {
@@ -64,6 +65,7 @@ export function WeekSchedule({ comparisonMode = false, comparisonName }: WeekSch
       const params = new URLSearchParams(window.location.search)
       const encodedSchedule = params.get('schedule')
       if (encodedSchedule) {
+        setScheduleDecodeError('')
         try {
           // Try new timezone-aware format first
           const { decodeScheduleWithTimezone } = require('@/lib/utils/timezone')
@@ -74,9 +76,14 @@ export function WeekSchedule({ comparisonMode = false, comparisonName }: WeekSch
           // Fallback to old format (plain array)
           try {
             const decoded = JSON.parse(decodeURIComponent(encodedSchedule))
-            setComparisonSlots(new Set(decoded))
+            if (Array.isArray(decoded)) {
+              setComparisonSlots(new Set(decoded))
+            } else {
+              throw new Error('Invalid schedule format')
+            }
           } catch (fallbackError) {
             console.error('Failed to decode shared schedule:', fallbackError)
+            setScheduleDecodeError('Unable to load shared schedule. The link may be corrupted or expired.')
           }
         }
       }
@@ -112,10 +119,18 @@ export function WeekSchedule({ comparisonMode = false, comparisonName }: WeekSch
   // Update slots when week changes
   useEffect(() => {
     const newWeekKey = `week_schedule_${formatDate(selectedWeekStart)}`
-    const storedSlots = typeof window !== 'undefined'
-      ? JSON.parse(localStorage.getItem(newWeekKey) || '[]')
-      : []
-    setSelectedSlotsState(new Set(storedSlots))
+    if (typeof window !== 'undefined') {
+      try {
+        const stored = localStorage.getItem(newWeekKey)
+        const storedSlots = stored ? JSON.parse(stored) : []
+        setSelectedSlotsState(new Set(Array.isArray(storedSlots) ? storedSlots : []))
+      } catch (error) {
+        console.error('Error parsing stored schedule:', error)
+        setSelectedSlotsState(new Set())
+      }
+    } else {
+      setSelectedSlotsState(new Set())
+    }
   }, [selectedWeekStart])
 
   // Format week display
@@ -278,6 +293,13 @@ export function WeekSchedule({ comparisonMode = false, comparisonName }: WeekSch
         <p className="text-sm text-gray-600">
           Tap times when you're free to hang
         </p>
+
+        {/* Schedule Decode Error */}
+        {scheduleDecodeError && (
+          <div className="mt-3 p-3 bg-red-500/10 border border-red-500/50 rounded-lg">
+            <p className="text-sm text-red-600 font-medium">{scheduleDecodeError}</p>
+          </div>
+        )}
         {userTimezone && (
           <div className="mt-2 text-xs text-gray-500">
             {comparisonMode && comparisonTimezone && comparisonTimezone !== userTimezone ? (

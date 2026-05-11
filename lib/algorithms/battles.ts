@@ -25,15 +25,19 @@ export function selectBattlePair(
     const person1 = sorted[i]
     const person2 = sorted[i + 1]
 
-    // Check if they've battled in last 7 days
-    const recentBattle = battleHistory.find(
+    // Find the MOST RECENT battle between these two people
+    // Filter all battles between this pair, then find the most recent
+    const battlesWithPair = battleHistory.filter(
       (b) =>
         (b.winner_id === person1.id && b.loser_id === person2.id) ||
         (b.winner_id === person2.id && b.loser_id === person1.id)
     )
 
-    const daysSinceBattle = recentBattle
-      ? daysBetween(recentBattle.created_at, new Date())
+    // Get most recent battle (battleHistory should already be sorted by created_at DESC)
+    const mostRecentBattle = battlesWithPair.length > 0 ? battlesWithPair[0] : null
+
+    const daysSinceBattle = mostRecentBattle
+      ? daysBetween(mostRecentBattle.created_at, new Date())
       : Infinity
 
     if (daysSinceBattle > 7) {

@@ -136,6 +136,11 @@ export default function AddPage() {
 
       // Authenticated mode: Use Supabase
 
+      // Validate user data first
+      if (!user.id || !user.email) {
+        throw new Error('User authentication data is incomplete. Please sign in again.')
+      }
+
       // First, ensure user profile exists in public.users
       const { data: userProfile, error: userCheckError } = await supabase
         .from('users')
@@ -148,7 +153,7 @@ export default function AddPage() {
         console.log('User profile not found, creating...')
         const { error: createUserError } = await supabase.from('users').insert({
           id: user.id,
-          email: user.email!,
+          email: user.email,
         })
 
         if (createUserError) {

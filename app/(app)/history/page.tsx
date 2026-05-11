@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Image from 'next/image'
 import { createClient } from '@/lib/supabase/client'
 import { useAuth } from '@/lib/contexts/AuthContext'
 import { GuestBanner } from '@/components/GuestBanner'
@@ -214,20 +215,24 @@ export default function HistoryPage() {
                   {/* Header: Avatar, Name, Date */}
                   <div className="flex items-start gap-3 mb-3">
                     {/* Avatar */}
-                    <div
-                      className="w-12 h-12 rounded-full flex items-center justify-center text-white font-semibold text-sm flex-shrink-0"
-                      style={{ backgroundColor: person.avatar_color }}
-                    >
-                      {person.avatar_url ? (
-                        <img
+                    {person.avatar_url ? (
+                      <div className="w-12 h-12 rounded-full overflow-hidden flex-shrink-0 relative">
+                        <Image
                           src={person.avatar_url}
-                          alt={person.name}
-                          className="w-full h-full rounded-full object-cover"
+                          alt={`${person.name}'s profile photo`}
+                          fill
+                          sizes="48px"
+                          className="object-cover"
                         />
-                      ) : (
-                        getInitials(person.name)
-                      )}
-                    </div>
+                      </div>
+                    ) : (
+                      <div
+                        className="w-12 h-12 rounded-full flex items-center justify-center text-white font-semibold text-sm flex-shrink-0"
+                        style={{ backgroundColor: person.avatar_color }}
+                      >
+                        {getInitials(person.name)}
+                      </div>
+                    )}
 
                     {/* Name and Date */}
                     <div className="flex-1 min-w-0">
