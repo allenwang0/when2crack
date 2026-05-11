@@ -183,7 +183,7 @@ export default function AddPage() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto px-4 py-6 pb-28">
+    <div className="py-6 pb-28">
       {!user && !authLoading && <GuestBanner />}
 
       <h2 className="text-2xl font-serif font-bold mb-6">Add Person</h2>

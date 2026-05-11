@@ -368,30 +368,32 @@ export default function TonightPage() {
   const battlesCompleted = completedBattles.length
 
   return (
-    <div className="max-w-2xl mx-auto px-4 py-6 pb-28">
+    <div className="pb-28">
       {!user && !authLoading && <GuestBanner />}
 
       {/* Tabs */}
-      <div className="flex gap-3 mb-8">
+      <div className="flex gap-2 sm:gap-3 mb-6 sm:mb-8 touch-manipulation">
         <button
           onClick={() => setActiveTab('tonight')}
-          className={`flex-1 py-4 px-4 rounded-2xl font-bold transition-all text-lg ${
+          className={`flex-1 py-3 sm:py-4 px-3 sm:px-4 rounded-2xl font-bold transition-all text-base sm:text-lg active:scale-95 ${
             activeTab === 'tonight'
               ? 'bg-gradient-to-r from-pink to-purple text-white shadow-xl'
               : 'bg-white border-2 border-gray-200 text-gray-600 hover:border-pink/30 hover:bg-pink/5 hover:shadow-md'
           }`}
         >
-          📅 Tonight
+          <span className="hidden sm:inline">📅 Tonight</span>
+          <span className="sm:hidden">📅 Tonight</span>
         </button>
         <button
           onClick={() => setActiveTab('battle')}
-          className={`flex-1 py-4 px-4 rounded-2xl font-bold transition-all text-lg ${
+          className={`flex-1 py-3 sm:py-4 px-3 sm:px-4 rounded-2xl font-bold transition-all text-base sm:text-lg active:scale-95 ${
             activeTab === 'battle'
               ? 'bg-gradient-to-r from-pink to-purple text-white shadow-xl'
               : 'bg-white border-2 border-gray-200 text-gray-600 hover:border-purple/30 hover:bg-purple/5 hover:shadow-md'
           }`}
         >
-          ⚔️ Battle
+          <span className="hidden sm:inline">⚔️ Battle</span>
+          <span className="sm:hidden">⚔️ Battle</span>
         </button>
       </div>
 

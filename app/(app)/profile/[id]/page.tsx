@@ -177,7 +177,9 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
     }
 
     fetchProfile()
-  }, [id, user, supabase, router, localRoster])
+    // supabase is now a singleton, no need to track as dependency
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id, user, router, localRoster])
 
   const handleSaveNotes = async () => {
     if (!person) return

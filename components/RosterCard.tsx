@@ -21,7 +21,14 @@ export const RosterCard = memo(function RosterCard({ person }: RosterCardProps) 
           {/* Avatar */}
           {person.avatar_url ? (
             <div className="w-12 h-12 rounded-full overflow-hidden flex-shrink-0 border-2 border-pink">
-              <img src={person.avatar_url} alt={person.name} className="w-full h-full object-cover" />
+              <img
+                src={person.avatar_url}
+                alt={person.name}
+                className="w-full h-full object-cover"
+                loading="lazy"
+                width={48}
+                height={48}
+              />
             </div>
           ) : (
             <div

@@ -170,7 +170,9 @@ export default function RosterPage() {
     return () => {
       supabase.removeChannel(channel)
     }
-  }, [user, authLoading, supabase])
+    // supabase is now a singleton, no need to track as dependency
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user, authLoading])
 
   if (loading) {
     return (
@@ -182,7 +184,7 @@ export default function RosterPage() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto px-4 py-6 pb-28">
+    <div className="py-6 pb-28">
       {!user && !authLoading && <GuestBanner />}
 
       <div className="flex items-center justify-between mb-6">

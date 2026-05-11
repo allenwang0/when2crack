@@ -145,7 +145,9 @@ export default function ProfilePage() {
     }
 
     fetchStats()
-  }, [user, localRoster, supabase, userAvatar])
+    // supabase is now a singleton, no need to track as dependency
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user, localRoster, userAvatar])
 
   const handleSignOut = async () => {
     await signOut()
@@ -187,7 +189,7 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto px-4 py-6 pb-28">
+    <div className="py-6 pb-28">
       <ToastContainer toasts={toasts} removeToast={removeToast} />
       {!user && !authLoading && <GuestBanner />}
 

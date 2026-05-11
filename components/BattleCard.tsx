@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import type { RosterPerson } from '@/lib/types'
 import { Badge } from '@/components/ui/Badge'
 import { getInitials } from '@/lib/utils/colors'
@@ -9,7 +10,7 @@ interface BattleCardProps {
   disabled?: boolean
 }
 
-export function BattleCard({ person, onClick, disabled }: BattleCardProps) {
+export const BattleCard = memo(function BattleCard({ person, onClick, disabled }: BattleCardProps) {
   const initials = getInitials(person.name)
   const compositeScore = calculateCompositeScore(person)
 
@@ -26,7 +27,14 @@ export function BattleCard({ person, onClick, disabled }: BattleCardProps) {
       {/* Avatar */}
       {person.avatar_url ? (
         <div className="w-16 h-16 sm:w-24 sm:h-24 rounded-full overflow-hidden mx-auto mb-3 sm:mb-4 border-2 border-pink">
-          <img src={person.avatar_url} alt={person.name} className="w-full h-full object-cover" />
+          <img
+            src={person.avatar_url}
+            alt={person.name}
+            className="w-full h-full object-cover"
+            loading="lazy"
+            width={96}
+            height={96}
+          />
         </div>
       ) : (
         <div
@@ -91,4 +99,4 @@ export function BattleCard({ person, onClick, disabled }: BattleCardProps) {
       )}
     </button>
   )
-}
+})

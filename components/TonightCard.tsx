@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import Link from 'next/link'
 import type { TonightRecommendation } from '@/lib/types'
 import { Badge } from '@/components/ui/Badge'
@@ -10,7 +11,7 @@ interface TonightCardProps {
   onShootShot: (personId: string) => void
 }
 
-export function TonightCard({ recommendation, rank, onShootShot }: TonightCardProps) {
+export const TonightCard = memo(function TonightCard({ recommendation, rank, onShootShot }: TonightCardProps) {
   const { person, reasoning } = recommendation
   const initials = getInitials(person.name)
 
@@ -37,7 +38,14 @@ export function TonightCard({ recommendation, rank, onShootShot }: TonightCardPr
       <div className="flex items-start gap-3 mb-4">
         {person.avatar_url ? (
           <div className="w-12 h-12 rounded-full overflow-hidden flex-shrink-0 border-2 border-pink">
-            <img src={person.avatar_url} alt={person.name} className="w-full h-full object-cover" />
+            <img
+              src={person.avatar_url}
+              alt={person.name}
+              className="w-full h-full object-cover"
+              loading="lazy"
+              width={48}
+              height={48}
+            />
           </div>
         ) : (
           <div
@@ -99,4 +107,4 @@ export function TonightCard({ recommendation, rank, onShootShot }: TonightCardPr
       </div>
     </div>
   )
-}
+})

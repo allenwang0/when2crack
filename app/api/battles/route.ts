@@ -25,26 +25,29 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Get current Elo ratings
-    // @ts-ignore
-    const { data: winner, error: winnerError } = await supabase
-      .from('roster')
-      .select('elo_rating')
-      .eq('id', winner_id)
-      .eq('user_id', user.id)
-      .single()
+    // Get current Elo ratings in parallel
+    const [winnerResult, loserResult] = await Promise.all([
+      // @ts-ignore
+      supabase
+        .from('roster')
+        .select('elo_rating')
+        .eq('id', winner_id)
+        .eq('user_id', user.id)
+        .single(),
+      // @ts-ignore
+      supabase
+        .from('roster')
+        .select('elo_rating')
+        .eq('id', loser_id)
+        .eq('user_id', user.id)
+        .single(),
+    ])
 
-    if (winnerError) throw winnerError
+    if (winnerResult.error) throw winnerResult.error
+    if (loserResult.error) throw loserResult.error
 
-    // @ts-ignore
-    const { data: loser, error: loserError } = await supabase
-      .from('roster')
-      .select('elo_rating')
-      .eq('id', loser_id)
-      .eq('user_id', user.id)
-      .single()
-
-    if (loserError) throw loserError
+    const winner = winnerResult.data
+    const loser = loserResult.data
 
     // Calculate new Elo ratings
     const [newWinnerRating, newLoserRating] = updateElo(
@@ -52,8 +55,8 @@ export async function POST(request: NextRequest) {
       loser.elo_rating
     )
 
-    // Update both ratings in parallel
-    const updates = [
+    // Update both ratings AND log battle in parallel
+    const [, , battleResult] = await Promise.all([
       // @ts-ignore
       supabase
         .from('roster')
@@ -66,19 +69,15 @@ export async function POST(request: NextRequest) {
         .update({ elo_rating: newLoserRating })
         .eq('id', loser_id)
         .eq('user_id', user.id),
-    ]
+      // @ts-ignore
+      supabase.from('battles').insert({
+        user_id: user.id,
+        winner_id,
+        loser_id,
+      }),
+    ])
 
-    await Promise.all(updates)
-
-    // Log the battle
-    // @ts-ignore
-    const { error: battleError } = await supabase.from('battles').insert({
-      user_id: user.id,
-      winner_id,
-      loser_id,
-    })
-
-    if (battleError) throw battleError
+    if (battleResult.error) throw battleResult.error
 
     return NextResponse.json({
       success: true,

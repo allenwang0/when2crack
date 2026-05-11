@@ -60,10 +60,11 @@ export function HelpFAQ() {
     return (
       <button
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-24 right-3 sm:right-4 z-50 w-12 h-12 sm:w-14 sm:h-14 rounded-full shadow-lg transition-all hover:scale-110 active:scale-95 flex items-center justify-center"
+        className="fixed bottom-24 right-3 sm:right-4 w-12 h-12 sm:w-14 sm:h-14 rounded-full shadow-lg transition-all hover:scale-110 active:scale-95 flex items-center justify-center"
         style={{
           background: 'linear-gradient(135deg, #FFD93D 0%, #F4C430 100%)',
-          border: '2px solid #1A1A1A'
+          border: '2px solid #1A1A1A',
+          zIndex: 9999
         }}
         title="Help & FAQ"
       >
@@ -75,7 +76,7 @@ export function HelpFAQ() {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center pointer-events-none p-4">
+    <div className="fixed inset-0 flex items-end sm:items-center justify-center pointer-events-none p-4" style={{ zIndex: 9999 }}>
       <div className="pointer-events-auto w-full max-w-md mb-20 sm:mb-0">
         <div
           className="bg-white rounded-3xl shadow-2xl overflow-hidden flex flex-col"
