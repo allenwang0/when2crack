@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { DM_Sans, DM_Serif_Display } from "next/font/google";
 import { AuthProvider } from "@/lib/contexts/AuthContext";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 import "./globals.css";
 
 const dmSans = DM_Sans({
@@ -42,7 +43,9 @@ export default function RootLayout({
         className="bg-background text-foreground font-sans"
         style={{ height: '100%', overflow: 'hidden', margin: 0, padding: 0 }}
       >
-        <AuthProvider>{children}</AuthProvider>
+        <ErrorBoundary>
+          <AuthProvider>{children}</AuthProvider>
+        </ErrorBoundary>
       </body>
     </html>
   );

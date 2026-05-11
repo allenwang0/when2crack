@@ -27,7 +27,7 @@ export default function AddPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
-  const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
 
@@ -37,12 +37,21 @@ export default function AddPage() {
       return
     }
 
-    // Convert to base64
-    const reader = new FileReader()
-    reader.onloadend = () => {
-      setAvatarUrl(reader.result as string)
+    // Check file type
+    if (!file.type.startsWith('image/')) {
+      setError('Please upload an image file')
+      return
     }
-    reader.readAsDataURL(file)
+
+    try {
+      // Compress and resize image
+      const { compressImage } = await import('@/lib/utils/imageCompression')
+      const compressedBase64 = await compressImage(file)
+      setAvatarUrl(compressedBase64)
+    } catch (err) {
+      console.error('Image compression error:', err)
+      setError('Failed to process image. Please try another.')
+    }
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -52,19 +61,32 @@ export default function AddPage() {
     setError('')
 
     try {
-      const avatarColor = generateAvatarColor(name)
+      // Sanitize inputs
+      const { sanitizeName, sanitizeScore } = await import('@/lib/utils/sanitize')
+      const sanitizedName = sanitizeName(name)
+      const sanitizedAttractionScore = sanitizeScore(attractionScore)
+      const sanitizedPersonalityScore = sanitizeScore(personalityScore)
+      const sanitizedReliabilityScore = sanitizeScore(reliabilityScore)
+
+      if (!sanitizedName) {
+        setError('Please enter a valid name')
+        setLoading(false)
+        return
+      }
+
+      const avatarColor = generateAvatarColor(sanitizedName)
 
       // Guest mode: Use localStorage
       if (!user) {
         const newPerson: RosterPerson = {
           id: `guest-${Date.now()}-${Math.random().toString(36).substring(7)}`,
           user_id: 'guest',
-          name,
+          name: sanitizedName,
           tier: 'A', // Default tier, not shown in UI
           status,
-          attraction_score: attractionScore,
-          personality_score: personalityScore,
-          reliability_score: reliabilityScore,
+          attraction_score: sanitizedAttractionScore,
+          personality_score: sanitizedPersonalityScore,
+          reliability_score: sanitizedReliabilityScore,
           avatar_color: avatarColor,
           avatar_url: avatarUrl,
           notes: null,
@@ -83,12 +105,12 @@ export default function AddPage() {
       // @ts-ignore - Supabase types not fully configured
       const { error: insertError } = await supabase.from('roster').insert({
         user_id: user.id,
-        name,
+        name: sanitizedName,
         tier: 'A', // Default tier, not shown in UI
         status,
-        attraction_score: attractionScore,
-        personality_score: personalityScore,
-        reliability_score: reliabilityScore,
+        attraction_score: sanitizedAttractionScore,
+        personality_score: sanitizedPersonalityScore,
+        reliability_score: sanitizedReliabilityScore,
         avatar_color: avatarColor,
         avatar_url: avatarUrl,
         last_contact_date: new Date().toISOString(),

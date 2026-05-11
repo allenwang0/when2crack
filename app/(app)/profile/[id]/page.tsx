@@ -52,33 +52,43 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
       return
     }
 
-    // Convert to base64
-    const reader = new FileReader()
-    reader.onloadend = async () => {
-      const newAvatarUrl = reader.result as string
-      setAvatarUrl(newAvatarUrl)
+    // Check file type
+    if (!file.type.startsWith('image/')) {
+      showToast('Please upload an image file', 'error')
+      return
+    }
+
+    try {
+      // Compress and resize image
+      const { compressImage } = await import('@/lib/utils/imageCompression')
+      const compressedBase64 = await compressImage(file)
+      setAvatarUrl(compressedBase64)
 
       // Save immediately
       if (!user) {
         // Guest mode: Update localStorage
         const updatedRoster = localRoster.map(p =>
-          p.id === person.id ? { ...p, avatar_url: newAvatarUrl } : p
+          p.id === person.id ? { ...p, avatar_url: compressedBase64 } : p
         )
         setLocalRoster(updatedRoster)
-        setPerson({ ...person, avatar_url: newAvatarUrl })
+        setPerson({ ...person, avatar_url: compressedBase64 })
       } else {
         // Authenticated mode: Update Supabase
         // @ts-ignore
         await supabase
           .from('roster')
-          .update({ avatar_url: newAvatarUrl })
+          .update({ avatar_url: compressedBase64 })
           .eq('id', person.id)
           .eq('user_id', user.id)
 
-        setPerson({ ...person, avatar_url: newAvatarUrl })
+        setPerson({ ...person, avatar_url: compressedBase64 })
       }
+
+      showToast('Photo updated!', 'success')
+    } catch (err) {
+      console.error('Image compression error:', err)
+      showToast('Failed to process image. Please try another.', 'error')
     }
-    reader.readAsDataURL(file)
   }
 
   const handleRemovePhoto = async () => {
@@ -178,10 +188,15 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
 
     setSaving(true)
 
+    // Sanitize notes
+    const { sanitizeNotes } = await import('@/lib/utils/sanitize')
+    const sanitizedNotes = sanitizeNotes(notes)
+    setNotes(sanitizedNotes) // Update state with sanitized version
+
     // Guest mode: Update localStorage
     if (!user) {
       const updatedRoster = localRoster.map(p =>
-        p.id === person.id ? { ...p, notes } : p
+        p.id === person.id ? { ...p, notes: sanitizedNotes } : p
       )
       setLocalRoster(updatedRoster)
       setSaving(false)
@@ -192,7 +207,7 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
     // @ts-ignore
     await supabase
       .from('roster')
-      .update({ notes })
+      .update({ notes: sanitizedNotes })
       .eq('id', person.id)
       .eq('user_id', user.id)
 
