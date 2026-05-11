@@ -10,12 +10,14 @@ import { useLocalStorage } from '@/lib/hooks/useLocalStorage'
 import type { RosterPerson } from '@/lib/types'
 
 export default function BattlePage() {
-  const { user } = useAuth()
+  const { user, loading: authLoading } = useAuth()
   const [localRoster, setLocalRoster] = useLocalStorage<RosterPerson[]>('guest_roster', [])
   const [completedBattles, setCompletedBattles] = useLocalStorage<string[]>('completed_battles', [])
+  const [skippedBattles, setSkippedBattles] = useLocalStorage<string[]>('skipped_battles', [])
   const [person1, setPerson1] = useState<RosterPerson | null>(null)
   const [person2, setPerson2] = useState<RosterPerson | null>(null)
   const [loading, setLoading] = useState(true)
+  const [loadingMessage, setLoadingMessage] = useState('Loading battle...')
   const [processing, setProcessing] = useState(false)
   const [result, setResult] = useState<{
     winner: string
@@ -49,10 +51,10 @@ export default function BattlePage() {
         }
       }
 
-      // Filter out completed battles
+      // Filter out completed and skipped battles
       const availablePairs = allPairs.filter(([p1, p2]) => {
         const key = getBattleKey(p1.id, p2.id)
-        return !completedBattles.includes(key)
+        return !completedBattles.includes(key) && !skippedBattles.includes(key)
       })
 
       // If all battles completed, show completion screen
@@ -102,12 +104,30 @@ export default function BattlePage() {
   }
 
   useEffect(() => {
+    // Wait for auth to load first
+    if (authLoading) {
+      setLoadingMessage('Checking authentication...')
+      setLoading(true)
+      return
+    }
+
+    // Set a safety timeout
+    const safetyTimeout = setTimeout(() => {
+      console.warn('Battle loading timeout - forcing completion')
+      setLoading(false)
+    }, 8000)
+
+    setLoadingMessage('Loading battle...')
+
     if (user) {
-      fetchBattlePair()
+      fetchBattlePair().finally(() => clearTimeout(safetyTimeout))
     } else {
       fetchBattlePairGuest()
+      clearTimeout(safetyTimeout)
     }
-  }, [user, localRoster])
+
+    return () => clearTimeout(safetyTimeout)
+  }, [user, authLoading, localRoster])
 
   const handleBattleGuest = (winnerId: string, loserId: string) => {
     setProcessing(true)
@@ -122,15 +142,20 @@ export default function BattlePage() {
 
       // Simple ELO calculation for guest mode
       const K = 32
+      let actualWinnerChange = 0
+      let actualLoserChange = 0
+
       const updatedRoster = localRoster.map(person => {
         if (person.id === winnerId) {
           const expectedScore = 1 / (1 + Math.pow(10, ((person2?.elo_rating || 1000) - person.elo_rating) / 400))
           const change = Math.round(K * (1 - expectedScore))
+          actualWinnerChange = change
           return { ...person, elo_rating: person.elo_rating + change }
         }
         if (person.id === loserId) {
           const expectedScore = 1 / (1 + Math.pow(10, ((person1?.elo_rating || 1000) - person.elo_rating) / 400))
           const change = Math.round(K * (0 - expectedScore))
+          actualLoserChange = change
           return { ...person, elo_rating: person.elo_rating + change }
         }
         return person
@@ -138,11 +163,11 @@ export default function BattlePage() {
 
       setLocalRoster(updatedRoster)
 
-      // Show result
+      // Show result with actual calculated changes
       setResult({
         winner: winnerId,
-        winnerChange: 10,
-        loserChange: -10,
+        winnerChange: actualWinnerChange,
+        loserChange: actualLoserChange,
       })
 
       // Auto-load next battle after 2 seconds
@@ -205,7 +230,8 @@ export default function BattlePage() {
       <div className="py-6 flex items-center justify-center min-h-[60vh]">
         <div className="text-center">
           <div className="text-4xl mb-4 animate-bounce">⚔️</div>
-          <p className="text-foreground/60">Loading battle...</p>
+          <p className="text-foreground/60 mb-2">{loadingMessage}</p>
+          <div className="w-8 h-8 border-b-2 border-pink animate-spin rounded-full mx-auto"></div>
         </div>
       </div>
     )
@@ -217,7 +243,17 @@ export default function BattlePage() {
         {!user && <GuestBanner />}
         <OutOfComparisons
           onReset={() => {
+            // Reset completed and skipped battles
             setCompletedBattles([])
+            setSkippedBattles([])
+
+            // Reset all ELO ratings to default (initial formula from add page)
+            const resetRoster = localRoster.map(person => ({
+              ...person,
+              elo_rating: 1000 + (person.attraction_score + person.personality_score + person.reliability_score) * 10
+            }))
+            setLocalRoster(resetRoster)
+
             setShowOutOfComparisons(false)
             fetchBattlePairGuest()
           }}
@@ -253,15 +289,25 @@ export default function BattlePage() {
     )
   }
 
+  // Calculate progress
+  const totalPossibleBattles = (localRoster.length * (localRoster.length - 1)) / 2
+  const battlesCompleted = completedBattles.length
+  const battlesRemaining = totalPossibleBattles - battlesCompleted
+
   return (
     <div className="py-6">
       {!user && <GuestBanner />}
 
       <div className="text-center mb-6">
         <h2 className="text-2xl font-serif font-bold mb-2">Battle</h2>
-        <p className="text-sm text-gray-400">
+        <p className="text-sm text-gray-400 mb-1">
           Right now, tonight — who would you rather?
         </p>
+        {!user && totalPossibleBattles > 0 && (
+          <p className="text-xs text-gray-500">
+            Battle {battlesCompleted + 1} of {totalPossibleBattles}
+          </p>
+        )}
       </div>
 
       {/* Battle Result */}
@@ -303,7 +349,15 @@ export default function BattlePage() {
       <div className="text-center">
         <Button
           variant="ghost"
-          onClick={user ? fetchBattlePair : fetchBattlePairGuest}
+          onClick={() => {
+            // Mark this pair as skipped (guest mode only)
+            if (!user && person1 && person2) {
+              const battleKey = getBattleKey(person1.id, person2.id)
+              setSkippedBattles([...skippedBattles, battleKey])
+            }
+            // Load new pair
+            user ? fetchBattlePair() : fetchBattlePairGuest()
+          }}
           disabled={processing}
           className="text-gray-400"
         >

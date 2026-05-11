@@ -1,88 +1,17 @@
 'use client'
 
-interface Achievement {
-  id: string
-  icon: string
-  title: string
-  description: string
-  unlocked: boolean
-  progress?: number
-  total?: number
+import type { Achievement } from '@/lib/utils/achievements'
+
+interface AchievementsProps {
+  achievements: Achievement[]
 }
 
-const ACHIEVEMENTS: Achievement[] = [
-  {
-    id: 'first_add',
-    icon: '🥚',
-    title: 'Crack the First Egg',
-    description: 'Add your first person',
-    unlocked: false
-  },
-  {
-    id: 'five_people',
-    icon: '🐣',
-    title: 'Growing Roster',
-    description: 'Add 5 people to your roster',
-    unlocked: false,
-    progress: 0,
-    total: 5
-  },
-  {
-    id: 'ten_people',
-    icon: '🐥',
-    title: 'Squad Goals',
-    description: 'Add 10 people to your roster',
-    unlocked: false,
-    progress: 0,
-    total: 10
-  },
-  {
-    id: 'first_battle',
-    icon: '⚔️',
-    title: 'First Battle',
-    description: 'Complete your first comparison',
-    unlocked: false
-  },
-  {
-    id: 'ten_battles',
-    icon: '🏆',
-    title: 'Battle Royale',
-    description: 'Complete 10 battles',
-    unlocked: false,
-    progress: 0,
-    total: 10
-  },
-  {
-    id: 'all_battles',
-    icon: '👑',
-    title: 'Comparison King',
-    description: 'Compare everyone with everyone',
-    unlocked: false
-  },
-  {
-    id: 'schedule_set',
-    icon: '📅',
-    title: 'Planning Ahead',
-    description: 'Set your availability for the week',
-    unlocked: false
-  },
-  {
-    id: 'seven_day_streak',
-    icon: '🔥',
-    title: 'Week Warrior',
-    description: 'Open the app 7 days in a row',
-    unlocked: false,
-    progress: 0,
-    total: 7
-  }
-]
-
-export function Achievements() {
+export function Achievements({ achievements }: AchievementsProps) {
   return (
-    <div className="py-6">
+    <div>
       {/* Header */}
       <div className="text-center mb-6">
-        <div className="inline-block bg-black text-yellow-bright px-6 py-3 rounded-full mb-3">
+        <div className="inline-block bg-gradient-to-r from-pink to-purple text-white px-8 py-3 rounded-2xl mb-3 shadow-lg">
           <span className="font-bold text-xl">🏆 Achievements</span>
         </div>
         <p className="text-sm text-gray-600">
@@ -92,35 +21,30 @@ export function Achievements() {
 
       {/* Achievements Grid */}
       <div className="grid grid-cols-1 gap-4">
-        {ACHIEVEMENTS.map(achievement => (
+        {achievements.map(achievement => (
           <div
             key={achievement.id}
-            className="bg-white rounded-2xl p-5 transition-all"
-            style={{
-              border: achievement.unlocked
-                ? '3px solid #FFD93D'
-                : '2px solid #E8E8E8',
-              opacity: achievement.unlocked ? 1 : 0.6,
-              boxShadow: achievement.unlocked
-                ? '0 4px 12px rgba(255, 217, 61, 0.3)'
-                : 'none'
-            }}
+            className={`bg-white rounded-2xl p-6 transition-all ${
+              achievement.unlocked
+                ? 'border-[3px] border-yellow-bright opacity-100 shadow-[0_8px_16px_rgba(255,217,61,0.3)]'
+                : 'border-2 border-gray-200 opacity-70 shadow-sm'
+            }`}
           >
             <div className="flex items-start gap-4">
               {/* Icon */}
               <div
-                className="w-16 h-16 flex-shrink-0 flex items-center justify-center rounded-full text-3xl"
-                style={{
-                  backgroundColor: achievement.unlocked ? '#FFD93D' : '#F5F5F0',
-                  border: achievement.unlocked ? '2px solid #1A1A1A' : 'none'
-                }}
+                className={`w-16 h-16 flex-shrink-0 flex items-center justify-center rounded-full text-3xl ${
+                  achievement.unlocked
+                    ? 'bg-yellow-bright border-2 border-foreground'
+                    : 'bg-background'
+                }`}
               >
                 {achievement.icon}
               </div>
 
               {/* Content */}
               <div className="flex-1 min-w-0">
-                <h3 className="font-bold text-lg mb-1" style={{ color: '#1A1A1A' }}>
+                <h3 className="font-bold text-lg mb-1 text-foreground">
                   {achievement.title}
                 </h3>
                 <p className="text-sm text-gray-600 mb-3">
@@ -138,10 +62,9 @@ export function Achievements() {
                     </div>
                     <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
                       <div
-                        className="h-full rounded-full transition-all"
+                        className="h-full rounded-full transition-all bg-yellow-bright"
                         style={{
-                          width: `${(achievement.progress / achievement.total) * 100}%`,
-                          backgroundColor: '#FFD93D'
+                          width: `${(achievement.progress / achievement.total) * 100}%`
                         }}
                       />
                     </div>
@@ -161,26 +84,25 @@ export function Achievements() {
       </div>
 
       {/* Stats Summary */}
-      <div className="mt-8 bg-gradient-to-r from-yellow-soft to-white rounded-3xl p-6 text-center"
-           style={{ border: '2px solid #FFD93D' }}>
-        <div className="grid grid-cols-3 gap-4">
+      <div className="mt-8 bg-gradient-to-r from-yellow-50 to-white rounded-2xl p-8 text-center shadow-sm border-[3px] border-yellow-bright">
+        <div className="grid grid-cols-3 gap-6">
           <div>
-            <div className="text-3xl font-bold" style={{ color: '#1A1A1A' }}>
-              {ACHIEVEMENTS.filter(a => a.unlocked).length}
+            <div className="text-4xl font-bold mb-2 text-foreground">
+              {achievements.filter(a => a.unlocked).length}
             </div>
-            <div className="text-xs text-gray-600 mt-1">Unlocked</div>
+            <div className="text-sm font-medium text-gray-600">Unlocked</div>
           </div>
           <div>
-            <div className="text-3xl font-bold" style={{ color: '#1A1A1A' }}>
-              {ACHIEVEMENTS.length}
+            <div className="text-4xl font-bold mb-2 text-foreground">
+              {achievements.length}
             </div>
-            <div className="text-xs text-gray-600 mt-1">Total</div>
+            <div className="text-sm font-medium text-gray-600">Total</div>
           </div>
           <div>
-            <div className="text-3xl font-bold" style={{ color: '#FFD93D' }}>
-              {Math.round((ACHIEVEMENTS.filter(a => a.unlocked).length / ACHIEVEMENTS.length) * 100)}%
+            <div className="text-4xl font-bold mb-2 text-yellow-bright">
+              {achievements.length > 0 ? Math.round((achievements.filter(a => a.unlocked).length / achievements.length) * 100) : 0}%
             </div>
-            <div className="text-xs text-gray-600 mt-1">Complete</div>
+            <div className="text-sm font-medium text-gray-600">Complete</div>
           </div>
         </div>
       </div>

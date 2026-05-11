@@ -18,15 +18,7 @@ export function calculateTonightScore(person: RosterPerson): number {
   // Scale: -100 to +100 based on reliability score
   const reliabilityBoost = (person.reliability_score - 5) * 20
 
-  // Tier multiplier
-  const tierMultiplier = {
-    S: 1.3,
-    A: 1.1,
-    B: 0.9,
-    C: 0.7,
-  }[person.tier] || 1.0
-
-  return (baseScore + reliabilityBoost + recencyPenalty) * tierMultiplier
+  return baseScore + reliabilityBoost + recencyPenalty
 }
 
 /**
@@ -47,7 +39,7 @@ export function getTonightRecommendations(
     person,
     tonight_score: calculateTonightScore(person),
     reasoning: {
-      tier: person.tier,
+      tier: person.tier, // Keep in data structure but not displayed
       reliability: person.reliability_score,
       recency_days: daysBetween(person.last_contact_date, new Date()),
       elo_rating: person.elo_rating,

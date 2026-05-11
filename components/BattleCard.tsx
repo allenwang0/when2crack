@@ -17,10 +17,10 @@ export function BattleCard({ person, onClick, disabled }: BattleCardProps) {
     <button
       onClick={onClick}
       disabled={disabled}
-      className={`w-full bg-card border-2 border-border rounded-xl p-6 transition-all duration-200 ${
+      className={`w-full bg-white border-2 border-gray-200 rounded-2xl p-6 transition-all duration-200 ${
         disabled
           ? 'opacity-50 cursor-not-allowed'
-          : 'hover:border-pink hover:scale-105 active:scale-95 cursor-pointer'
+          : 'hover:border-yellow-400 hover:shadow-lg active:scale-98 cursor-pointer focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-yellow-bright focus-visible:ring-offset-2'
       }`}
     >
       {/* Avatar */}
@@ -41,13 +41,6 @@ export function BattleCard({ person, onClick, disabled }: BattleCardProps) {
       <h3 className="text-xl font-serif font-bold text-foreground mb-2">
         {person.name}
       </h3>
-
-      {/* Tier Badge */}
-      <div className="flex justify-center mb-4">
-        <Badge variant="tier" tier={person.tier}>
-          {person.tier} Tier
-        </Badge>
-      </div>
 
       {/* Scores */}
       <div className="space-y-2 mb-4">

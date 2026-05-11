@@ -11,9 +11,10 @@ interface PostHangPromptProps {
   person: RosterPerson
   onClose: () => void
   onSuccess: () => void
+  showToast?: (message: string, type: 'success' | 'error' | 'info') => void
 }
 
-export function PostHangPrompt({ person, onClose, onSuccess }: PostHangPromptProps) {
+export function PostHangPrompt({ person, onClose, onSuccess, showToast }: PostHangPromptProps) {
   const { user } = useAuth()
   const supabase = createClient()
 
@@ -76,7 +77,9 @@ export function PostHangPrompt({ person, onClose, onSuccess }: PostHangPromptPro
       onSuccess()
     } catch (error) {
       console.error('Error logging hang:', error)
-      alert('Failed to log hang. Please try again.')
+      if (showToast) {
+        showToast('Failed to log hang. Please try again.', 'error')
+      }
     } finally {
       setLoading(false)
     }

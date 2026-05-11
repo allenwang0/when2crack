@@ -4,7 +4,6 @@ import { Badge } from '@/components/ui/Badge'
 import { getInitials } from '@/lib/utils/colors'
 import { formatRelativeTime } from '@/lib/utils/dates'
 import { calculateCompositeScore } from '@/lib/utils/scores'
-import { getAvailabilityIndicator } from '@/lib/algorithms/tonight'
 
 interface RosterCardProps {
   person: RosterPerson
@@ -13,17 +12,10 @@ interface RosterCardProps {
 export function RosterCard({ person }: RosterCardProps) {
   const initials = getInitials(person.name)
   const compositeScore = calculateCompositeScore(person)
-  const availability = getAvailabilityIndicator(person)
-
-  const availabilityColors = {
-    likely: 'bg-teal',
-    uncertain: 'bg-amber',
-    unlikely: 'bg-gray-500',
-  }
 
   return (
     <Link href={`/profile/${person.id}`}>
-      <div className="bg-card border border-border rounded-lg p-4 hover:bg-border transition-colors cursor-pointer">
+      <div className="bg-white border-2 border-gray-200 rounded-2xl p-4 hover:border-yellow-400 hover:shadow-lg transition-all duration-200 cursor-pointer focus-within:ring-4 focus-within:ring-yellow-bright focus-within:ring-offset-2">
         <div className="flex items-start gap-3">
           {/* Avatar */}
           {person.avatar_url ? (
@@ -45,13 +37,6 @@ export function RosterCard({ person }: RosterCardProps) {
               <h3 className="font-semibold text-foreground truncate">
                 {person.name}
               </h3>
-              <div className="flex items-center gap-1.5 flex-shrink-0">
-                {/* Availability indicator */}
-                <div
-                  className={`w-2 h-2 rounded-full ${availabilityColors[availability]}`}
-                  title={availability}
-                />
-              </div>
             </div>
 
             <div className="flex items-center gap-2 mb-2">

@@ -27,7 +27,7 @@ export function OutOfComparisons({ onReset, totalPeople }: OutOfComparisonsProps
         </div>
 
         {/* Title */}
-        <h2 className="text-3xl font-serif font-bold mb-3" style={{ color: '#FFB6D9' }}>
+        <h2 className="text-3xl font-serif font-bold mb-3 text-pink">
           All Done!
         </h2>
 
@@ -43,19 +43,19 @@ export function OutOfComparisons({ onReset, totalPeople }: OutOfComparisonsProps
         <div className="bg-gradient-to-r from-pink/10 via-purple/10 to-blue/10 rounded-3xl p-6 mb-8">
           <div className="grid grid-cols-3 gap-4">
             <div>
-              <div className="text-2xl font-bold" style={{ color: '#FFB6D9' }}>
+              <div className="text-2xl font-bold text-pink">
                 {totalBattles}
               </div>
               <div className="text-xs text-foreground/60">Battles</div>
             </div>
             <div>
-              <div className="text-2xl font-bold" style={{ color: '#E4C1F9' }}>
+              <div className="text-2xl font-bold text-purple">
                 {totalPeople}
               </div>
               <div className="text-xs text-foreground/60">People</div>
             </div>
             <div>
-              <div className="text-2xl font-bold" style={{ color: '#C1E7FF' }}>
+              <div className="text-2xl font-bold text-blue">
                 100%
               </div>
               <div className="text-xs text-foreground/60">Complete</div>
@@ -67,11 +67,7 @@ export function OutOfComparisons({ onReset, totalPeople }: OutOfComparisonsProps
         <div className="space-y-3">
           <Button
             onClick={onReset}
-            className="w-full py-4 text-lg font-semibold shadow-lg"
-            style={{
-              background: 'linear-gradient(135deg, #FFB6D9 0%, #E4C1F9 100%)',
-              color: 'white'
-            }}
+            className="w-full py-4 text-lg font-semibold shadow-lg bg-gradient-to-r from-pink to-purple text-white"
           >
             Start Over 🔄
           </Button>
@@ -94,40 +90,6 @@ export function OutOfComparisons({ onReset, totalPeople }: OutOfComparisonsProps
           ))}
         </div>
       </div>
-
-      <style jsx>{`
-        @keyframes pulse {
-          0%, 100% {
-            opacity: 1;
-            transform: scale(1);
-          }
-          50% {
-            opacity: 0.7;
-            transform: scale(1.1);
-          }
-        }
-
-        @keyframes bounce {
-          0%, 100% {
-            transform: translateY(0);
-          }
-          50% {
-            transform: translateY(-20px);
-          }
-        }
-
-        .animate-pulse {
-          animation: pulse 2s ease-in-out infinite;
-        }
-
-        .animate-bounce {
-          animation: bounce 2s ease-in-out infinite;
-        }
-
-        .delay-100 {
-          animation-delay: 0.1s;
-        }
-      `}</style>
     </div>
   )
 }

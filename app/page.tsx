@@ -105,9 +105,8 @@ export default function AuthPage() {
           </div>
 
           <Button
-            onClick={() => window.location.href = '/roster'}
-            className="w-full py-3"
-            style={{ backgroundColor: '#FF8C69' }}
+            onClick={() => router.push('/roster')}
+            className="w-full py-3 bg-[#FF8C69] hover:bg-[#FF7A58]"
           >
             Try as Guest
           </Button>

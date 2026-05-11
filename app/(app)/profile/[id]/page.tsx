@@ -6,8 +6,11 @@ import { createClient } from '@/lib/supabase/client'
 import { useAuth } from '@/lib/contexts/AuthContext'
 import { GuestBanner } from '@/components/GuestBanner'
 import { useLocalStorage } from '@/lib/hooks/useLocalStorage'
+import { useToast } from '@/lib/hooks/useToast'
+import { ToastContainer } from '@/components/ui/Toast'
 import { Button } from '@/components/ui/Button'
-import { Textarea } from '@/components/ui/Input'
+import { Input, Textarea } from '@/components/ui/Input'
+import { Slider } from '@/components/ui/Slider'
 import { Badge } from '@/components/ui/Badge'
 import { PostHangPrompt } from '@/components/PostHangPrompt'
 import { getInitials } from '@/lib/utils/colors'
@@ -20,6 +23,7 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
   const router = useRouter()
   const { user } = useAuth()
   const supabase = createClient()
+  const { toasts, showToast, removeToast } = useToast()
   const [localRoster, setLocalRoster] = useLocalStorage<RosterPerson[]>('guest_roster', [])
 
   const [person, setPerson] = useState<RosterPerson | null>(null)
@@ -29,6 +33,14 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
   const [saving, setSaving] = useState(false)
   const [loading, setLoading] = useState(true)
   const [showHangPrompt, setShowHangPrompt] = useState(false)
+  const [linkCopied, setLinkCopied] = useState(false)
+  const [isEditing, setIsEditing] = useState(false)
+  const [editedName, setEditedName] = useState('')
+  const [editedStatus, setEditedStatus] = useState<'New' | 'Chatting' | 'Met Once' | 'Regular' | 'Archived'>('New')
+  const [editedAttractionScore, setEditedAttractionScore] = useState(5)
+  const [editedPersonalityScore, setEditedPersonalityScore] = useState(5)
+  const [editedReliabilityScore, setEditedReliabilityScore] = useState(5)
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
 
   const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -36,7 +48,7 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
 
     // Check file size (max 5MB)
     if (file.size > 5 * 1024 * 1024) {
-      alert('Image must be less than 5MB')
+      showToast('Image must be less than 5MB', 'error')
       return
     }
 
@@ -105,6 +117,12 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
       setPerson(guestPerson)
       setNotes(guestPerson.notes || '')
       setAvatarUrl(guestPerson.avatar_url || null)
+      // Initialize edit state
+      setEditedName(guestPerson.name)
+      setEditedStatus(guestPerson.status)
+      setEditedAttractionScore(guestPerson.attraction_score)
+      setEditedPersonalityScore(guestPerson.personality_score)
+      setEditedReliabilityScore(guestPerson.reliability_score)
       setLoading(false)
       return
     }
@@ -129,6 +147,12 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
       setPerson(personData as RosterPerson)
       setNotes(personData.notes || '')
       setAvatarUrl(personData.avatar_url || null)
+      // Initialize edit state
+      setEditedName(personData.name)
+      setEditedStatus(personData.status)
+      setEditedAttractionScore(personData.attraction_score)
+      setEditedPersonalityScore(personData.personality_score)
+      setEditedReliabilityScore(personData.reliability_score)
 
       // Fetch hangs
       // @ts-ignore
@@ -178,7 +202,94 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
   const handleHangLogged = () => {
     setShowHangPrompt(false)
     // Refresh the profile data
-    window.location.reload()
+    router.refresh()
+  }
+
+  const handleShareLink = async () => {
+    // Get user's current schedule from localStorage
+    const storedSchedule = localStorage.getItem('week_schedule')
+    let mySchedule: string[] = []
+    try {
+      mySchedule = storedSchedule ? JSON.parse(storedSchedule) : []
+    } catch (e) {
+      console.error('Failed to parse schedule:', e)
+    }
+
+    const baseUrl = window.location.origin
+    const encodedSchedule = encodeURIComponent(JSON.stringify(mySchedule))
+    const shareUrl = `${baseUrl}/schedule?for=${encodeURIComponent(person?.name || '')}&schedule=${encodedSchedule}`
+
+    try {
+      await navigator.clipboard.writeText(shareUrl)
+      setLinkCopied(true)
+      setTimeout(() => setLinkCopied(false), 2000)
+    } catch (err) {
+      console.error('Failed to copy:', err)
+    }
+  }
+
+  const handleSaveEdit = async () => {
+    if (!person) return
+
+    setSaving(true)
+
+    const updatedPerson = {
+      ...person,
+      name: editedName,
+      status: editedStatus,
+      attraction_score: editedAttractionScore,
+      personality_score: editedPersonalityScore,
+      reliability_score: editedReliabilityScore,
+    }
+
+    if (!user) {
+      // Guest mode: Update localStorage
+      const updatedRoster = localRoster.map(p =>
+        p.id === person.id ? updatedPerson : p
+      )
+      setLocalRoster(updatedRoster)
+      setPerson(updatedPerson)
+    } else {
+      // Authenticated mode: Update Supabase
+      // @ts-ignore
+      await supabase
+        .from('roster')
+        .update({
+          name: editedName,
+          status: editedStatus,
+          attraction_score: editedAttractionScore,
+          personality_score: editedPersonalityScore,
+          reliability_score: editedReliabilityScore,
+        })
+        .eq('id', person.id)
+        .eq('user_id', user.id)
+
+      setPerson(updatedPerson)
+    }
+
+    setIsEditing(false)
+    setSaving(false)
+  }
+
+  const handleDelete = async () => {
+    if (!person) return
+
+    if (!user) {
+      // Guest mode: Remove from localStorage
+      const updatedRoster = localRoster.filter(p => p.id !== person.id)
+      setLocalRoster(updatedRoster)
+      router.push('/roster')
+    } else {
+      // Authenticated mode: Delete from Supabase
+      // @ts-ignore
+      await supabase
+        .from('roster')
+        .delete()
+        .eq('id', person.id)
+        .eq('user_id', user.id)
+
+      router.push('/roster')
+    }
   }
 
   if (loading) {
@@ -197,7 +308,7 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
   const compositeScore = calculateCompositeScore(person)
 
   return (
-    <div className="py-6 pb-20">
+    <div className="max-w-2xl mx-auto px-4 py-6 pb-28">
       {!user && <GuestBanner />}
 
       {/* Header */}
@@ -238,17 +349,104 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
         </div>
 
         <div className="flex-1 min-w-0">
-          <h1 className="text-2xl font-serif font-bold mb-1">{person.name}</h1>
+          <div className="flex items-center justify-between mb-1">
+            <h1 className="text-2xl font-serif font-bold">{isEditing ? 'Edit Profile' : person.name}</h1>
+            {!isEditing && (
+              <button
+                onClick={() => setIsEditing(true)}
+                className="text-sm text-gray-500 hover:text-black transition-colors"
+              >
+                ✏️ Edit
+              </button>
+            )}
+          </div>
           <div className="flex items-center gap-2 flex-wrap">
-            <Badge variant="tier" tier={person.tier}>
-              {person.tier} Tier
-            </Badge>
             <Badge variant="status" status={person.status}>
               {person.status}
             </Badge>
           </div>
         </div>
       </div>
+
+      {/* Edit Mode Form */}
+      {isEditing && (
+        <div className="bg-card border border-border rounded-lg p-6 mb-6">
+          <h3 className="font-semibold mb-4">Edit Details</h3>
+
+          <div className="space-y-4">
+            <Input
+              label="Name"
+              value={editedName}
+              onChange={(e) => setEditedName(e.target.value)}
+              placeholder="Enter name"
+            />
+
+            <div>
+              <label className="block text-sm font-medium text-foreground mb-2">
+                Status
+              </label>
+              <select
+                value={editedStatus}
+                onChange={(e) => setEditedStatus(e.target.value as any)}
+                className="w-full px-4 py-2 bg-card border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-pink"
+              >
+                <option value="New">New</option>
+                <option value="Chatting">Chatting</option>
+                <option value="Met Once">Met Once</option>
+                <option value="Regular">Regular</option>
+              </select>
+            </div>
+
+            <Slider
+              label="Looks"
+              value={editedAttractionScore}
+              onChange={setEditedAttractionScore}
+              min={0}
+              max={10}
+            />
+
+            <Slider
+              label="Personality"
+              value={editedPersonalityScore}
+              onChange={setEditedPersonalityScore}
+              min={0}
+              max={10}
+            />
+
+            <Slider
+              label="Values"
+              value={editedReliabilityScore}
+              onChange={setEditedReliabilityScore}
+              min={0}
+              max={10}
+            />
+
+            <div className="flex gap-3 pt-2">
+              <Button
+                onClick={handleSaveEdit}
+                className="flex-1"
+                disabled={saving || !editedName.trim()}
+              >
+                {saving ? 'Saving...' : 'Save Changes'}
+              </Button>
+              <Button
+                variant="secondary"
+                onClick={() => {
+                  setIsEditing(false)
+                  // Reset to original values
+                  setEditedName(person.name)
+                  setEditedStatus(person.status)
+                  setEditedAttractionScore(person.attraction_score)
+                  setEditedPersonalityScore(person.personality_score)
+                  setEditedReliabilityScore(person.reliability_score)
+                }}
+              >
+                Cancel
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Composite Score */}
       <div className="bg-card border border-border rounded-lg p-6 mb-6 text-center">
@@ -435,16 +633,90 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
       </div>
 
       {/* Actions */}
-      <div className="flex gap-3">
-        {user && (
-          <Button className="flex-1" onClick={() => setShowHangPrompt(true)}>
-            Log Hang
+      <div className="space-y-3">
+        <div className="flex gap-3">
+          {user && (
+            <Button className="flex-1" onClick={() => setShowHangPrompt(true)}>
+              Log Hang
+            </Button>
+          )}
+          <Button variant="secondary" onClick={() => router.push('/roster')} className={user ? '' : 'flex-1'}>
+            Back
           </Button>
-        )}
-        <Button variant="secondary" onClick={() => router.push('/roster')} className={user ? '' : 'flex-1'}>
-          Back
+        </div>
+
+        {/* Share When2Crack Link */}
+        <div className="bg-gradient-to-r from-pink-50 to-purple-50 border-2 border-pink/30 rounded-2xl p-5">
+          <div className="text-center mb-3">
+            <div className="text-3xl mb-2">💌</div>
+            <h4 className="font-bold text-lg text-gray-800 mb-1">
+              Send {person.name} a when2crack
+            </h4>
+            <p className="text-xs text-gray-600">
+              Share your availability and find the perfect time to hang
+            </p>
+          </div>
+          <Button
+            onClick={handleShareLink}
+            className="w-full bg-gradient-to-r from-pink to-purple hover:opacity-90 transition-opacity"
+          >
+            {linkCopied ? (
+              <>
+                <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                </svg>
+                Link Copied!
+              </>
+            ) : (
+              <>
+                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+                </svg>
+                Copy Link to Share
+              </>
+            )}
+          </Button>
+        </div>
+
+        {/* Delete Button */}
+        <Button
+          variant="secondary"
+          onClick={() => setShowDeleteConfirm(true)}
+          className="w-full text-red-500 hover:bg-red-50 border-red-300"
+        >
+          🗑️ Delete Person
         </Button>
       </div>
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteConfirm && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-3xl p-6 max-w-sm w-full" style={{ border: '3px solid #FFD93D' }}>
+            <div className="text-center mb-4">
+              <div className="text-4xl mb-2">⚠️</div>
+              <h3 className="font-bold text-lg mb-2">Delete {person.name}?</h3>
+              <p className="text-sm text-gray-600">
+                This will permanently remove this person from your roster. This action cannot be undone.
+              </p>
+            </div>
+            <div className="flex gap-3">
+              <Button
+                variant="secondary"
+                onClick={() => setShowDeleteConfirm(false)}
+                className="flex-1"
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={handleDelete}
+                className="flex-1 bg-red-500 hover:bg-red-600"
+              >
+                Delete
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Post-Hang Prompt Modal */}
       {showHangPrompt && user && (
@@ -452,8 +724,11 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
           person={person}
           onClose={() => setShowHangPrompt(false)}
           onSuccess={handleHangLogged}
+          showToast={showToast}
         />
       )}
+
+      <ToastContainer toasts={toasts} removeToast={removeToast} />
     </div>
   )
 }

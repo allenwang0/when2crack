@@ -43,7 +43,7 @@ const FAQ_ITEMS: FAQItem[] = [
 ]
 
 export function HelpFAQ() {
-  const [isOpen, setIsOpen] = useLocalStorage('faq_open', true)
+  const [isOpen, setIsOpen] = useLocalStorage('faq_open', false)
   const [expandedItem, setExpandedItem] = useState<number | null>(null)
 
   if (!isOpen) {

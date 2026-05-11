@@ -27,7 +27,7 @@ export function TonightCard({ recommendation, rank, onShootShot }: TonightCardPr
   }
 
   return (
-    <div className="bg-card border border-border rounded-xl p-5">
+    <div className="bg-white border-2 border-gray-200 rounded-2xl p-5 hover:border-yellow-400 hover:shadow-lg transition-all duration-200">
       {/* Rank */}
       <div className={`text-sm font-semibold mb-3 ${rankColors[rank as 1 | 2 | 3]}`}>
         {rankLabels[rank as 1 | 2 | 3]}
@@ -51,8 +51,8 @@ export function TonightCard({ recommendation, rank, onShootShot }: TonightCardPr
         <div className="flex-1 min-w-0">
           <h3 className="font-serif font-bold text-lg mb-1">{person.name}</h3>
           <div className="flex items-center gap-2 flex-wrap">
-            <Badge variant="tier" tier={person.tier}>
-              {person.tier}
+            <Badge variant="status" status={person.status}>
+              {person.status}
             </Badge>
             <span className="text-xs text-gray-500">
               Elo {reasoning.elo_rating}
@@ -65,8 +65,8 @@ export function TonightCard({ recommendation, rank, onShootShot }: TonightCardPr
       <div className="bg-background rounded-lg p-3 mb-4 space-y-1.5">
         <p className="text-xs text-gray-400 font-medium">Why tonight:</p>
         <div className="flex items-center justify-between text-sm">
-          <span className="text-gray-400">Tier</span>
-          <span className="font-semibold">{reasoning.tier}</span>
+          <span className="text-gray-400">Composite</span>
+          <span className="font-semibold">{Math.round((person.attraction_score + person.personality_score + person.reliability_score) / 3)}/10</span>
         </div>
         <div className="flex items-center justify-between text-sm">
           <span className="text-gray-400">Reliability</span>

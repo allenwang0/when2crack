@@ -16,11 +16,14 @@
   --gray: #E8E8E8;
 
   /* Accent colors */
-  --pink: #FFD93D;
-  --purple: #FFD93D;
+  --pink: #FFB6D9;
+  --purple: #E4C1F9;
   --yellow: #FFD93D;
-  --blue: #FFD93D;
-  --mint: #FFD93D;
+  --blue: #C1E7FF;
+  --teal: #00D084;
+  --teal-dark: #00A86B;
+  --amber: #FFC870;
+  --mint: #B8E6D5;
 
   /* Tier colors - for later */
   --tier-s: #FFD93D;
@@ -44,16 +47,15 @@
   --color-white: var(--white);
   --color-gray: var(--gray);
 
-  /* Legacy compatibility - all map to yellow */
-  --color-pink: var(--yellow-bright);
-  --color-purple: var(--yellow-bright);
-  --color-yellow: var(--yellow-bright);
-  --color-blue: var(--yellow-bright);
-  --color-mint: var(--yellow-bright);
-  --color-coral: var(--yellow-bright);
-  --color-teal: var(--yellow-bright);
-  --color-amber: var(--yellow-bright);
-  --color-orange: var(--yellow-bright);
+  /* Accent colors - now with distinct values */
+  --color-pink: var(--pink);
+  --color-purple: var(--purple);
+  --color-yellow: var(--yellow);
+  --color-blue: var(--blue);
+  --color-teal: var(--teal);
+  --color-teal-dark: var(--teal-dark);
+  --color-amber: var(--amber);
+  --color-mint: var(--mint);
 
   /* Tier colors */
   --color-tier-s: var(--tier-s);
