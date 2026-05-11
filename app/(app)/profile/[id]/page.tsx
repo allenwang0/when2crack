@@ -18,6 +18,7 @@ import { getInitials } from '@/lib/utils/colors'
 import { calculateCompositeScore } from '@/lib/utils/scores'
 import { formatDate, formatRelativeTime } from '@/lib/utils/dates'
 import { logger } from '@/lib/utils/logger'
+import { isValidAvatarUrl } from '@/lib/utils/avatar'
 import type { RosterPerson, Hang } from '@/lib/types'
 
 export default function ProfilePage({ params }: { params: Promise<{ id: string }> }) {
@@ -420,31 +421,23 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
       {/* Header */}
       <div className="flex items-start gap-4 mb-6">
         <div className="relative flex-shrink-0">
-          {avatarUrl && avatarUrl.trim() !== '' && avatarUrl !== 'null' && avatarUrl !== 'undefined' ? (
-            <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-pink bg-white">
+          <div
+            className="w-16 h-16 rounded-full flex items-center justify-center text-white font-bold text-2xl border-2 border-pink overflow-hidden"
+            style={{ backgroundColor: person.avatar_color }}
+          >
+            {isValidAvatarUrl(avatarUrl) ? (
               <img
-                src={avatarUrl}
+                src={avatarUrl!}
                 alt={person.name}
-                className="w-full h-full object-cover"
+                className="w-full h-full object-cover absolute inset-0"
                 onError={(e) => {
-                  // Fallback to initials if image fails to load
-                  const target = e.target as HTMLImageElement
-                  const parent = target.parentElement
-                  if (parent) {
-                    parent.innerHTML = `<div class="w-full h-full rounded-full flex items-center justify-center text-white font-bold text-2xl" style="background-color: ${person.avatar_color}">${initials}</div>`
-                    parent.className = 'w-16 h-16'
-                  }
+                  // Hide image on error, showing initials background
+                  e.currentTarget.style.display = 'none'
                 }}
               />
-            </div>
-          ) : (
-            <div
-              className="w-16 h-16 rounded-full flex items-center justify-center text-white font-bold text-2xl"
-              style={{ backgroundColor: person.avatar_color }}
-            >
-              {initials}
-            </div>
-          )}
+            ) : null}
+            <span className="relative z-10">{initials}</span>
+          </div>
           <label className="absolute bottom-0 right-0 w-6 h-6 bg-black rounded-full flex items-center justify-center cursor-pointer hover:bg-gray-800 transition-colors">
             <input
               type="file"
@@ -809,8 +802,15 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
 
       {/* Delete Confirmation Modal */}
       {showDeleteConfirm && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-3xl p-6 max-w-sm w-full" style={{ border: '3px solid #FFD93D' }}>
+        <div
+          className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+          onClick={() => setShowDeleteConfirm(false)}
+        >
+          <div
+            className="bg-white rounded-3xl p-6 max-w-sm w-full"
+            style={{ border: '3px solid #FFD93D' }}
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="text-center mb-4">
               <div className="text-4xl mb-2">⚠️</div>
               <h3 className="font-bold text-lg mb-2">Delete {person.name}?</h3>

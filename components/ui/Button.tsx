@@ -18,8 +18,8 @@ export function Button({
 
   const variantStyles = {
     primary: 'bg-gradient-to-r from-pink to-purple text-white shadow-md hover:shadow-lg hover:opacity-90',
-    secondary: 'bg-white border-2 border-gray-800 text-gray-800 shadow-sm hover:bg-yellow-soft hover:border-pink hover:shadow-md',
-    tertiary: 'bg-transparent text-gray-700 hover:bg-yellow-soft shadow-none hover:shadow-sm',
+    secondary: 'bg-white dark:bg-gray-800 border-2 border-gray-800 dark:border-gray-600 text-gray-800 dark:text-gray-100 shadow-sm hover:bg-yellow-soft dark:hover:bg-gray-700 hover:border-pink hover:shadow-md',
+    tertiary: 'bg-transparent text-gray-700 dark:text-gray-300 hover:bg-yellow-soft dark:hover:bg-gray-800 shadow-none hover:shadow-sm',
     danger: 'bg-red-500 text-white shadow-md hover:bg-red-600 hover:shadow-lg',
   }
 

@@ -58,13 +58,12 @@ export function HelpFAQ({ isOpen, onClose }: HelpFAQProps) {
     <div className="fixed inset-0 flex items-end sm:items-center justify-center pointer-events-none p-4" style={{ zIndex: 9999 }}>
       <div className="pointer-events-auto w-full max-w-md mb-20 sm:mb-0">
         <div
-          className="bg-white rounded-3xl shadow-2xl overflow-hidden flex flex-col"
-          style={{ border: '3px solid #FFD93D', maxHeight: 'calc(100vh - 180px)' }}
+          className="bg-white dark:bg-gray-900 rounded-3xl shadow-2xl overflow-hidden flex flex-col border-[3px] border-yellow-bright"
+          style={{ maxHeight: 'calc(100vh - 180px)' }}
         >
           {/* Header */}
           <div
-            className="px-6 py-4 flex items-center justify-between flex-shrink-0"
-            style={{ background: '#1A1A1A' }}
+            className="px-6 py-4 flex items-center justify-between flex-shrink-0 bg-foreground dark:bg-gray-800"
           >
             <div className="flex items-center gap-3">
               <span className="text-2xl">💡</span>
@@ -87,11 +86,11 @@ export function HelpFAQ({ isOpen, onClose }: HelpFAQProps) {
             {FAQ_ITEMS.map((item, index) => (
               <div
                 key={index}
-                className="rounded-2xl overflow-hidden transition-all"
-                style={{
-                  border: '2px solid #F5F5F0',
-                  backgroundColor: expandedItem === index ? '#FFF4CC' : '#FFFFFF'
-                }}
+                className={`rounded-2xl overflow-hidden transition-all border-2 ${
+                  expandedItem === index
+                    ? 'bg-yellow-soft dark:bg-yellow-900/20 border-border dark:border-gray-700'
+                    : 'bg-white dark:bg-gray-800 border-border dark:border-gray-700'
+                }`}
               >
                 <button
                   onClick={() => setExpandedItem(expandedItem === index ? null : index)}
@@ -99,16 +98,14 @@ export function HelpFAQ({ isOpen, onClose }: HelpFAQProps) {
                 >
                   <div className="flex items-center gap-3">
                     <span className="text-xl">{item.emoji}</span>
-                    <span className="font-semibold text-sm" style={{ color: '#1A1A1A' }}>
+                    <span className="font-semibold text-sm text-foreground dark:text-gray-100">
                       {item.question}
                     </span>
                   </div>
                   <svg
-                    className="w-5 h-5 transition-transform flex-shrink-0"
-                    style={{
-                      transform: expandedItem === index ? 'rotate(180deg)' : 'rotate(0deg)',
-                      color: '#1A1A1A'
-                    }}
+                    className={`w-5 h-5 transition-transform flex-shrink-0 text-foreground dark:text-gray-100 ${
+                      expandedItem === index ? 'rotate-180' : 'rotate-0'
+                    }`}
                     fill="none"
                     stroke="currentColor"
                     strokeWidth={2}
@@ -120,7 +117,7 @@ export function HelpFAQ({ isOpen, onClose }: HelpFAQProps) {
 
                 {expandedItem === index && (
                   <div className="px-4 pb-4 pt-1">
-                    <p className="text-sm text-gray-700 leading-relaxed">
+                    <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
                       {item.answer}
                     </p>
                   </div>
@@ -130,8 +127,8 @@ export function HelpFAQ({ isOpen, onClose }: HelpFAQProps) {
           </div>
 
           {/* Footer */}
-          <div className="px-6 py-3 border-t border-gray-200 text-center flex-shrink-0">
-            <p className="text-xs text-gray-600">
+          <div className="px-6 py-3 border-t border-gray-200 dark:border-gray-700 text-center flex-shrink-0">
+            <p className="text-xs text-gray-600 dark:text-gray-400">
               Close this and reopen anytime with the info button
             </p>
           </div>

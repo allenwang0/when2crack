@@ -3,7 +3,7 @@ import { SkeletonAvatar, SkeletonText, SkeletonRectangle } from './Skeleton'
 
 export function SkeletonTonightCard() {
   return (
-    <div className="bg-white border-2 border-gray-200 rounded-2xl p-5">
+    <div className="bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-2xl p-5">
       {/* Rank Label */}
       <div className="mb-3">
         <SkeletonText width="w-24" height="h-4" />

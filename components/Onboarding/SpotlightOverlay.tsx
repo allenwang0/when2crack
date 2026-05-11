@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState, useRef } from 'react'
+import { ONBOARDING, trackOnboardingEvent, ONBOARDING_ANALYTICS_EVENTS } from '@/lib/constants'
 
 interface SpotlightOverlayProps {
   targetSelector: string | null
@@ -8,6 +9,7 @@ interface SpotlightOverlayProps {
   padding: number
   allowInteraction: boolean
   children?: React.ReactNode
+  onAutoSkip?: () => void
 }
 
 interface SpotlightPosition {
@@ -17,8 +19,8 @@ interface SpotlightPosition {
   height: number
 }
 
-const MAX_RETRIES = 10
-const RETRY_DELAY = 200
+const MAX_RETRIES = ONBOARDING.SPOTLIGHT_MAX_RETRIES
+const RETRY_DELAY = ONBOARDING.SPOTLIGHT_RETRY_DELAY
 
 export function SpotlightOverlay({
   targetSelector,
@@ -26,6 +28,7 @@ export function SpotlightOverlay({
   padding,
   allowInteraction,
   children,
+  onAutoSkip,
 }: SpotlightOverlayProps) {
   const [position, setPosition] = useState<SpotlightPosition | null>(null)
   const [targetFound, setTargetFound] = useState(true)
@@ -154,7 +157,7 @@ export function SpotlightOverlay({
     return (
       <div
         className="fixed inset-0 bg-black/75 flex items-center justify-center"
-        style={{ zIndex: 10000, pointerEvents: targetFound ? 'auto' : 'none' }}
+        style={{ zIndex: 10000, pointerEvents: 'none' }}
       >
         {!targetFound && (
           <div className="bg-white rounded-2xl p-6 max-w-sm mx-4 text-center">

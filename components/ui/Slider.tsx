@@ -52,7 +52,7 @@ export function Slider({
           <label htmlFor={`slider-${label.toLowerCase().replace(/\s+/g, '-')}`} className="text-sm font-medium text-foreground">{label}</label>
         </div>
         {showValue && (
-          <div className="text-center text-3xl font-bold" style={{ color: '#FFB6C1' }} aria-live="polite" aria-atomic="true">{value}/10</div>
+          <div className="text-center text-3xl font-bold text-pink" aria-live="polite" aria-atomic="true">{value}/10</div>
         )}
       </div>
       <input
@@ -70,12 +70,12 @@ export function Slider({
         aria-valuenow={value}
         aria-valuetext={`${value} out of ${max}`}
         style={{
-          background: `linear-gradient(to right, #FFB6C1 0%, #FFB6C1 ${
+          background: `linear-gradient(to right, var(--pink) 0%, var(--pink) ${
             ((value - min) / (max - min)) * 100
-          }%, #E6E6FA ${((value - min) / (max - min)) * 100}%, #E6E6FA 100%)`,
+          }%, var(--purple) ${((value - min) / (max - min)) * 100}%, var(--purple) 100%)`,
         }}
       />
-      <div className="flex justify-between text-xs text-gray-500 mt-3">
+      <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400 mt-3">
         <span>{min}</span>
         <span>{max}</span>
       </div>
@@ -85,18 +85,18 @@ export function Slider({
           width: 24px;
           height: 24px;
           border-radius: 50%;
-          background: #FFB6C1;
+          background: var(--pink);
           cursor: pointer;
-          border: 3px solid #FFF;
+          border: 3px solid var(--card);
           box-shadow: 0 2px 8px rgba(0,0,0,0.15);
         }
         .slider::-moz-range-thumb {
           width: 24px;
           height: 24px;
           border-radius: 50%;
-          background: #FFB6C1;
+          background: var(--pink);
           cursor: pointer;
-          border: 3px solid #FFF;
+          border: 3px solid var(--card);
           box-shadow: 0 2px 8px rgba(0,0,0,0.15);
         }
       `}</style>

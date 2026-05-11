@@ -3,6 +3,9 @@
 import { createContext, useContext, useEffect, useState, useCallback } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import { useLocalStorage } from '@/lib/hooks/useLocalStorage'
+import { useToast } from '@/lib/hooks/useToast'
+import { ONBOARDING_STEPS } from '@/lib/constants/onboardingSteps'
+import { trackOnboardingEvent, ONBOARDING_ANALYTICS_EVENTS } from '@/lib/constants'
 import type { OnboardingState, OnboardingContextValue } from '@/lib/types/onboarding'
 
 const OnboardingContext = createContext<OnboardingContextValue | null>(null)
@@ -22,12 +25,30 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
   const router = useRouter()
   const pathname = usePathname()
   const [state, setState] = useState<OnboardingState>(INITIAL_STATE)
+  const { showToast } = useToast()
 
   // Persist to localStorage
-  const [onboardingSeen, setOnboardingSeen] = useLocalStorage('onboarding_seen', false)
-  const [onboardingCompleted, setOnboardingCompleted] = useLocalStorage('onboarding_completed', false)
-  const [onboardingVersion, setOnboardingVersion] = useLocalStorage('onboarding_version', 0)
-  const [onboardingSkipped, setOnboardingSkipped] = useLocalStorage('onboarding_skipped', false)
+  const [onboardingSeen, setOnboardingSeen, onboardingSeenError] = useLocalStorage('onboarding_seen', false)
+  const [onboardingCompleted, setOnboardingCompleted, onboardingCompletedError] = useLocalStorage('onboarding_completed', false)
+  const [onboardingVersion, setOnboardingVersion, onboardingVersionError] = useLocalStorage('onboarding_version', 0)
+  const [onboardingSkipped, setOnboardingSkipped, onboardingSkippedError] = useLocalStorage('onboarding_skipped', false)
+
+  // Handle localStorage quota errors
+  useEffect(() => {
+    const errors = [
+      onboardingSeenError,
+      onboardingCompletedError,
+      onboardingVersionError,
+      onboardingSkippedError,
+    ]
+
+    const hasQuotaError = errors.some(err => err === 'QUOTA_EXCEEDED')
+
+    if (hasQuotaError) {
+      showToast('Storage limit reached. Sign in to save your progress!', 'error')
+      console.warn('LocalStorage quota exceeded in onboarding context')
+    }
+  }, [onboardingSeenError, onboardingCompletedError, onboardingVersionError, onboardingSkippedError, showToast])
 
   // Load saved state on mount
   useEffect(() => {
@@ -62,6 +83,9 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
     setOnboardingSeen(true)
     setOnboardingCompleted(false)
     setOnboardingSkipped(false)
+
+    // Track analytics
+    trackOnboardingEvent(ONBOARDING_ANALYTICS_EVENTS.STARTED, { version: 1 })
   }, [setOnboardingSeen, setOnboardingCompleted, setOnboardingSkipped])
 
   const skipTour = useCallback(() => {
@@ -72,26 +96,49 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
     }))
     setOnboardingSkipped(true)
     setOnboardingSeen(true)
-  }, [setOnboardingSkipped, setOnboardingSeen])
+
+    // Track analytics
+    trackOnboardingEvent(ONBOARDING_ANALYTICS_EVENTS.SKIPPED, { at_step: state.currentStep })
+  }, [setOnboardingSkipped, setOnboardingSeen, state.currentStep])
 
   const nextStep = useCallback(() => {
-    setState(prev => ({
-      ...prev,
-      currentStep: Math.min(prev.currentStep + 1, 7),
-    }))
+    setState(prev => {
+      const newStep = Math.min(prev.currentStep + 1, ONBOARDING_STEPS.length)
+
+      // Track analytics
+      trackOnboardingEvent(ONBOARDING_ANALYTICS_EVENTS.STEP_NEXT, {
+        from_step: prev.currentStep,
+        to_step: newStep,
+      })
+
+      return {
+        ...prev,
+        currentStep: newStep,
+      }
+    })
   }, [])
 
   const previousStep = useCallback(() => {
-    setState(prev => ({
-      ...prev,
-      currentStep: Math.max(prev.currentStep - 1, 0),
-    }))
+    setState(prev => {
+      const newStep = Math.max(prev.currentStep - 1, 0)
+
+      // Track analytics
+      trackOnboardingEvent(ONBOARDING_ANALYTICS_EVENTS.STEP_PREVIOUS, {
+        from_step: prev.currentStep,
+        to_step: newStep,
+      })
+
+      return {
+        ...prev,
+        currentStep: newStep,
+      }
+    })
   }, [])
 
   const goToStep = useCallback((step: number) => {
     setState(prev => ({
       ...prev,
-      currentStep: Math.max(0, Math.min(step, 7)),
+      currentStep: Math.max(0, Math.min(step, ONBOARDING_STEPS.length)),
     }))
   }, [])
 
@@ -107,13 +154,14 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
     setOnboardingVersion(1)
 
     // Track analytics
-    if (typeof window !== 'undefined' && (window as any).plausible) {
-      (window as any).plausible('onboarding_completed', {
-        props: {
-          duration: state.startedAt ? Date.now() - new Date(state.startedAt).getTime() : 0,
-        },
-      })
-    }
+    const duration = state.startedAt
+      ? new Date(now).getTime() - new Date(state.startedAt).getTime()
+      : 0
+
+    trackOnboardingEvent(ONBOARDING_ANALYTICS_EVENTS.COMPLETED, {
+      duration_ms: duration,
+      duration_seconds: Math.round(duration / 1000),
+    })
   }, [setOnboardingCompleted, setOnboardingVersion, state.startedAt])
 
   const pauseForAction = useCallback(() => {

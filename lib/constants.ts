@@ -112,3 +112,69 @@ export const FEATURES = {
   when2crackShares: false, // Table may not exist yet
   achievements: true,
 } as const
+
+// Onboarding (all timing values in milliseconds)
+export const ONBOARDING = {
+  // Timing
+  INITIAL_CALCULATION_DELAY: 100,        // SpotlightOverlay initial position calc
+  TOOLTIP_POSITION_DELAY: 150,           // OnboardingTooltip position calc (after spotlight)
+  AUTH_SETTLE_DELAY: 500,                // Wait for auth state to settle
+  TAB_FORCE_INITIAL_DELAY: 300,          // Initial delay before forcing tab
+  TAB_FORCE_RETRY_DELAY: 200,            // Delay between tab force retries
+  CONFETTI_DURATION: 2000,               // How long confetti shows
+  COMPLETION_REDIRECT_DELAY: 2000,       // Delay before redirecting after completion
+
+  // Retry logic
+  SPOTLIGHT_MAX_RETRIES: 10,             // Max retries to find spotlight target
+  SPOTLIGHT_RETRY_DELAY: 200,            // Delay between spotlight retries
+  TAB_FORCE_MAX_RETRIES: 3,              // Max retries for tab forcing
+  AUTO_SKIP_AFTER_RETRIES: true,         // Auto-skip step if target never found
+
+  // MutationObserver
+  MUTATION_DEBOUNCE_MS: 500,             // Debounce for mutation recalculations
+
+  // Animation durations (match CSS)
+  SPOTLIGHT_TRANSITION_MS: 400,          // Spotlight move transition
+  TOOLTIP_SLIDE_UP_MS: 300,              // Tooltip appear animation
+
+  // Tooltip dimensions (for position calculation)
+  TOOLTIP_WIDTH: 400,
+  TOOLTIP_HEIGHT: 300,
+  TOOLTIP_GAP: 16,
+
+  // Version
+  CURRENT_VERSION: 1,                    // Increment when onboarding changes significantly
+} as const
+
+// Onboarding Analytics Events
+export const ONBOARDING_ANALYTICS_EVENTS = {
+  STARTED: 'onboarding_started',
+  STEP_VIEW: 'onboarding_step_view',
+  STEP_NEXT: 'onboarding_step_next',
+  STEP_PREVIOUS: 'onboarding_step_previous',
+  STEP_SKIP_AUTO: 'onboarding_step_skip_auto',
+  COMPLETED: 'onboarding_completed',
+  SKIPPED: 'onboarding_skipped',
+  ERROR: 'onboarding_error',
+  TARGET_NOT_FOUND: 'onboarding_target_not_found',
+} as const
+
+// Type-safe analytics helper
+export function trackOnboardingEvent(
+  event: typeof ONBOARDING_ANALYTICS_EVENTS[keyof typeof ONBOARDING_ANALYTICS_EVENTS],
+  props?: Record<string, string | number | boolean>
+): void {
+  if (typeof window === 'undefined') return
+
+  try {
+    const plausible = (window as any).plausible
+    if (plausible) {
+      plausible(event, props ? { props } : undefined)
+    }
+  } catch (error) {
+    // Only log in development to avoid noise
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Analytics tracking failed:', error)
+    }
+  }
+}

@@ -197,6 +197,19 @@ h1, h2, h3, h4, h5, h6, p {
     --purple: #D4B0F5;
     --teal: #00F0A0;
   }
+
+  .skeleton {
+    background-color: #2A2A2A;
+  }
+
+  .skeleton::after {
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.1) 50%,
+      transparent 100%
+    );
+  }
 }
 
 /* Force dark mode when data-theme attribute is present */
@@ -210,6 +223,19 @@ h1, h2, h3, h4, h5, h6, p {
   --pink: #FF9EC8;
   --purple: #D4B0F5;
   --teal: #00F0A0;
+}
+
+[data-theme="dark"] .skeleton {
+  background-color: #2A2A2A;
+}
+
+[data-theme="dark"] .skeleton::after {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.1) 50%,
+    transparent 100%
+  );
 }
 
 [data-theme="light"] {

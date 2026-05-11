@@ -141,6 +141,7 @@ export function OnboardingTooltip({
         zIndex: 10003,
         maxWidth: isMobile ? 'calc(100vw - 32px)' : '400px',
         animation: 'slideUp 300ms ease-out',
+        pointerEvents: 'auto',
         ...getMobileStyle(),
       }}
       role="dialog"

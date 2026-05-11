@@ -13,6 +13,7 @@ import { useLocalStorage } from '@/lib/hooks/useLocalStorage'
 import { useToast } from '@/lib/hooks/useToast'
 import { ToastContainer } from '@/components/ui/Toast'
 import { calculateAchievements } from '@/lib/utils/achievements'
+import { isValidAvatarUrl, DEFAULT_PROFILE_PIC } from '@/lib/utils/avatar'
 import type { RosterPerson } from '@/lib/types'
 
 export default function ProfilePage() {
@@ -206,27 +207,22 @@ export default function ProfilePage() {
       {/* Header */}
       <div className="text-center mb-8">
         <div className="relative inline-block group">
-          {avatarUrl && avatarUrl.trim() !== '' && avatarUrl !== 'null' && avatarUrl !== 'undefined' ? (
-            <div className="w-24 h-24 rounded-full overflow-hidden border-4 border-pink shadow-lg bg-white">
+          <div className="w-24 h-24 bg-white rounded-full flex items-center justify-center shadow-lg border-4 border-pink/20 overflow-hidden">
+            {isValidAvatarUrl(avatarUrl) ? (
               <img
-                src={avatarUrl}
+                src={avatarUrl!}
                 alt="Profile"
                 className="w-full h-full object-cover"
                 onError={(e) => {
                   // Fallback to default if image fails to load
-                  const target = e.target as HTMLImageElement
-                  const parent = target.parentElement
-                  if (parent) {
-                    parent.innerHTML = '<img src="/egg.png" alt="Default Profile" class="w-20 h-20 object-contain m-auto" />'
-                  }
+                  e.currentTarget.src = DEFAULT_PROFILE_PIC
+                  e.currentTarget.className = 'w-20 h-20 object-contain'
                 }}
               />
-            </div>
-          ) : (
-            <div className="w-24 h-24 bg-white rounded-full flex items-center justify-center shadow-lg border-4 border-pink/20">
-              <img src="/egg.png" alt="Default Profile" className="w-20 h-20 object-contain" />
-            </div>
-          )}
+            ) : (
+              <img src={DEFAULT_PROFILE_PIC} alt="Default Profile" className="w-20 h-20 object-contain" />
+            )}
+          </div>
 
           {/* Photo upload overlay */}
           <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-40 rounded-full transition-all duration-200 flex items-center justify-center">

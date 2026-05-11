@@ -3,7 +3,7 @@ import { SkeletonAvatar, SkeletonText } from './Skeleton'
 
 export function SkeletonRosterCard() {
   return (
-    <div className="bg-white border-2 border-gray-200 rounded-2xl p-4">
+    <div className="bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-2xl p-4">
       <div className="flex items-start gap-3">
         {/* Avatar */}
         <SkeletonAvatar size="sm" />

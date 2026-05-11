@@ -91,7 +91,7 @@ export function Navigation() {
   ]
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-sm border-t border-gray-200 shadow-[0_-2px_10px_rgba(0,0,0,0.05)] pb-[env(safe-area-inset-bottom)]" style={{ zIndex: Z_INDEX.navigation }} role="navigation" aria-label="Main navigation">
+    <nav className="fixed bottom-0 left-0 right-0 bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm border-t border-gray-200 dark:border-gray-800 shadow-[0_-2px_10px_rgba(0,0,0,0.05)] pb-[env(safe-area-inset-bottom)]" style={{ zIndex: Z_INDEX.navigation }} role="navigation" aria-label="Main navigation">
       <div className="max-w-md mx-auto flex justify-around items-center h-16 px-2">
         {navItems.map((item) => {
           const isActive = pathname === item.path
@@ -104,7 +104,7 @@ export function Navigation() {
               className={`flex flex-col items-center justify-center gap-1 transition-all duration-200 min-w-[64px] min-h-[56px] rounded-xl py-2 px-3 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-yellow-bright focus-visible:ring-inset active:scale-95 ${
                 isActive
                   ? 'text-gray-900 bg-yellow-bright shadow-md'
-                  : 'text-gray-500 hover:text-gray-900 hover:bg-yellow-soft'
+                  : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-yellow-soft dark:hover:bg-gray-800'
               }`}
             >
               <div className={isActive ? 'scale-110' : ''} aria-hidden="true">

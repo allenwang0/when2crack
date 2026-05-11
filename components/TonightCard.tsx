@@ -32,16 +32,16 @@ export const TonightCard = memo(function TonightCard({ recommendation, rank, onS
   }
 
   return (
-    <div className="bg-white border-2 border-gray-200 rounded-2xl p-5 hover:border-yellow-400 hover:shadow-lg transition-all duration-200">
+    <div className="bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-2xl p-5 hover:border-yellow-400 hover:shadow-lg transition-all duration-200">
       {/* Rank */}
-      <div className={`text-sm font-semibold mb-3 ${rankColors[rank] || 'text-gray-600'}`}>
+      <div className={`text-sm font-semibold mb-3 ${rankColors[rank] || 'text-gray-600 dark:text-gray-400'}`}>
         {rankLabels[rank] || `#${rank}`}
       </div>
 
       {/* Person Info */}
       <div className="flex items-start gap-4 mb-4">
         {person.avatar_url && person.avatar_url.trim() !== '' && person.avatar_url !== 'null' && person.avatar_url !== 'undefined' ? (
-          <div className="w-16 h-16 rounded-full overflow-hidden flex-shrink-0 border-2 border-pink bg-white">
+          <div className="w-16 h-16 rounded-full overflow-hidden flex-shrink-0 border-2 border-pink bg-white dark:bg-gray-800">
             <img
               src={person.avatar_url}
               alt={person.name}
@@ -65,12 +65,12 @@ export const TonightCard = memo(function TonightCard({ recommendation, rank, onS
         )}
 
         <div className="flex-1 min-w-0">
-          <h3 className="font-serif font-bold text-lg mb-2 text-gray-900">{person.name}</h3>
+          <h3 className="font-serif font-bold text-lg mb-2 text-gray-900 dark:text-gray-100">{person.name}</h3>
           <div className="flex items-center gap-2 flex-wrap">
             <Badge variant="status" status={person.status}>
               {person.status}
             </Badge>
-            <span className="text-sm font-semibold text-gray-700">
+            <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">
               Elo {reasoning.elo_rating}
             </span>
           </div>
@@ -78,19 +78,19 @@ export const TonightCard = memo(function TonightCard({ recommendation, rank, onS
       </div>
 
       {/* Reasoning - Increased Contrast */}
-      <div className="bg-yellow-soft rounded-xl p-4 mb-4 space-y-3 border border-yellow-bright/20">
-        <p className="text-xs text-gray-700 font-semibold mb-2">Why tonight:</p>
+      <div className="bg-yellow-soft dark:bg-yellow-900/20 rounded-xl p-4 mb-4 space-y-3 border border-yellow-bright/20 dark:border-yellow-bright/30">
+        <p className="text-xs text-gray-700 dark:text-gray-300 font-semibold mb-2">Why tonight:</p>
         <div className="flex items-center justify-between text-sm">
-          <span className="text-gray-700">Composite</span>
-          <span className="font-bold text-gray-900">{Math.round((person.attraction_score + person.personality_score + person.reliability_score) / 3)}/10</span>
+          <span className="text-gray-700 dark:text-gray-300">Composite</span>
+          <span className="font-bold text-gray-900 dark:text-gray-100">{Math.round((person.attraction_score + person.personality_score + person.reliability_score) / 3)}/10</span>
         </div>
         <div className="flex items-center justify-between text-sm">
-          <span className="text-gray-700 font-medium">Reliability</span>
-          <span className="font-bold text-teal">{reasoning.reliability}/10</span>
+          <span className="text-gray-700 dark:text-gray-300 font-medium">Reliability</span>
+          <span className="font-bold text-teal dark:text-teal">{reasoning.reliability}/10</span>
         </div>
         <div className="flex items-center justify-between text-sm">
-          <span className="text-gray-700">Last contact</span>
-          <span className="font-semibold text-gray-900">
+          <span className="text-gray-700 dark:text-gray-300">Last contact</span>
+          <span className="font-semibold text-gray-900 dark:text-gray-100">
             {reasoning.recency_days === 0
               ? 'Today'
               : `${reasoning.recency_days}d ago`}
