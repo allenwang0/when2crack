@@ -306,7 +306,11 @@ export default function TonightPage() {
         .eq('user_id', user.id)
 
       showToast('Outreach logged! Good luck 🎯', 'success')
-      fetchRecommendations()
+      // Only refresh recommendations in list mode, not in swipe/stack mode
+      // to avoid race condition with card advancement animation
+      if (viewMode === 'list') {
+        fetchRecommendations()
+      }
     } catch (err) {
       console.error('Error logging outreach:', err)
       showToast('Failed to log outreach. Please try again.', 'error')

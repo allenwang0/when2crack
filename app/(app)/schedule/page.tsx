@@ -54,8 +54,15 @@ export default function SchedulePage() {
       const encodedSchedule = encodeScheduleWithTimezone(mySchedule)
 
       // Get display name if set
-      const displayName = localStorage.getItem('display_name') || 'Someone'
-      const cleanName = displayName ? JSON.parse(displayName) : 'Someone'
+      const displayName = localStorage.getItem('display_name')
+      let cleanName = 'Someone'
+      if (displayName) {
+        try {
+          cleanName = JSON.parse(displayName)
+        } catch {
+          cleanName = displayName // Use as-is if it's not JSON
+        }
+      }
 
       const baseUrl = process.env.NEXT_PUBLIC_APP_URL || window.location.origin
       const shareUrl = `${baseUrl}/schedule?for=${encodeURIComponent(cleanName)}&schedule=${encodedSchedule}`

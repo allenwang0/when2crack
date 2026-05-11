@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head><title>Avatar Test</title></head>
+<body style="padding: 40px; font-family: sans-serif;">
+<h1>AVATAR DEBUG</h1>
+
+<h2>Test 1: Egg PNG</h2>
+<div style="width: 100px; height: 100px; background: linear-gradient(135deg, pink, purple); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+    <img src="/egg.png" style="width: 80px; height: 80px; object-fit: contain;" id="egg1">
+</div>
+<p id="status1">Loading...</p>
+
+<h2>Test 2: Black Circle Simulation</h2>
+<div style="width: 100px; height: 100px; background: black; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+    <p style="color: white; font-size: 12px;">This is what<br>black looks like</p>
+</div>
+
+<h2>Test 3: Transparent Circle</h2>
+<div style="width: 100px; height: 100px; background: transparent; border: 2px solid red; border-radius: 50%;"></div>
+<p>This is transparent</p>
+
+<h2>LocalStorage Data:</h2>
+<pre id="storage"></pre>
+
+<script>
+document.getElementById('egg1').onload = () => {
+    document.getElementById('status1').innerHTML = '✅ EGG LOADED!';
+    document.getElementById('status1').style.color = 'green';
+    document.getElementById('status1').style.fontWeight = 'bold';
+};
+document.getElementById('egg1').onerror = () => {
+    document.getElementById('status1').innerHTML = '❌ EGG FAILED TO LOAD!';
+    document.getElementById('status1').style.color = 'red';
+    document.getElementById('status1').style.fontWeight = 'bold';
+};
+
+// Show localStorage
+document.getElementById('storage').textContent = JSON.stringify({
+    user_avatar: localStorage.getItem('user_avatar'),
+    all_keys: Object.keys(localStorage)
+}, null, 2);
+</script>
+</body>
+</html>

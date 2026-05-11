@@ -206,19 +206,50 @@ export default function ProfilePage() {
 
       {/* Header */}
       <div className="text-center mb-8">
+        {/* DEBUG INFO */}
+        <div className="mb-4 p-4 bg-yellow-100 border-2 border-yellow-500 rounded text-xs text-left">
+          <div><strong>Avatar Debug:</strong></div>
+          <div>avatarUrl: {avatarUrl || 'null'}</div>
+          <div>isValid: {isValidAvatarUrl(avatarUrl) ? 'YES' : 'NO'}</div>
+          <div>Will show: {isValidAvatarUrl(avatarUrl) ? 'UPLOADED IMAGE' : 'EGG.PNG'}</div>
+          {avatarUrl && <div>First 50 chars: {avatarUrl.substring(0, 50)}...</div>}
+        </div>
+
         <div className="relative inline-block group">
-          {/* ULTRA SIMPLE VERSION - ALWAYS SHOWS EGG IF NO VALID AVATAR */}
-          <div className="w-24 h-24 bg-gradient-to-br from-pink-100 to-purple-100 rounded-full flex items-center justify-center shadow-lg border-4 border-pink overflow-hidden">
+          {/* FORCE VISIBLE BACKGROUND */}
+          <div style={{
+            width: '96px',
+            height: '96px',
+            background: 'linear-gradient(135deg, #ffc0cb 0%, #dda0dd 100%)',
+            borderRadius: '50%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            border: '4px solid #ff1493',
+            overflow: 'hidden',
+            position: 'relative'
+          }}>
             <img
               src={isValidAvatarUrl(avatarUrl) ? avatarUrl! : '/egg.png'}
               alt="Profile"
-              className={isValidAvatarUrl(avatarUrl) ? 'w-full h-full object-cover' : 'w-20 h-20 object-contain'}
-              onError={(e) => {
-                console.error('Image failed to load:', e.currentTarget.src)
-                e.currentTarget.src = '/egg.png'
-                e.currentTarget.className = 'w-20 h-20 object-contain'
+              style={{
+                width: isValidAvatarUrl(avatarUrl) ? '100%' : '80px',
+                height: isValidAvatarUrl(avatarUrl) ? '100%' : '80px',
+                objectFit: isValidAvatarUrl(avatarUrl) ? 'cover' : 'contain',
+                position: 'relative',
+                zIndex: 10
               }}
-              onLoad={() => console.log('Image loaded successfully:', isValidAvatarUrl(avatarUrl) ? 'user avatar' : 'default egg')}
+              onError={(e) => {
+                console.error('❌ Image failed to load:', e.currentTarget.src)
+                alert('IMAGE FAILED: ' + e.currentTarget.src.substring(0, 100))
+                e.currentTarget.src = '/egg.png'
+                e.currentTarget.style.width = '80px'
+                e.currentTarget.style.height = '80px'
+                e.currentTarget.style.objectFit = 'contain'
+              }}
+              onLoad={(e) => {
+                console.log('✅ Image loaded:', e.currentTarget.src.substring(0, 50))
+              }}
             />
           </div>
 
