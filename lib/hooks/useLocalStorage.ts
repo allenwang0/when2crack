@@ -1,6 +1,42 @@
 import { useState, useEffect, useRef } from 'react'
 
+// Check available localStorage space
+function checkStorageQuota(): number {
+  if (typeof window === 'undefined') return Infinity
+
+  let total = 0
+  try {
+    for (const key in localStorage) {
+      if (localStorage.hasOwnProperty(key)) {
+        total += (localStorage[key].length + key.length) * 2 // UTF-16 encoding
+      }
+    }
+  } catch (error) {
+    return 0
+  }
+
+  // Most browsers have 5-10MB limit
+  const ESTIMATED_LIMIT = 5 * 1024 * 1024
+  return ESTIMATED_LIMIT - total
+}
+
+// Show user-friendly error message
+function showQuotaError() {
+  if (typeof window === 'undefined') return
+
+  const message =
+    'Storage limit reached! Your data might not be saved.\n\n' +
+    'Options:\n' +
+    '1. Sign in to sync data to the cloud\n' +
+    '2. Clear old battle history to free up space\n' +
+    '3. Remove some people from your roster'
+
+  alert(message)
+}
+
 export function useLocalStorage<T>(key: string, initialValue: T) {
+  // State to store error
+  const [error, setError] = useState<string | null>(null)
   // State to store our value
   const [storedValue, setStoredValue] = useState<T>(() => {
     if (typeof window === 'undefined') {
@@ -56,9 +92,29 @@ export function useLocalStorage<T>(key: string, initialValue: T) {
 
         timeoutRef.current = setTimeout(() => {
           try {
-            window.localStorage.setItem(key, JSON.stringify(valueToStore))
-          } catch (error) {
-            console.log('localStorage write error:', error)
+            const serialized = JSON.stringify(valueToStore)
+            const dataSize = serialized.length * 2 // UTF-16 encoding
+            const available = checkStorageQuota()
+
+            // Check if we have enough space
+            if (dataSize > available) {
+              setError('QUOTA_EXCEEDED')
+              showQuotaError()
+              return
+            }
+
+            window.localStorage.setItem(key, serialized)
+            setError(null)
+          } catch (error: any) {
+            console.error('localStorage write error:', error)
+
+            // Handle quota exceeded error
+            if (error.name === 'QuotaExceededError' || error.code === 22) {
+              setError('QUOTA_EXCEEDED')
+              showQuotaError()
+            } else {
+              console.error('localStorage error:', error)
+            }
           }
         }, 300) // 300ms debounce - increased to reduce event loop blocking
       }
@@ -67,5 +123,5 @@ export function useLocalStorage<T>(key: string, initialValue: T) {
     }
   }
 
-  return [storedValue, setValue] as const
+  return [storedValue, setValue, error] as const
 }
