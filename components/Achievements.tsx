@@ -11,7 +11,7 @@ export function Achievements({ achievements }: AchievementsProps) {
     <div>
       {/* Header */}
       <div className="text-center mb-6">
-        <div className="inline-block bg-gradient-to-r from-pink to-purple text-white px-8 py-3 rounded-2xl mb-3 shadow-lg">
+        <div className="inline-block bg-gradient-to-r from-pink to-purple text-white px-8 py-3 rounded-2xl mb-4 shadow-lg">
           <span className="font-bold text-xl">🏆 Achievements</span>
         </div>
         <p className="text-sm text-gray-600">
@@ -44,10 +44,10 @@ export function Achievements({ achievements }: AchievementsProps) {
 
               {/* Content */}
               <div className="flex-1 min-w-0">
-                <h3 className="font-bold text-lg mb-1 text-foreground">
+                <h3 className="font-bold text-lg mb-2 text-foreground">
                   {achievement.title}
                 </h3>
-                <p className="text-sm text-gray-600 mb-3">
+                <p className="text-sm text-gray-600 mb-4">
                   {achievement.description}
                 </p>
 

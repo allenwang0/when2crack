@@ -12,6 +12,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter()
   const [signingOut, setSigningOut] = useState(false)
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false)
+  const [showFAQ, setShowFAQ] = useState(false)
 
   const handleSignOut = async () => {
     // For authenticated users, show confirmation if they have guest data
@@ -60,6 +61,16 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             </h1>
           </div>
           <div className="flex items-center gap-2 flex-shrink-0">
+            <button
+              onClick={() => setShowFAQ(true)}
+              className="p-2 rounded-full hover:bg-gray-100 transition-colors"
+              title="Help & FAQ"
+              style={{ color: '#9CA3AF' }}
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </button>
             {user ? (
               <button
                 onClick={handleSignOut}
@@ -105,8 +116,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       {/* Bottom navigation - now rendered via fixed positioning in Navigation component */}
       <Navigation />
 
-      {/* Help FAQ - persistent */}
-      <HelpFAQ />
+      {/* Help FAQ - controlled by header button */}
+      <HelpFAQ isOpen={showFAQ} onClose={() => setShowFAQ(false)} />
 
         {/* Logout Confirmation Modal */}
         {showLogoutConfirm && (

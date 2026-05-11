@@ -52,7 +52,7 @@ export function useLocalStorage<T>(key: string, initialValue: T) {
   })
 
   // Ref to store debounce timeout
-  const timeoutRef = useRef<NodeJS.Timeout>()
+  const timeoutRef = useRef<NodeJS.Timeout | undefined>(undefined)
   // Ref to store the latest value for flushing on unmount
   const latestValueRef = useRef<T>(storedValue)
 

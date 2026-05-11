@@ -19,7 +19,7 @@ export function Badge({
   availability,
   className = '',
 }: BadgeProps) {
-  const baseStyles = 'inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium'
+  const baseStyles = 'inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium'
 
   let variantStyles = ''
 

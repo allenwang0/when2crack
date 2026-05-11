@@ -237,7 +237,7 @@ export default function BattlePage() {
       <div className="py-6 flex items-center justify-center min-h-[60vh]">
         <div className="text-center">
           <div className="text-4xl mb-4 animate-bounce">⚔️</div>
-          <p className="text-foreground/60 mb-2">{loadingMessage}</p>
+          <p className="text-foreground/60 mb-4">{loadingMessage}</p>
           <div className="w-8 h-8 border-b-2 border-pink animate-spin rounded-full mx-auto"></div>
         </div>
       </div>
@@ -291,7 +291,7 @@ export default function BattlePage() {
       <div className="py-6">
         <h2 className="text-2xl font-serif font-bold mb-4">Battle</h2>
         <div className="bg-card border border-border rounded-lg p-8 text-center">
-          <p className="text-gray-600 mb-2">Not enough people for battles</p>
+          <p className="text-gray-600 mb-4">Not enough people for battles</p>
           <p className="text-sm text-gray-500">
             Add at least 2 people to your roster to start battles
           </p>
@@ -310,8 +310,8 @@ export default function BattlePage() {
       {!user && !authLoading && <GuestBanner />}
 
       <div className="text-center mb-6">
-        <h2 className="text-2xl font-serif font-bold mb-2">Battle</h2>
-        <p className="text-sm text-gray-600 mb-1">
+        <h2 className="text-2xl font-serif font-bold mb-4">Battle</h2>
+        <p className="text-sm text-gray-600 mb-3">
           Right now, tonight — who would you rather?
         </p>
         {!user && totalPossibleBattles > 0 && (

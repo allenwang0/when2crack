@@ -11,7 +11,7 @@ export function calculateTonightScore(person: RosterPerson): number {
   const baseScore = person.elo_rating
 
   // Recency decay: 4-week penalty
-  const daysSinceContact = daysBetween(person.last_contact_date, new Date())
+  const daysSinceContact = person.last_contact_date ? daysBetween(person.last_contact_date, new Date()) : 9999
   const recencyPenalty = daysSinceContact > 28 ? -100 : 0
 
   // Reliability weight (heavily weighted)
@@ -41,7 +41,7 @@ export function getTonightRecommendations(
     reasoning: {
       tier: person.tier, // Keep in data structure but not displayed
       reliability: person.reliability_score,
-      recency_days: daysBetween(person.last_contact_date, new Date()),
+      recency_days: person.last_contact_date ? daysBetween(person.last_contact_date, new Date()) : 9999,
       elo_rating: person.elo_rating,
     },
   }))
@@ -61,7 +61,7 @@ export function getTonightRecommendations(
 export function getAvailabilityIndicator(
   person: RosterPerson
 ): 'likely' | 'uncertain' | 'unlikely' {
-  const daysSinceContact = daysBetween(person.last_contact_date, new Date())
+  const daysSinceContact = person.last_contact_date ? daysBetween(person.last_contact_date, new Date()) : 9999
   const { reliability_score } = person
 
   // High reliability + recent contact = likely

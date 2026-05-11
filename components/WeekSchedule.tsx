@@ -249,13 +249,13 @@ export function WeekSchedule({ comparisonMode = false, comparisonName }: WeekSch
     <div className="bg-white rounded-3xl p-3 sm:p-6 shadow-lg border-[3px] border-yellow-bright schedule-grid">
       {/* Header */}
       <div className="mb-4 sm:mb-6 text-center">
-        <div className="inline-block bg-black text-yellow-bright px-4 sm:px-6 py-2 rounded-full mb-3">
+        <div className="inline-block bg-black text-yellow-bright px-4 sm:px-6 py-2 rounded-full mb-4">
           <span className="font-bold text-base sm:text-lg">📅 This Week's Availability</span>
         </div>
 
         {/* Week Picker - Only show when NOT in comparison mode */}
         {!comparisonMode && (
-          <div className="flex items-center justify-center gap-2 mb-3">
+          <div className="flex items-center justify-center gap-2 mb-4">
             <button
               onClick={goToPreviousWeek}
               className="p-2 hover:bg-gray-100 rounded-full transition-colors"

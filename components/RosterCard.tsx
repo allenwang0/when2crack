@@ -62,7 +62,7 @@ export const RosterCard = memo(function RosterCard({ person }: RosterCardProps) 
 
             <div className="flex items-center justify-between text-xs text-gray-500">
               <span>Elo: {person.elo_rating}</span>
-              <span>Last contact: {formatRelativeTime(person.last_contact_date)}</span>
+              <span>Last contact: {person.last_contact_date ? formatRelativeTime(person.last_contact_date) : 'Never'}</span>
             </div>
           </div>
         </div>

@@ -31,11 +31,11 @@ export function OutOfComparisons({ onReset, totalPeople }: OutOfComparisonsProps
           All Done!
         </h2>
 
-        <p className="text-lg mb-4 text-foreground/80">
+        <p className="text-lg mb-6 text-foreground/80">
           You've compared everyone! 🏆
         </p>
 
-        <p className="text-sm text-foreground/60 mb-8">
+        <p className="text-sm text-foreground/60 mb-10">
           Completed {totalBattles} battles with {totalPeople} people
         </p>
 

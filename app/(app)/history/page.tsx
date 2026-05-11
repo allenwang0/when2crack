@@ -236,7 +236,7 @@ export default function HistoryPage() {
 
                     {/* Name and Date */}
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1">
+                      <div className="flex items-center gap-2 mb-2">
                         <h3 className="font-semibold text-lg truncate">
                           {person.name}
                         </h3>

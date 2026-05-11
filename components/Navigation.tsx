@@ -101,7 +101,7 @@ export function Navigation() {
               href={item.path}
               aria-label={item.ariaLabel}
               aria-current={isActive ? 'page' : undefined}
-              className={`flex flex-col items-center justify-center gap-1 transition-all duration-200 min-w-[56px] rounded-2xl py-3 px-2 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-yellow-bright focus-visible:ring-inset active:scale-95 ${
+              className={`flex flex-col items-center justify-center gap-2 transition-all duration-200 min-w-[56px] rounded-2xl py-3 px-2 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-yellow-bright focus-visible:ring-inset active:scale-95 ${
                 isActive
                   ? 'text-white bg-gradient-to-r from-pink to-purple shadow-[0_4px_12px_rgba(255,182,217,0.3)]'
                   : 'text-gray-400 hover:text-gray-800 hover:bg-yellow-50'

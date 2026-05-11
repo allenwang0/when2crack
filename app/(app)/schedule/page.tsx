@@ -90,7 +90,7 @@ export default function SchedulePage() {
           <p className="text-sm font-semibold text-gray-800">
             📅 Scheduling with <span className="text-pink">{sharedFor}</span>
           </p>
-          <p className="text-xs text-gray-600 mt-1">
+          <p className="text-xs text-gray-600 mt-2">
             Mark your free times below to coordinate a hangout
           </p>
         </div>
@@ -102,8 +102,8 @@ export default function SchedulePage() {
       {!sharedFor && (
         <div className="mt-8 bg-gradient-to-r from-pink-50 to-purple-50 border-2 border-pink/30 rounded-2xl p-6 text-center">
           <div className="mb-4">
-            <div className="text-4xl mb-2">💌</div>
-            <h3 className="font-bold text-lg text-gray-800 mb-2">
+            <div className="text-4xl mb-3">💌</div>
+            <h3 className="font-bold text-lg text-gray-800 mb-3">
               Share Your When2Crack
             </h3>
             <p className="text-sm text-gray-600 mb-4">

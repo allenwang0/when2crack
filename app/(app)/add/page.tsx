@@ -151,6 +151,7 @@ export default function AddPage() {
       // If user profile doesn't exist, create it
       if (userCheckError && userCheckError.code === 'PGRST116') {
         console.log('User profile not found, creating...')
+        // @ts-ignore - Supabase types not fully configured
         const { error: createUserError } = await supabase.from('users').insert({
           id: user.id,
           email: user.email,
