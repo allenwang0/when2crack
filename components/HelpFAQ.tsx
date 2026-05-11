@@ -42,40 +42,16 @@ const FAQ_ITEMS: FAQItem[] = [
   }
 ]
 
-export function HelpFAQ() {
-  const [hasSeen, setHasSeen] = useLocalStorage('faq_seen', false)
-  const [isOpen, setIsOpen] = useState(false)
+interface HelpFAQProps {
+  isOpen: boolean
+  onClose: () => void
+}
+
+export function HelpFAQ({ isOpen, onClose }: HelpFAQProps) {
   const [expandedItem, setExpandedItem] = useState<number | null>(null)
 
-  // Auto-show on first visit (but not if onboarding hasn't been completed)
-  useEffect(() => {
-    const onboardingCompleted = localStorage.getItem('onboarding_completed')
-    if (!onboardingCompleted) return // Don't auto-show during/before onboarding
-
-    if (!hasSeen) {
-      setIsOpen(true)
-      setHasSeen(true)
-    }
-  }, [hasSeen, setHasSeen])
-
   if (!isOpen) {
-    // Info button to reopen
-    return (
-      <button
-        onClick={() => setIsOpen(true)}
-        className="fixed bottom-24 right-3 sm:right-4 w-12 h-12 sm:w-14 sm:h-14 rounded-full shadow-lg transition-all hover:scale-110 active:scale-95 flex items-center justify-center"
-        style={{
-          background: 'linear-gradient(135deg, #FFD93D 0%, #F4C430 100%)',
-          border: '2px solid #1A1A1A',
-          zIndex: 9999
-        }}
-        title="Help & FAQ"
-      >
-        <svg className="w-6 h-6 sm:w-7 sm:h-7" fill="none" stroke="#1A1A1A" strokeWidth={2.5} viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-      </button>
-    )
+    return null
   }
 
   return (
@@ -97,7 +73,7 @@ export function HelpFAQ() {
               </h3>
             </div>
             <button
-              onClick={() => setIsOpen(false)}
+              onClick={onClose}
               className="w-8 h-8 rounded-full flex items-center justify-center transition-colors hover:bg-white/20 flex-shrink-0"
             >
               <svg className="w-5 h-5" fill="none" stroke="#FFD93D" strokeWidth={2} viewBox="0 0 24 24">

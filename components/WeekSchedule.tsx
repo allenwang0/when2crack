@@ -43,6 +43,7 @@ export function WeekSchedule({ comparisonMode = false, comparisonName }: WeekSch
   const [selectedSlotsArray, setSelectedSlotsArray] = useLocalStorage<string[]>(weekKey, [])
   const [selectedSlots, setSelectedSlotsState] = useState<Set<string>>(new Set(selectedSlotsArray))
   const [isDragging, setIsDragging] = useState(false)
+  const [isTouchDragging, setIsTouchDragging] = useState(false)
   const [showSavedMessage, setShowSavedMessage] = useState(false)
 
   // For comparison mode - decode schedule from URL if present
@@ -208,6 +209,23 @@ export function WeekSchedule({ comparisonMode = false, comparisonName }: WeekSch
     setSelectedSlots(newSlots)
   }, [selectedSlots, setSelectedSlots, getSlotKey])
 
+  // Get slot element at touch coordinates
+  const getSlotAtTouch = useCallback((touch: Touch) => {
+    const element = document.elementFromPoint(touch.clientX, touch.clientY)
+    if (!element) return null
+
+    const button = element.closest('button[data-slot-key]')
+    if (!button) return null
+
+    const key = button.getAttribute('data-slot-key')
+    if (!key) return null
+
+    const [day, hourStr] = key.split('-')
+    const hour = parseInt(hourStr, 10)
+
+    return { day, hour, key }
+  }, [])
+
   const formatHour = (hour: number) => {
     if (hour === 0) return '12am'
     if (hour < 12) return `${hour}am`
@@ -370,9 +388,11 @@ export function WeekSchedule({ comparisonMode = false, comparisonName }: WeekSch
                           toggleSlot(day, hour)
                         }}
                         onMouseUp={() => setIsDragging(false)}
-                        onTouchStart={() => {
+                        onTouchStart={(e) => {
+                          e.preventDefault() // Prevent mouse events from firing on mobile
                           toggleSlot(day, hour)
                         }}
+                        onTouchEnd={() => setIsDragging(false)}
                         className={`flex-1 h-11 min-w-[60px] transition-all rounded-lg mx-0.5 touch-manipulation ${
                           isOverlap
                             ? 'bg-teal border-2 border-teal-dark'

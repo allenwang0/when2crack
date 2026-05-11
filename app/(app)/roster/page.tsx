@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { useAuth } from '@/lib/contexts/AuthContext'
 import { RosterCard } from '@/components/RosterCard'
+import { SkeletonRosterCard } from '@/components/skeletons/SkeletonRosterCard'
 import { GuestBanner } from '@/components/GuestBanner'
 import { Button } from '@/components/ui/Button'
 import { useLocalStorage } from '@/lib/hooks/useLocalStorage'
@@ -175,9 +176,16 @@ export default function RosterPage() {
 
   if (loading) {
     return (
-      <div className="py-6 flex flex-col items-center justify-center min-h-[40vh] gap-3">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-pink"></div>
-        <p className="text-gray-600">{loadingMessage}</p>
+      <div className="py-6 roster-section" aria-label="Loading roster" aria-busy="true">
+        <div className="flex items-center justify-between mb-8">
+          <div className="w-48 h-10 skeleton rounded-2xl" />
+          <div className="w-20 h-10 skeleton rounded-2xl" />
+        </div>
+        <div className="space-y-4">
+          {[1, 2, 3].map((i) => (
+            <SkeletonRosterCard key={i} />
+          ))}
+        </div>
       </div>
     )
   }

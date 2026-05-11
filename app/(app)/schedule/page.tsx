@@ -1,10 +1,9 @@
 'use client'
 
 import { useState } from 'react'
-import { useSearchParams, useRouter } from 'next/navigation'
+import { useSearchParams } from 'next/navigation'
 import { WeekSchedule } from '@/components/WeekSchedule'
 import { GuestBanner } from '@/components/GuestBanner'
-import { Button } from '@/components/ui/Button'
 import { useAuth } from '@/lib/contexts/AuthContext'
 import { useToast } from '@/lib/hooks/useToast'
 import { ToastContainer } from '@/components/ui/Toast'
@@ -12,7 +11,6 @@ import { encodeScheduleWithTimezone } from '@/lib/utils/timezone'
 
 export default function SchedulePage() {
   const { user, loading: authLoading } = useAuth()
-  const router = useRouter()
   const searchParams = useSearchParams()
   const sharedFor = searchParams.get('for')
   const { toasts, showToast, removeToast } = useToast()
@@ -77,13 +75,9 @@ export default function SchedulePage() {
     <div className="py-6">
       {!user && !authLoading && <GuestBanner />}
 
-      <Button
-        variant="ghost"
-        onClick={() => router.back()}
-        className="mb-4"
-      >
-        ← Back
-      </Button>
+      <div className="text-center mb-6">
+        <h2 className="text-2xl font-bold text-gray-800">This Week's Availability</h2>
+      </div>
 
       {sharedFor && (
         <div className="bg-gradient-to-r from-pink-50 to-purple-50 border-2 border-pink rounded-2xl p-4 mb-6 text-center">
@@ -111,12 +105,12 @@ export default function SchedulePage() {
             </p>
           </div>
 
-          <Button
+          <button
             onClick={handleShareSchedule}
-            className="w-full bg-gradient-to-r from-pink to-purple hover:opacity-90 transition-opacity"
+            className="w-full bg-gradient-to-r from-pink to-purple hover:opacity-90 transition-opacity px-6 py-3 rounded-full text-white font-semibold shadow-md hover:shadow-lg"
           >
             {linkCopied ? '✓ Link Copied!' : 'Copy Link to Share'}
-          </Button>
+          </button>
         </div>
       )}
 

@@ -5,6 +5,8 @@ import { createClient } from '@/lib/supabase/client'
 import { useAuth } from '@/lib/contexts/AuthContext'
 import { TonightCard } from '@/components/TonightCard'
 import { BattleCard } from '@/components/BattleCard'
+import { SkeletonTonightCard } from '@/components/skeletons/SkeletonTonightCard'
+import { SkeletonBattleCard } from '@/components/skeletons/SkeletonBattleCard'
 import { GuestBanner } from '@/components/GuestBanner'
 import { OutOfComparisons } from '@/components/OutOfComparisons'
 import { Button } from '@/components/ui/Button'
@@ -348,9 +350,28 @@ export default function TonightPage() {
 
   if (loading) {
     return (
-      <div className="py-6 flex flex-col items-center justify-center min-h-[60vh] gap-3">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-pink"></div>
-        <p className="text-gray-600">{loadingMessage}</p>
+      <div className="py-6" aria-label="Loading recommendations" aria-busy="true">
+        {/* Tab Navigation */}
+        <div className="flex gap-2 mb-6">
+          <div className="flex-1 h-10 skeleton rounded-2xl" />
+          <div className="flex-1 h-10 skeleton rounded-2xl" />
+        </div>
+
+        {/* Content based on active tab */}
+        {activeTab === 'tonight' ? (
+          <div className="space-y-4">
+            {[1, 2, 3].map((i) => (
+              <SkeletonTonightCard key={i} />
+            ))}
+          </div>
+        ) : (
+          <div className="flex flex-col gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <SkeletonBattleCard />
+              <SkeletonBattleCard />
+            </div>
+          </div>
+        )}
       </div>
     )
   }

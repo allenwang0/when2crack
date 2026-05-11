@@ -74,8 +74,8 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
         setPerson({ ...person, avatar_url: compressedBase64 })
       } else {
         // Authenticated mode: Update Supabase
-        const { error: updateError } = await supabase
-          .from('roster')
+        const { error: updateError } = await (supabase
+          .from('roster') as any)
           .update({ avatar_url: compressedBase64 })
           .eq('id', person.id)
           .eq('user_id', user.id)
@@ -110,8 +110,8 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
       setPerson({ ...person, avatar_url: null })
     } else {
       // Authenticated mode: Update Supabase
-      const { error: updateError } = await supabase
-        .from('roster')
+      const { error: updateError } = await (supabase
+        .from('roster') as any)
         .update({ avatar_url: null })
         .eq('id', person.id)
         .eq('user_id', user.id)
@@ -152,7 +152,7 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
     // Authenticated mode: Load from Supabase
     const fetchProfile = async () => {
       // Fetch person
-      const { data: personData, error: personError } = await supabase
+      const { data: personDataRaw, error: personError } = await supabase
         .from('roster')
         .select('*')
         .eq('id', id)
@@ -165,7 +165,8 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
         return
       }
 
-      setPerson(personData as RosterPerson)
+      const personData = personDataRaw as RosterPerson
+      setPerson(personData)
       setNotes(personData.notes || '')
       setAvatarUrl(personData.avatar_url || null)
       // Initialize edit state
@@ -282,8 +283,8 @@ export default function ProfilePage({ params }: { params: Promise<{ id: string }
       setPerson(updatedPerson)
     } else {
       // Authenticated mode: Update Supabase
-      const { error: updateError } = await supabase
-        .from('roster')
+      const { error: updateError } = await (supabase
+        .from('roster') as any)
         .update({
           name: editedName,
           status: editedStatus,

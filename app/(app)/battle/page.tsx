@@ -7,9 +7,12 @@ import { GuestBanner } from '@/components/GuestBanner'
 import { OutOfComparisons } from '@/components/OutOfComparisons'
 import { useAuth } from '@/lib/contexts/AuthContext'
 import { useLocalStorage } from '@/lib/hooks/useLocalStorage'
+import { useBattleUndo } from '@/lib/hooks/useBattleUndo'
+import { BattleUndoButton } from '@/components/BattleUndoButton'
 import type { RosterPerson } from '@/lib/types'
 import { calculateEloChanges, calculateInitialElo } from '@/lib/algorithms/elo'
 import { API_SAFETY_TIMEOUT, BATTLE_RESULT_DISPLAY_DURATION } from '@/lib/constants'
+import { logger } from '@/lib/utils/logger'
 
 export default function BattlePage() {
   const { user, loading: authLoading } = useAuth()
@@ -28,6 +31,14 @@ export default function BattlePage() {
   } | null>(null)
   const [error, setError] = useState('')
   const [showOutOfComparisons, setShowOutOfComparisons] = useState(false)
+
+  // Battle undo functionality
+  const { recordBattle, undo, isUndoable, getRemainingTime } = useBattleUndo({
+    undoWindowMs: 5000, // 5 second undo window
+    onUndo: () => {
+      logger.info('Battle undo triggered')
+    },
+  })
 
   const getBattleKey = (id1: string, id2: string) => {
     return [id1, id2].sort().join('-')
@@ -134,6 +145,35 @@ export default function BattlePage() {
     return () => clearTimeout(safetyTimeout)
   }, [user, authLoading, localRoster])
 
+  const handleUndo = () => {
+    const battleToUndo = undo()
+    if (!battleToUndo) return
+
+    // Revert ELO ratings
+    const updatedRoster = localRoster.map(person => {
+      if (person.id === battleToUndo.winnerId) {
+        return { ...person, elo_rating: battleToUndo.winnerOldRating }
+      }
+      if (person.id === battleToUndo.loserId) {
+        return { ...person, elo_rating: battleToUndo.loserOldRating }
+      }
+      return person
+    })
+
+    setLocalRoster(updatedRoster)
+
+    // Remove from completed battles
+    if (person1 && person2) {
+      const battleKey = getBattleKey(person1.id, person2.id)
+      setCompletedBattles(completedBattles.filter(key => key !== battleKey))
+    }
+
+    // Clear result display
+    setResult(null)
+
+    logger.info('Battle undone successfully')
+  }
+
   const handleBattleGuest = (winnerId: string, loserId: string) => {
     setProcessing(true)
     setError('')
@@ -157,6 +197,9 @@ export default function BattlePage() {
         winner.elo_rating,
         loser.elo_rating
       )
+
+      // Record battle for undo
+      recordBattle(winnerId, loserId, winner.elo_rating, loser.elo_rating)
 
       const updatedRoster = localRoster.map(person => {
         if (person.id === winnerId) {
@@ -375,6 +418,13 @@ export default function BattlePage() {
           Skip this battle
         </Button>
       </div>
+
+      {/* Undo Button */}
+      <BattleUndoButton
+        isUndoable={isUndoable && !user} // Only for guest mode
+        onUndo={handleUndo}
+        getRemainingTime={getRemainingTime}
+      />
     </div>
   )
 }
