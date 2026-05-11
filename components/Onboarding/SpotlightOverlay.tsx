@@ -32,6 +32,7 @@ export function SpotlightOverlay({
   const hasScrolledRef = useRef(false)
   const retryCountRef = useRef(0)
   const previousTargetRef = useRef<string | null>(null)
+  const observerRef = useRef<MutationObserver | null>(null)
 
   useEffect(() => {
     if (!targetSelector) return
@@ -42,6 +43,12 @@ export function SpotlightOverlay({
       retryCountRef.current = 0
       setTargetFound(true)
       previousTargetRef.current = targetSelector
+
+      // Disconnect old observer when target changes
+      if (observerRef.current) {
+        observerRef.current.disconnect()
+        observerRef.current = null
+      }
     }
 
     const calculatePosition = () => {
@@ -90,8 +97,11 @@ export function SpotlightOverlay({
     // Optimized MutationObserver - only watch the likely container
     const observer = new MutationObserver(() => {
       clearTimeout(resizeTimeout)
-      resizeTimeout = setTimeout(calculatePosition, 300)
+      resizeTimeout = setTimeout(calculatePosition, 500) // Increased from 300ms to 500ms
     })
+
+    // Store observer ref for cleanup on target change
+    observerRef.current = observer
 
     // Watch only the main content area, not entire body
     const mainContent = document.querySelector('main') || document.body
@@ -104,6 +114,9 @@ export function SpotlightOverlay({
     return () => {
       window.removeEventListener('resize', handleResize)
       observer.disconnect()
+      if (observerRef.current === observer) {
+        observerRef.current = null
+      }
       clearTimeout(resizeTimeout)
       clearTimeout(initialTimeout)
     }
