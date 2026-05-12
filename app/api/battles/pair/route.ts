@@ -17,9 +17,16 @@ export async function GET() {
 
   try {
     // Get next battle pair using the daily combination system
+    type BattlePairResult = {
+      person1_id: string | null
+      person2_id: string | null
+      remaining_count: number
+      total_count: number
+    }
+
     const { data: pairData, error: pairError } = await supabase
-      .rpc('get_next_daily_battle_pair', { p_user_id: user.id })
-      .single()
+      .rpc('get_next_daily_battle_pair', { p_user_id: user.id } as any)
+      .single() as { data: BattlePairResult | null; error: any }
 
     if (pairError) throw pairError
 

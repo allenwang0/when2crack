@@ -3,7 +3,7 @@
 import { createContext, useContext, useRef, ReactNode, RefObject } from 'react'
 
 interface ScrollContextType {
-  scrollContainerRef: RefObject<HTMLElement>
+  scrollContainerRef: RefObject<HTMLElement | null>
   scrollToTop: (smooth?: boolean) => void
 }
 

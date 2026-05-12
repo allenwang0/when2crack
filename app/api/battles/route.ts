@@ -38,6 +38,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Mark this combination as shown in the daily tracker
+    // @ts-ignore - Supabase RPC types not fully configured
     const { error: markError } = await supabase.rpc('mark_combination_shown', {
       p_user_id: user.id,
       p_person1_id: winner_id,
