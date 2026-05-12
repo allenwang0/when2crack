@@ -78,11 +78,33 @@ export function OnboardingTooltip({
       let newPosition: 'bottom' | 'top' | 'left' | 'right' = 'bottom'
       let style: React.CSSProperties = {}
 
-      // Try right first
-      if (rect.right + tooltipWidth + gap < viewportWidth) {
+      // Account for nav bar height when positioning at bottom
+      const navBarHeight = 64 // h-16
+      const bottomMargin = navBarHeight + 16 // nav + gap
+
+      // Try bottom first (most common for large elements)
+      if (rect.bottom + tooltipHeight + gap < viewportHeight - bottomMargin) {
+        newPosition = 'bottom'
+        style = {
+          top: rect.bottom + gap,
+          left: Math.max(gap, Math.min(rect.left + rect.width / 2, viewportWidth - tooltipWidth / 2 - gap)),
+          transform: 'translateX(-50%)',
+        }
+      }
+      // Try top
+      else if (rect.top - tooltipHeight - gap > 0) {
+        newPosition = 'top'
+        style = {
+          bottom: viewportHeight - rect.top + gap,
+          left: Math.max(gap, Math.min(rect.left + rect.width / 2, viewportWidth - tooltipWidth / 2 - gap)),
+          transform: 'translateX(-50%)',
+        }
+      }
+      // Try right
+      else if (rect.right + tooltipWidth + gap < viewportWidth) {
         newPosition = 'right'
         style = {
-          top: rect.top + rect.height / 2,
+          top: Math.max(gap, Math.min(rect.top + rect.height / 2, viewportHeight - tooltipHeight / 2 - gap)),
           left: rect.right + gap,
           transform: 'translateY(-50%)',
         }
@@ -91,26 +113,17 @@ export function OnboardingTooltip({
       else if (rect.left - tooltipWidth - gap > 0) {
         newPosition = 'left'
         style = {
-          top: rect.top + rect.height / 2,
+          top: Math.max(gap, Math.min(rect.top + rect.height / 2, viewportHeight - tooltipHeight / 2 - gap)),
           right: viewportWidth - rect.left + gap,
           transform: 'translateY(-50%)',
         }
       }
-      // Try bottom
-      else if (rect.bottom + tooltipHeight + gap < viewportHeight) {
+      // Fallback: center on screen above nav bar (if target takes up entire viewport)
+      else {
         newPosition = 'bottom'
         style = {
-          top: rect.bottom + gap,
-          left: rect.left + rect.width / 2,
-          transform: 'translateX(-50%)',
-        }
-      }
-      // Default to top
-      else {
-        newPosition = 'top'
-        style = {
-          bottom: viewportHeight - rect.top + gap,
-          left: rect.left + rect.width / 2,
+          left: '50%',
+          bottom: `${bottomMargin + 16}px`,
           transform: 'translateX(-50%)',
         }
       }
@@ -142,8 +155,9 @@ export function OnboardingTooltip({
     if (!isMobile) return tooltipStyle
 
     // Fixed position above nav bar on mobile
+    // Nav bar is h-16 (64px) + safe area padding
     return {
-      bottom: 'calc(80px + 1rem)', // nav height + gap
+      bottom: 'calc(64px + 1rem + env(safe-area-inset-bottom))', // nav height + gap + safe area
     }
   }
 
