@@ -8,6 +8,7 @@ import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { useTheme } from '@/lib/hooks/useTheme'
 import { useScroll } from '@/lib/hooks/useScroll'
+import { useInitializeStarterRoster } from '@/lib/hooks/useInitializeStarterRoster'
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const { user, loading, signOut } = useAuth()
@@ -18,6 +19,9 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const { theme, resolvedTheme, setTheme } = useTheme()
   const [showThemeMenu, setShowThemeMenu] = useState(false)
   const { scrollContainerRef } = useScroll()
+
+  // Initialize starter roster for new guest users
+  useInitializeStarterRoster()
 
   const handleSignOut = async () => {
     // For authenticated users, show confirmation if they have guest data
