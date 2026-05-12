@@ -34,6 +34,17 @@ export default function AddPage() {
     const file = e.target.files?.[0]
     if (!file) return
 
+    setError('') // Clear previous errors
+
+    // Validate image BEFORE compression
+    const { validateImageClient } = await import('@/lib/utils/imageValidation')
+    const validation = await validateImageClient(file)
+
+    if (!validation.valid) {
+      setError(validation.error || 'Invalid image')
+      return
+    }
+
     // Check file size
     if (file.size > MAX_IMAGE_SIZE_BYTES) {
       setError('Image must be less than 5MB')
@@ -51,6 +62,7 @@ export default function AddPage() {
       const { compressImage } = await import('@/lib/utils/imageCompression')
       const compressedBase64 = await compressImage(file)
       setAvatarUrl(compressedBase64)
+      setError('') // Clear error on success
     } catch (err) {
       logger.error('Image compression error:', err)
       setError('Failed to process image. Please try another.')
