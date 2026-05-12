@@ -14,7 +14,7 @@ export function Input({ label, error, className = '', ...props }: InputProps) {
         </label>
       )}
       <input
-        className={`w-full px-4 py-2 bg-card dark:bg-gray-800 border border-border dark:border-gray-700 rounded-lg text-foreground dark:text-gray-100 placeholder:text-gray-500 dark:placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-pink focus:border-transparent transition-shadow ${
+        className={`w-full px-4 py-2 bg-card dark:bg-gray-800 border border-border dark:border-gray-700 rounded-lg text-foreground dark:text-gray-100 placeholder:text-gray-500 dark:placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-pink focus:border-transparent transition-shadow ${
           error ? 'border-red-500 focus:ring-red-500' : ''
         } ${className}`}
         {...props}
@@ -38,7 +38,7 @@ export function Textarea({ label, error, className = '', ...props }: TextareaPro
         </label>
       )}
       <textarea
-        className={`w-full px-4 py-2 bg-card dark:bg-gray-800 border border-border dark:border-gray-700 rounded-lg text-foreground dark:text-gray-100 placeholder:text-gray-500 dark:placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-pink focus:border-transparent transition-shadow resize-none ${
+        className={`w-full px-4 py-2 bg-card dark:bg-gray-800 border border-border dark:border-gray-700 rounded-lg text-foreground dark:text-gray-100 placeholder:text-gray-500 dark:placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-pink focus:border-transparent transition-shadow resize-none ${
           error ? 'border-red-500 focus:ring-red-500' : ''
         } ${className}`}
         {...props}

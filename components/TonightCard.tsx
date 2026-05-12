@@ -34,7 +34,7 @@ export const TonightCard = memo(function TonightCard({ recommendation, rank, onS
   return (
     <div className="bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-2xl p-5 hover:border-yellow-400 hover:shadow-lg transition-all duration-200">
       {/* Rank */}
-      <div className={`text-sm font-semibold mb-3 ${rankColors[rank] || 'text-gray-600 dark:text-gray-400'}`}>
+      <div className={`text-sm font-semibold mb-3 ${rankColors[rank] || 'text-gray-600 dark:text-gray-300'}`}>
         {rankLabels[rank] || `#${rank}`}
       </div>
 

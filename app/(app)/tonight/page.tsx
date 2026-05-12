@@ -466,8 +466,8 @@ export default function TonightPage() {
           }}
           className={`flex-1 py-3 px-4 rounded-2xl font-bold transition-all text-base active:scale-95 ${
             activeTab === 'tonight'
-              ? 'bg-gray-900 text-yellow-bright shadow-lg border-2 border-gray-900'
-              : 'bg-white border-2 border-gray-300 text-gray-700 hover:border-yellow-bright hover:bg-yellow-soft hover:shadow-md'
+              ? 'bg-gray-900 dark:bg-gray-100 text-yellow-bright dark:text-gray-900 shadow-lg border-2 border-gray-900 dark:border-gray-100'
+              : 'bg-white dark:bg-gray-800 border-2 border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:border-yellow-bright hover:bg-yellow-soft dark:hover:bg-gray-700 hover:shadow-md'
           }`}
         >
           Tonight
@@ -479,8 +479,8 @@ export default function TonightPage() {
           }}
           className={`flex-1 py-3 px-4 rounded-2xl font-bold transition-all text-base active:scale-95 ${
             activeTab === 'battle'
-              ? 'bg-gray-900 text-yellow-bright shadow-lg border-2 border-gray-900'
-              : 'bg-white border-2 border-gray-300 text-gray-700 hover:border-yellow-bright hover:bg-yellow-soft hover:shadow-md'
+              ? 'bg-gray-900 dark:bg-gray-100 text-yellow-bright dark:text-gray-900 shadow-lg border-2 border-gray-900 dark:border-gray-100'
+              : 'bg-white dark:bg-gray-800 border-2 border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:border-yellow-bright hover:bg-yellow-soft dark:hover:bg-gray-700 hover:shadow-md'
           }`}
         >
           Battle
@@ -494,7 +494,7 @@ export default function TonightPage() {
             <h2 className="text-2xl sm:text-3xl font-serif font-bold mb-2 text-gray-900 dark:text-gray-100">
               Tonight's Top Picks
             </h2>
-            <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+            <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
               Weighted by reliability, recency, and vibe
             </p>
 
@@ -545,7 +545,7 @@ export default function TonightPage() {
               <p className="text-gray-900 dark:text-gray-100 font-semibold text-base sm:text-lg mb-2">
                 No recommendations yet
               </p>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
+              <p className="text-sm text-gray-600 dark:text-gray-300">
                 Add people to your roster and run some battles to get personalized picks
               </p>
             </div>
@@ -583,12 +583,12 @@ export default function TonightPage() {
       {activeTab === 'battle' && (
         <div className="battle-section">
           <div className="text-center mb-6">
-            <h2 className="text-2xl sm:text-3xl font-serif font-bold mb-2 text-gray-900">Battle Mode</h2>
-            <p className="text-sm text-gray-600 mb-3">
+            <h2 className="text-2xl sm:text-3xl font-serif font-bold mb-2 text-gray-900 dark:text-gray-100">Battle Mode</h2>
+            <p className="text-sm text-gray-600 dark:text-gray-300 mb-3">
               Right now, tonight — who would you rather?
             </p>
             {!user && totalPossibleBattles > 0 && (
-              <p className="text-xs text-gray-500 font-medium">
+              <p className="text-xs text-gray-500 dark:text-gray-400 font-medium">
                 Battle {battlesCompleted + 1} of {totalPossibleBattles}
               </p>
             )}
@@ -602,10 +602,10 @@ export default function TonightPage() {
           )}
 
           {!error && (!person1 || !person2) && (
-            <div className="bg-white border-2 border-dashed border-gray-300 rounded-2xl p-8 sm:p-12 text-center">
+            <div className="bg-white dark:bg-gray-800 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-2xl p-8 sm:p-12 text-center">
               <div className="text-5xl sm:text-6xl mb-4 sm:mb-6">⚔️</div>
-              <p className="text-gray-900 font-semibold text-base sm:text-lg mb-2">Need more people</p>
-              <p className="text-sm text-gray-600">
+              <p className="text-gray-900 dark:text-gray-100 font-semibold text-base sm:text-lg mb-2">Need more people</p>
+              <p className="text-sm text-gray-600 dark:text-gray-300">
                 Add at least 2 people to your roster to start battles
               </p>
             </div>
@@ -614,9 +614,9 @@ export default function TonightPage() {
           {person1 && person2 && (
             <>
               {battleResult && (
-                <div className="bg-pink/10 border border-pink rounded-xl p-4 mb-6 text-center animate-fade-in">
-                  <p className="text-pink font-semibold mb-2">Battle Complete!</p>
-                  <p className="text-sm text-gray-700">
+                <div className="bg-pink/10 dark:bg-pink/20 border border-pink rounded-xl p-4 mb-6 text-center animate-fade-in">
+                  <p className="text-pink dark:text-pink font-semibold mb-2">Battle Complete!</p>
+                  <p className="text-sm text-gray-700 dark:text-gray-300">
                     Winner: {battleResult.winnerChange > 0 ? '+' : ''}
                     {battleResult.winnerChange} Elo
                     {' • '}
@@ -642,7 +642,7 @@ export default function TonightPage() {
 
                 {/* VS Badge - Positioned between cards */}
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10">
-                  <span className="inline-block px-4 py-2 bg-gray-900 text-yellow-bright rounded-full text-sm font-bold shadow-lg">
+                  <span className="inline-block px-4 py-2 bg-gray-900 dark:bg-gray-100 text-yellow-bright dark:text-gray-900 rounded-full text-sm font-bold shadow-lg">
                     VS
                   </span>
                 </div>

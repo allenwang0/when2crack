@@ -71,7 +71,7 @@ export default function AchievementsPage() {
       <div className="py-6">
         <div className="flex flex-col items-center justify-center min-h-[60vh] gap-3">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-pink"></div>
-          <p className="text-gray-600 dark:text-gray-400">Loading achievements...</p>
+          <p className="text-gray-600 dark:text-gray-300">Loading achievements...</p>
         </div>
       </div>
     )
@@ -92,7 +92,7 @@ export default function AchievementsPage() {
           <h2 className="text-2xl font-bold mb-3 text-gray-900 dark:text-gray-100">
             Track Your Progress
           </h2>
-          <p className="text-gray-600 dark:text-gray-400 mb-6 max-w-md mx-auto">
+          <p className="text-gray-600 dark:text-gray-300 mb-6 max-w-md mx-auto">
             Sign in to unlock achievements, earn points, and track your progress as you build your
             roster and make connections!
           </p>
@@ -114,7 +114,7 @@ export default function AchievementsPage() {
         <h1 className="text-3xl font-serif font-bold mb-2 text-gray-900 dark:text-gray-100">
           Achievements
         </h1>
-        <p className="text-sm text-gray-600 dark:text-gray-400">
+        <p className="text-sm text-gray-600 dark:text-gray-300">
           Unlock achievements and earn points as you use the app
         </p>
       </div>
@@ -143,7 +143,7 @@ export default function AchievementsPage() {
           initialCount={12}
         />
       ) : (
-        <div className="text-center py-12 text-gray-500 dark:text-gray-400">
+        <div className="text-center py-12 text-gray-500 dark:text-gray-300">
           <p>No achievements in this category yet.</p>
         </div>
       )}

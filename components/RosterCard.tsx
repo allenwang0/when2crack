@@ -68,13 +68,13 @@ export const RosterCard = memo(function RosterCard({ person }: RosterCardProps) 
               <span className="text-base font-bold text-gray-900 dark:text-gray-100">
                 Elo {person.elo_rating}
               </span>
-              <span className="text-sm text-gray-600 dark:text-gray-400">
+              <span className="text-sm text-gray-600 dark:text-gray-300">
                 Score: {compositeScore}/10
               </span>
             </div>
 
             {/* Last Contact */}
-            <div className="text-xs text-gray-500 dark:text-gray-400">
+            <div className="text-xs text-gray-500 dark:text-gray-300">
               Last contact: {person.last_contact_date ? formatRelativeTime(person.last_contact_date) : 'Never'}
             </div>
           </div>

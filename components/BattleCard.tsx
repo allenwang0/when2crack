@@ -82,25 +82,25 @@ export const BattleCard = memo(function BattleCard({ person, onClick, disabled }
       {/* Scores */}
       <div className="space-y-2 sm:space-y-3 mb-4 sm:mb-5">
         <div className="flex justify-between text-xs sm:text-sm">
-          <span className="text-gray-600 dark:text-gray-400">Composite</span>
+          <span className="text-gray-600 dark:text-gray-300">Composite</span>
           <span className="font-semibold text-pink">{compositeScore}</span>
         </div>
         <div className="flex justify-between text-xs sm:text-sm">
-          <span className="text-gray-600 dark:text-gray-400">Attraction</span>
+          <span className="text-gray-600 dark:text-gray-300">Attraction</span>
           <span className="text-foreground dark:text-gray-200">{person.attraction_score}</span>
         </div>
         <div className="flex justify-between text-xs sm:text-sm">
-          <span className="text-gray-600 dark:text-gray-400">Personality</span>
+          <span className="text-gray-600 dark:text-gray-300">Personality</span>
           <span className="text-foreground dark:text-gray-200">{person.personality_score}</span>
         </div>
         <div className="flex justify-between text-xs sm:text-sm">
-          <span className="text-gray-600 dark:text-gray-400">Reliability</span>
+          <span className="text-gray-600 dark:text-gray-300">Reliability</span>
           <span className="text-foreground dark:text-gray-200">{person.reliability_score}</span>
         </div>
       </div>
 
       {/* Elo Rating */}
-      <div className="text-xs text-gray-500 dark:text-gray-400 mt-3">
+      <div className="text-xs text-gray-500 dark:text-gray-300 mt-3">
         Elo: {person.elo_rating}
       </div>
     </button>
