@@ -19,7 +19,7 @@ export function Slider({
   step = 1,
   showValue = true,
 }: SliderProps) {
-  const timeoutRef = useRef<NodeJS.Timeout>()
+  const timeoutRef = useRef<NodeJS.Timeout | undefined>(undefined)
   const [localValue, setLocalValue] = useState(value)
 
   // Update local value when prop changes
