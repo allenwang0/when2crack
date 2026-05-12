@@ -264,16 +264,6 @@ export default function BattlePage() {
       const isOnboarding = onboardingState.isActive
       const rosterToUse = isOnboarding ? (DEMO_ROSTER_PEOPLE as RosterPerson[]) : localRoster
 
-      // Mark this combination as shown (only if not onboarding)
-      if (person1 && person2 && !isOnboarding) {
-        const updatedCombinations = markCombinationShown(
-          dailyCombinations,
-          person1.id,
-          person2.id
-        )
-        setDailyCombinations(updatedCombinations)
-      }
-
       // Calculate ELO changes
       const winner = rosterToUse.find(p => p.id === winnerId)
       const loser = rosterToUse.find(p => p.id === loserId)
@@ -307,7 +297,44 @@ export default function BattlePage() {
         setLocalRoster(updatedRoster)
       }
 
-      // Show result
+      // Mark this combination as shown and load next combo immediately (optimistic)
+      if (person1 && person2 && !isOnboarding) {
+        const updatedCombinations = markCombinationShown(
+          dailyCombinations,
+          person1.id,
+          person2.id
+        )
+        setDailyCombinations(updatedCombinations)
+
+        // Immediately load next combo
+        const nextCombination = getNextCombination(updatedCombinations)
+
+        if (nextCombination) {
+          setPerson1(nextCombination.person1)
+          setPerson2(nextCombination.person2)
+          setShowOutOfComparisons(false)
+
+          // Update progress tracking
+          const shown = updatedCombinations.filter(c => c.shown).length
+          setRemaining(updatedCombinations.length - shown)
+          setTotal(updatedCombinations.length)
+        } else {
+          // All combinations exhausted
+          setShowOutOfComparisons(true)
+          setRemaining(0)
+          setTotal(updatedCombinations.length)
+        }
+      } else if (isOnboarding) {
+        // For onboarding, regenerate fresh demo combos
+        const demoCombos = generateAllCombinations(rosterToUse)
+        const nextCombination = getNextCombination(demoCombos)
+        if (nextCombination) {
+          setPerson1(nextCombination.person1)
+          setPerson2(nextCombination.person2)
+        }
+      }
+
+      // Show result overlay (doesn't block next combo)
       setResult({
         winner: winnerId,
         winnerChange,
@@ -319,15 +346,15 @@ export default function BattlePage() {
       setShowConfetti(true)
       setTimeout(() => setShowConfetti(false), 2000)
 
-      // Auto-load next battle
+      // Clear result and re-enable after display duration
       setTimeout(() => {
-        fetchBattlePairGuest()
+        setResult(null)
+        setProcessing(false)
       }, BATTLE_RESULT_DISPLAY_DURATION)
     } catch (err) {
       if (err instanceof Error) {
         setError(err.message)
       }
-    } finally {
       setProcessing(false)
     }
   }
@@ -342,23 +369,45 @@ export default function BattlePage() {
     setError('')
 
     try {
-      const response = await fetch('/api/battles', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ winner_id: winnerId, loser_id: loserId }),
-      })
+      // Process battle and fetch next combo in parallel for better performance
+      const [battleResponse, nextPairResponse] = await Promise.all([
+        fetch('/api/battles', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ winner_id: winnerId, loser_id: loserId }),
+        }),
+        fetch('/api/battles/pair'),
+      ])
 
-      const data = await response.json()
+      const battleData = await battleResponse.json()
+      const nextPairData = await nextPairResponse.json()
 
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to process battle')
+      if (!battleResponse.ok) {
+        throw new Error(battleData.error || 'Failed to process battle')
       }
 
-      // Show result
+      // Immediately load next combo (optimistic)
+      if (nextPairResponse.ok) {
+        if (nextPairData.exhausted) {
+          setShowOutOfComparisons(true)
+          setRemaining(0)
+          setTotal(nextPairData.total || 0)
+        } else if (nextPairData.errorCode === 'EMPTY_ROSTER') {
+          setError(nextPairData.message || 'You need at least 2 people in your roster to start battles.')
+        } else {
+          setPerson1(nextPairData.person1)
+          setPerson2(nextPairData.person2)
+          setRemaining(nextPairData.remaining || 0)
+          setTotal(nextPairData.total || 0)
+          setShowOutOfComparisons(false)
+        }
+      }
+
+      // Show result overlay (doesn't block next combo)
       setResult({
         winner: winnerId,
-        winnerChange: data.winner.change,
-        loserChange: data.loser.change,
+        winnerChange: battleData.winner.change,
+        loserChange: battleData.loser.change,
       })
 
       // Trigger haptic and confetti
@@ -366,15 +415,15 @@ export default function BattlePage() {
       setShowConfetti(true)
       setTimeout(() => setShowConfetti(false), 2000)
 
-      // Auto-load next battle
+      // Clear result and re-enable after display duration
       setTimeout(() => {
-        fetchBattlePair()
+        setResult(null)
+        setProcessing(false)
       }, BATTLE_RESULT_DISPLAY_DURATION)
     } catch (err) {
       if (err instanceof Error) {
         setError(err.message)
       }
-    } finally {
       setProcessing(false)
     }
   }
