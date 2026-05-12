@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useRef, useEffect, useCallback, useState } from 'react'
 
 interface SliderProps {
   label: string
@@ -19,6 +19,40 @@ export function Slider({
   step = 1,
   showValue = true,
 }: SliderProps) {
+  const timeoutRef = useRef<NodeJS.Timeout>()
+  const [localValue, setLocalValue] = useState(value)
+
+  // Update local value when prop changes
+  useEffect(() => {
+    setLocalValue(value)
+  }, [value])
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current)
+      }
+    }
+  }, [])
+
+  // Debounced onChange handler
+  const handleChange = useCallback(
+    (newValue: number) => {
+      setLocalValue(newValue) // Update local value immediately for responsive UI
+
+      // Clear existing timeout
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current)
+      }
+
+      // Debounce the actual onChange call
+      timeoutRef.current = setTimeout(() => {
+        onChange(newValue)
+      }, 150) // 150ms debounce
+    },
+    [onChange]
+  )
   const getIcon = () => {
     if (label === 'Looks') {
       return (
@@ -52,7 +86,7 @@ export function Slider({
           <label htmlFor={`slider-${label.toLowerCase().replace(/\s+/g, '-')}`} className="text-sm font-medium text-foreground">{label}</label>
         </div>
         {showValue && (
-          <div className="text-center text-3xl font-bold text-pink" aria-live="polite" aria-atomic="true">{value}/10</div>
+          <div className="text-center text-3xl font-bold text-pink" aria-live="polite" aria-atomic="true">{localValue}/10</div>
         )}
       </div>
       <input
@@ -61,18 +95,18 @@ export function Slider({
         min={min}
         max={max}
         step={step}
-        value={value}
-        onChange={(e) => onChange(parseInt(e.target.value))}
+        value={localValue}
+        onChange={(e) => handleChange(parseInt(e.target.value))}
         className="w-full h-2 bg-border rounded-lg appearance-none cursor-pointer slider"
         aria-label={`${label} score`}
         aria-valuemin={min}
         aria-valuemax={max}
-        aria-valuenow={value}
-        aria-valuetext={`${value} out of ${max}`}
+        aria-valuenow={localValue}
+        aria-valuetext={`${localValue} out of ${max}`}
         style={{
           background: `linear-gradient(to right, var(--pink) 0%, var(--pink) ${
-            ((value - min) / (max - min)) * 100
-          }%, var(--purple) ${((value - min) / (max - min)) * 100}%, var(--purple) 100%)`,
+            ((localValue - min) / (max - min)) * 100
+          }%, var(--purple) ${((localValue - min) / (max - min)) * 100}%, var(--purple) 100%)`,
         }}
       />
       <div className="flex justify-between text-xs text-gray-500 dark:text-gray-300 mt-3">

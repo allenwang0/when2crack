@@ -122,6 +122,7 @@ export function validateUserContent(content: string): {
  */
 export class RateLimiter {
   private buckets: Map<string, { tokens: number; lastRefill: number }> = new Map()
+  private cleanupIntervalId?: NodeJS.Timeout
 
   constructor(
     private maxTokens: number = 10,
@@ -130,8 +131,19 @@ export class RateLimiter {
   ) {
     // Periodic cleanup of old buckets
     if (typeof setInterval !== 'undefined') {
-      setInterval(() => this.cleanup(), cleanupInterval)
+      this.cleanupIntervalId = setInterval(() => this.cleanup(), cleanupInterval)
     }
+  }
+
+  /**
+   * Cleanup method to stop the interval and free resources
+   */
+  destroy(): void {
+    if (this.cleanupIntervalId) {
+      clearInterval(this.cleanupIntervalId)
+      this.cleanupIntervalId = undefined
+    }
+    this.buckets.clear()
   }
 
   /**

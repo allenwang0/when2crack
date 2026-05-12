@@ -205,6 +205,36 @@ function getImageDimensions(
 }
 
 /**
+ * Validate image file on the client side
+ * Works with File objects from browser file input
+ */
+export async function validateImageClient(file: File): Promise<ImageValidationResult> {
+  try {
+    // Check file size first (quick check)
+    if (file.size > MAX_IMAGE_SIZE_BYTES) {
+      return {
+        valid: false,
+        error: `File size ${(file.size / 1024 / 1024).toFixed(2)}MB exceeds limit of ${
+          MAX_IMAGE_SIZE_BYTES / 1024 / 1024
+        }MB`,
+      }
+    }
+
+    // Read file as ArrayBuffer
+    const arrayBuffer = await file.arrayBuffer()
+    const buffer = Buffer.from(arrayBuffer)
+
+    // Use server validation logic on the buffer
+    return await validateImageServer(buffer)
+  } catch (error) {
+    return {
+      valid: false,
+      error: `Client validation error: ${error instanceof Error ? error.message : 'Unknown error'}`,
+    }
+  }
+}
+
+/**
  * Validate base64 image string
  * Used for client-uploaded images
  */

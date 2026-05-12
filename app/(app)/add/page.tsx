@@ -138,7 +138,11 @@ export default function AddPage() {
           return
         } catch (err) {
           logger.error('Guest mode localStorage error:', err)
-          setError('Failed to save locally. Your browser storage might be full.')
+          if (err instanceof Error && err.message.includes('quota')) {
+            setError('Storage quota exceeded. Please clear some data or sign in to use cloud storage.')
+          } else {
+            setError('Failed to save locally. Your browser storage might be full. Try signing in to use cloud storage.')
+          }
           setLoading(false)
           return
         }
@@ -210,7 +214,16 @@ export default function AddPage() {
     } catch (err: unknown) {
       logger.error('Add person error:', err)
       if (err instanceof Error) {
-        setError(err.message)
+        // Provide more specific error messages
+        if (err.message.includes('quota') || err.message.includes('storage')) {
+          setError('Storage quota exceeded. Please clear some data or sign in to use cloud storage.')
+        } else if (err.message.includes('network') || err.message.includes('fetch')) {
+          setError('Network error. Please check your connection and try again.')
+        } else if (err.message.includes('Failed to add to roster')) {
+          setError('Failed to save. Please try again or contact support if the issue persists.')
+        } else {
+          setError(err.message)
+        }
       } else {
         setError('An unexpected error occurred. Please try again.')
       }

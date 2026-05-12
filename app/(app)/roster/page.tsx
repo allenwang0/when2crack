@@ -23,6 +23,7 @@ export default function RosterPage() {
   const [roster, setRoster] = useState<RosterPerson[]>([])
   const [loading, setLoading] = useState(true)
   const [loadingMessage, setLoadingMessage] = useState('Loading...')
+  const [error, setError] = useState<string>('')
   const [viewMode, setViewMode] = useState<'ranked' | 'discover' | 'recent' | 'tlc'>('ranked')
 
   // Load guest roster immediately on mount (optimistic loading)
@@ -93,23 +94,27 @@ export default function RosterPage() {
     const fetchRoster = async () => {
       try {
         setLoadingMessage('Loading your roster...')
+        setError('') // Clear previous errors
 
         // Fetch roster with only needed columns for RosterCard display
-        const { data, error } = await supabase
+        const { data, error: fetchError } = await supabase
           .from('roster')
           .select('id, name, status, elo_rating, avatar_url, avatar_color, last_contact_date, attraction_score, personality_score, reliability_score')
           .eq('user_id', user.id)
           .neq('status', 'Archived')
           .order('elo_rating', { ascending: false })
 
-        if (!error && data) {
-          setRoster(data as RosterPerson[])
-        } else {
-          logger.error('Roster fetch error:', error)
+        if (fetchError) {
+          logger.error('Roster fetch error:', fetchError)
+          setError('Failed to load roster. Please try again.')
           setRoster([])
+        } else if (data) {
+          setRoster(data as RosterPerson[])
+          setError('') // Clear error on success
         }
       } catch (error) {
         logger.error('Error fetching roster:', error)
+        setError('An unexpected error occurred. Please try again.')
         setRoster([])
       } finally {
         setLoading(false)
@@ -119,6 +124,7 @@ export default function RosterPage() {
     fetchRoster()
 
     // Subscribe to realtime changes with smart delta updates
+    let isSubscribed = true // Add flag to prevent updates after unmount
     const channel = supabase
       .channel('roster_changes')
       .on(
@@ -130,6 +136,7 @@ export default function RosterPage() {
           filter: `user_id=eq.${user.id}`,
         },
         (payload: any) => {
+          if (!isSubscribed) return // Check subscription flag
           const newPerson = payload.new as RosterPerson
           if (newPerson.status !== 'Archived') {
             setRoster((prev) => [...prev, newPerson].sort((a, b) => b.elo_rating - a.elo_rating))
@@ -145,6 +152,7 @@ export default function RosterPage() {
           filter: `user_id=eq.${user.id}`,
         },
         (payload: any) => {
+          if (!isSubscribed) return // Check subscription flag
           const updatedPerson = payload.new as RosterPerson
           setRoster((prev) => {
             // Remove if archived, otherwise update
@@ -166,6 +174,7 @@ export default function RosterPage() {
           filter: `user_id=eq.${user.id}`,
         },
         (payload: any) => {
+          if (!isSubscribed) return // Check subscription flag
           const deletedId = payload.old.id
           setRoster((prev) => prev.filter((p) => p.id !== deletedId))
         }
@@ -173,6 +182,7 @@ export default function RosterPage() {
       .subscribe()
 
     return () => {
+      isSubscribed = false // Set flag to prevent updates
       supabase.removeChannel(channel)
     }
     // supabase is now a singleton, no need to track as dependency
@@ -215,6 +225,23 @@ export default function RosterPage() {
   return (
     <div className="py-6 roster-section">
       {!user && !authLoading && <GuestBanner />}
+
+      {error && (
+        <div className="mb-4 p-4 bg-red-500/10 border border-red-500/50 rounded-xl">
+          <p className="text-red-500 text-sm">{error}</p>
+          <Button
+            onClick={() => {
+              setError('')
+              window.location.reload()
+            }}
+            variant="tertiary"
+            size="sm"
+            className="mt-2"
+          >
+            Try Again
+          </Button>
+        </div>
+      )}
 
       <div className="flex items-center justify-between mb-4">
         <div>
