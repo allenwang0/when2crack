@@ -101,19 +101,19 @@ export function TonightSwipeStack({
         )}
 
         {/* Card content */}
-        <div className="p-8 h-full flex flex-col overflow-y-auto">
+        <div className="p-6 h-full flex flex-col">
           {/* Rank badge */}
-          <div className="text-pink font-bold text-lg mb-4">
+          <div className="text-pink font-bold text-base mb-3">
             #{currentIndex + 1} Tonight's Pick
           </div>
 
           {/* Avatar and name */}
-          <div className="flex flex-col items-center mb-6">
+          <div className="flex flex-col items-center mb-4">
             {person.avatar_url && person.avatar_url.trim() !== '' && person.avatar_url !== 'null' && person.avatar_url !== 'undefined' ? (
               <img
                 src={person.avatar_url}
                 alt={person.name}
-                className="w-32 h-32 rounded-full border-4 border-pink mb-4 object-cover bg-white"
+                className="w-24 h-24 rounded-full border-4 border-pink mb-3 object-cover bg-white"
                 onError={(e) => {
                   // Fallback to initials on error
                   e.currentTarget.style.display = 'none'
@@ -121,28 +121,28 @@ export function TonightSwipeStack({
               />
             ) : (
               <div
-                className="w-32 h-32 rounded-full border-4 border-pink mb-4 flex items-center justify-center text-white font-bold text-4xl"
+                className="w-24 h-24 rounded-full border-4 border-pink mb-3 flex items-center justify-center text-white font-bold text-3xl"
                 style={{ backgroundColor: person.avatar_color }}
               >
                 {initials}
               </div>
             )}
-            <h2 className="font-serif font-bold text-3xl mb-2 dark:text-gray-100">{person.name}</h2>
+            <h2 className="font-serif font-bold text-2xl mb-1 dark:text-gray-100">{person.name}</h2>
             <Badge variant="status" status={person.status}>
               {person.status}
             </Badge>
           </div>
 
           {/* Stats */}
-          <div className="space-y-4 mb-6">
-            <div className="bg-yellow-soft dark:bg-gray-700 rounded-xl p-4">
-              <p className="text-sm text-gray-600 dark:text-gray-300 mb-3 font-semibold">
+          <div className="mb-4">
+            <div className="bg-yellow-soft dark:bg-gray-700 rounded-xl p-3">
+              <p className="text-xs text-gray-600 dark:text-gray-300 mb-2 font-semibold">
                 Why tonight:
               </p>
-              <div className="space-y-2">
+              <div className="space-y-1.5">
                 <div className="flex justify-between">
-                  <span className="text-sm">Composite Score</span>
-                  <span className="font-bold">
+                  <span className="text-xs">Composite Score</span>
+                  <span className="font-bold text-sm">
                     {Math.round(
                       (person.attraction_score +
                         person.personality_score +
@@ -153,16 +153,16 @@ export function TonightSwipeStack({
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-sm">Reliability</span>
-                  <span className="font-bold text-teal">{reasoning.reliability}/10</span>
+                  <span className="text-xs">Reliability</span>
+                  <span className="font-bold text-sm text-teal">{reasoning.reliability}/10</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-sm">ELO Rating</span>
-                  <span className="font-bold">{reasoning.elo_rating}</span>
+                  <span className="text-xs">ELO Rating</span>
+                  <span className="font-bold text-sm">{reasoning.elo_rating}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-sm">Last Contact</span>
-                  <span className="font-bold">
+                  <span className="text-xs">Last Contact</span>
+                  <span className="font-bold text-sm">
                     {reasoning.recency_days === 0
                       ? 'Today'
                       : `${reasoning.recency_days}d ago`}
@@ -180,13 +180,13 @@ export function TonightSwipeStack({
                 triggerHaptic('medium')
                 onSchedule(person.id)
               }}
-              className="w-full py-3 px-4 bg-purple hover:bg-purple/90 text-white rounded-xl font-bold text-base transition-all active:scale-95 shadow-md mb-4"
+              className="w-full py-2.5 px-4 bg-purple hover:bg-purple/90 text-white rounded-xl font-bold text-sm transition-all active:scale-95 shadow-md mb-3"
             >
               📅 Schedule a Time
             </button>
 
             {/* Instructions */}
-            <div className="text-center text-sm text-gray-500 dark:text-gray-300 space-y-1">
+            <div className="text-center text-xs text-gray-500 dark:text-gray-300 space-y-0.5">
               <p>👉 Swipe right to shoot your shot</p>
               <p>👈 Swipe left to skip</p>
             </div>

@@ -24,7 +24,7 @@ export async function GET(request: NextRequest) {
 
     const { data: pairData, error: pairError } = (await supabase
       .rpc('get_next_daily_battle_pair', { p_user_id: user.id } as any)
-      .single()) as { data: BattlePairResult | null; error: any }
+      .maybeSingle()) as { data: BattlePairResult | null; error: any }
 
     if (pairError) {
       logger.error('RPC error getting battle pair:', pairError)
