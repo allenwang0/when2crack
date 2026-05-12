@@ -45,6 +45,13 @@ export function OnboardingTooltip({
     onSkip,
   })
 
+  // Ensure tooltip is scrolled into view when it appears
+  useEffect(() => {
+    if (tooltipRef.current) {
+      tooltipRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' })
+    }
+  }, [step])
+
   useEffect(() => {
     const checkMobile = () => {
       setIsMobile(window.innerWidth < 640)
@@ -143,11 +150,13 @@ export function OnboardingTooltip({
 
   const getPositionClasses = () => {
     if (isMobile) {
-      // Position above navigation bar (80px height)
+      // Position above navigation bar (64px height + safe area)
+      // Use left-4 right-4 for proper margin on mobile
       return 'fixed left-4 right-4'
     }
 
     // Desktop positioning - will be controlled by inline styles
+    // Ensure we don't exceed viewport bounds
     return 'fixed'
   }
 
@@ -156,8 +165,14 @@ export function OnboardingTooltip({
 
     // Fixed position above nav bar on mobile
     // Nav bar is h-16 (64px) + safe area padding
+    // Force the tooltip to be visible above the nav bar
     return {
       bottom: 'calc(64px + 1rem + env(safe-area-inset-bottom))', // nav height + gap + safe area
+      left: '1rem',
+      right: '1rem',
+      transform: 'none', // Override any desktop transforms
+      maxHeight: 'calc(100vh - 64px - 56px - 2rem)', // viewport - nav - header - gaps
+      overflowY: 'auto',
     }
   }
 
@@ -174,6 +189,8 @@ export function OnboardingTooltip({
         maxWidth: isMobile ? 'calc(100vw - 32px)' : '400px',
         animation: prefersReducedMotion ? 'none' : 'slideUp 300ms ease-out',
         pointerEvents: 'auto',
+        visibility: 'visible',
+        opacity: 1,
         ...getMobileStyle(),
       }}
       role="dialog"
