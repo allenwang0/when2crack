@@ -76,11 +76,10 @@ export function selectTonightBattlePair(
 
   // Filter to tonight-worthy candidates
   // People with good scores who are worth reaching out to
-  const tonightCandidates = active.filter(
-    (p) =>
-      ((p.composite_score || 0) >= 6 || (p.reliability_score || 0) >= 5) &&
-      p.status !== 'Archived'
-  )
+  const tonightCandidates = active.filter((p) => {
+    const compositeScore = (p.attraction_score + p.personality_score + p.reliability_score) / 3
+    return (compositeScore >= 6 || (p.reliability_score || 0) >= 5) && p.status !== 'Archived'
+  })
 
   // If we have enough tonight candidates, use them; otherwise use all active
   const candidatesToUse = tonightCandidates.length >= 2 ? tonightCandidates : active

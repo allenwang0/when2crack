@@ -42,7 +42,7 @@ export function TonightStats({ todayCount }: TonightStatsProps) {
         .limit(100)
 
       if (recentOutreach && recentOutreach.length > 0) {
-        const dates = recentOutreach.map(r => {
+        const dates = (recentOutreach as { outreach_date: string }[]).map(r => {
           const date = new Date(r.outreach_date)
           return date.toDateString()
         })

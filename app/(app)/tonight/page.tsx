@@ -14,11 +14,10 @@ import { OutOfComparisons } from '@/components/OutOfComparisons'
 import { Button } from '@/components/ui/Button'
 import { useLocalStorage } from '@/lib/hooks/useLocalStorage'
 import { useToast } from '@/lib/hooks/useToast'
-import { useScroll } from '@/lib/hooks/useScroll'
 import { ToastContainer } from '@/components/ui/Toast'
-import type { RosterPerson } from '@/lib/types'
+import type { RosterPerson, Database } from '@/lib/types'
 import { calculateEloChanges, calculateInitialElo } from '@/lib/algorithms/elo'
-import { API_SAFETY_TIMEOUT, BATTLE_RESULT_DISPLAY_DURATION } from '@/lib/constants'
+import { API_SAFETY_TIMEOUT } from '@/lib/constants'
 import { useOnboarding } from '@/lib/contexts/OnboardingContext'
 import { DEMO_ROSTER_PEOPLE } from '@/lib/constants/onboardingDemoData'
 
@@ -28,7 +27,6 @@ export default function TonightPage() {
   const supabase = createClient()
   const router = useRouter()
   const { toasts, showToast, removeToast } = useToast()
-  const { scrollToTop } = useScroll()
   const [localRoster, setLocalRoster] = useLocalStorage<RosterPerson[]>('guest_roster', [])
   const [completedBattles, setCompletedBattles] = useLocalStorage<string[]>('completed_battles', [])
 
@@ -259,23 +257,30 @@ export default function TonightPage() {
     try {
       if (user) {
         // Log outreach for authenticated users
-        const { error } = await supabase.from('outreach_log').insert({
-          roster_id: selectedPerson.id,
-          user_id: user.id,
-          outreach_date: new Date().toISOString(),
-          message_content: message,
-        } as any)
+        // @ts-expect-error - Supabase generated types issue
+        const { error } = await supabase
+          .from('outreach_log')
+          .insert({
+            roster_id: selectedPerson.id,
+            user_id: user.id,
+            outreach_date: new Date().toISOString(),
+          })
 
         if (error) throw error
 
-        await (supabase
-          .from('roster') as any)
-          .update({ last_contact_date: new Date().toISOString() })
+        // @ts-expect-error - Supabase generated types issue
+        const { error: updateError } = await supabase
+          .from('roster')
+          .update({
+            last_contact_date: new Date().toISOString(),
+          })
           .eq('id', selectedPerson.id)
           .eq('user_id', user.id)
+
+        if (updateError) throw updateError
       }
 
-      const firstName = selectedPerson.first_name || selectedPerson.name.split(' ')[0]
+      const firstName = selectedPerson.name.split(' ')[0]
       showToast(`Message ready for ${firstName}! 💬`, 'success')
       setMessagesCount(prev => prev + 1)
       setLastMessagedPerson(firstName)

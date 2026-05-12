@@ -122,7 +122,9 @@ export const BattleCard = memo(function BattleCard({ person, onClick, disabled }
       {/* Status Badge */}
       {person.status && person.status !== 'Regular' && (
         <div className="flex justify-center mb-4">
-          <Badge status={person.status} />
+          <Badge variant="status" status={person.status}>
+            {person.status}
+          </Badge>
         </div>
       )}
 

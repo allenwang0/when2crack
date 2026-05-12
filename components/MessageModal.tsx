@@ -38,22 +38,8 @@ export function MessageModal({ person, isOpen, onClose, onSend, onScheduleInstea
     try {
       await onSend(message)
 
-      // Try to open SMS app
-      const phone = person.phone_number || ''
-      if (phone) {
-        // Detect platform and open appropriate SMS interface
-        const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent)
-        const isAndroid = /Android/.test(navigator.userAgent)
-
-        if (isIOS) {
-          window.open(`sms:${phone}&body=${encodeURIComponent(message)}`)
-        } else if (isAndroid) {
-          window.open(`sms:${phone}?body=${encodeURIComponent(message)}`)
-        } else {
-          // Desktop - copy to clipboard
-          await navigator.clipboard.writeText(`${phone}\n${message}`)
-        }
-      }
+      // Copy message to clipboard (since phone_number not in DB yet)
+      await navigator.clipboard.writeText(message)
 
       onClose()
       setMessage('')
@@ -68,9 +54,7 @@ export function MessageModal({ person, isOpen, onClose, onSend, onScheduleInstea
     if (!message.trim()) return
 
     try {
-      const phone = person.phone_number || ''
-      const textToCopy = phone ? `${phone}\n${message}` : message
-      await navigator.clipboard.writeText(textToCopy)
+      await navigator.clipboard.writeText(message)
 
       // Visual feedback - could add a toast here
       const button = document.activeElement as HTMLButtonElement
@@ -128,11 +112,8 @@ export function MessageModal({ person, isOpen, onClose, onSend, onScheduleInstea
             )}
             <div>
               <h2 className="text-lg font-bold text-gray-900 dark:text-gray-100">
-                Message {person.first_name || person.name.split(' ')[0]}
+                Message {person.name.split(' ')[0]}
               </h2>
-              {person.phone_number && (
-                <p className="text-xs text-gray-500 dark:text-gray-400">{person.phone_number}</p>
-              )}
             </div>
           </div>
           <button
@@ -187,7 +168,7 @@ export function MessageModal({ person, isOpen, onClose, onSend, onScheduleInstea
               className="w-full"
               size="lg"
             >
-              {sending ? 'Sending...' : '💬 Send Message'}
+              {sending ? 'Copying...' : '💬 Copy & Send Message'}
             </Button>
 
             <Button

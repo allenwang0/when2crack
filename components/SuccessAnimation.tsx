@@ -31,7 +31,12 @@ export function SuccessAnimation({ count, personName }: SuccessAnimationProps) {
   const milestone = getMilestoneMessage(count)
 
   return (
-    <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 animate-slide-down">
+    <div
+      className="fixed top-4 left-1/2 -translate-x-1/2 z-50 animate-slide-down"
+      role="status"
+      aria-live="polite"
+      aria-atomic="true"
+    >
       <div className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-6 py-4 rounded-2xl shadow-2xl border-2 border-white/20">
         <div className="text-center">
           <p className="text-lg font-bold mb-1">
