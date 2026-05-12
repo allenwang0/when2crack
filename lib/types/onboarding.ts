@@ -28,6 +28,8 @@ export interface OnboardingState {
   startedAt: string | null
   completedAt: string | null
   pausedForAction: boolean
+  carouselCompleted: boolean
+  useNewOnboarding: boolean
 }
 
 export interface OnboardingContextValue {
@@ -40,4 +42,5 @@ export interface OnboardingContextValue {
   completeTour: () => void
   pauseForAction: () => void
   resumeFromAction: () => void
+  completeCarousel: () => void
 }

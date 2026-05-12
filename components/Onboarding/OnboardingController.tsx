@@ -8,6 +8,7 @@ import { useOnboarding } from '@/lib/contexts/OnboardingContext'
 import { ONBOARDING_STEPS } from '@/lib/constants/onboardingSteps'
 import { ONBOARDING, trackOnboardingEvent, ONBOARDING_ANALYTICS_EVENTS } from '@/lib/constants'
 import { WelcomeModal } from './WelcomeModal'
+import { WelcomeCarousel } from './WelcomeCarousel'
 import { SpotlightOverlay } from './SpotlightOverlay'
 import { OnboardingTooltip } from './OnboardingTooltip'
 import { ConfettiAnimation } from './ConfettiAnimation'
@@ -23,8 +24,9 @@ export function OnboardingController({ children }: OnboardingControllerProps) {
   const router = useRouter()
   const pathname = usePathname()
   const { loading: authLoading } = useAuth()
-  const { state, startTour, skipTour, nextStep, previousStep, completeTour } = useOnboarding()
+  const { state, startTour, skipTour, nextStep, previousStep, completeTour, completeCarousel } = useOnboarding()
   const [showWelcome, setShowWelcome] = useState(false)
+  const [showCarousel, setShowCarousel] = useState(false)
   const [showConfetti, setShowConfetti] = useState(false)
   const [isReady, setIsReady] = useState(false)
   const [showSkipConfirmation, setShowSkipConfirmation] = useState(false)
@@ -50,12 +52,20 @@ export function OnboardingController({ children }: OnboardingControllerProps) {
       const onboardingSkipped = localStorage.getItem('onboarding_skipped')
       const savedStep = parseInt(localStorage.getItem('onboarding_current_step') || '0', 10)
 
+      const carouselCompleted = localStorage.getItem('onboarding_carousel_completed')
+      const useNewOnboarding = localStorage.getItem('onboarding_version') !== '1' // Version 2 uses carousel
+
       // Show resume modal if user was mid-tour (step > 0 but not completed/skipped)
       if (onboardingSeen && !onboardingCompleted && !onboardingSkipped && savedStep > 0) {
         setShowResumeModal(true)
         setResumeStep(savedStep)
       } else if (!onboardingSeen && !onboardingCompleted && !onboardingSkipped) {
-        setShowWelcome(true)
+        // Use new carousel for new users
+        if (!carouselCompleted && useNewOnboarding !== false) {
+          setShowCarousel(true)
+        } else {
+          setShowWelcome(true)
+        }
       }
       setIsReady(true)
     }, ONBOARDING.AUTH_SETTLE_DELAY)
@@ -130,6 +140,21 @@ export function OnboardingController({ children }: OnboardingControllerProps) {
     nextStep() // Move to step 1
   }
 
+  const handleCarouselComplete = () => {
+    setShowCarousel(false)
+    completeCarousel()
+    // After carousel, skip directly to the app (no old-style tour)
+    skipTour()
+    router.push('/roster')
+  }
+
+  const handleCarouselSkip = () => {
+    setShowCarousel(false)
+    completeCarousel()
+    skipTour()
+    router.push('/roster')
+  }
+
   const handleSkipRequest = () => {
     setShowSkipConfirmation(true)
   }
@@ -179,8 +204,23 @@ export function OnboardingController({ children }: OnboardingControllerProps) {
   }
 
   // Don't render onboarding UI if not ready or inactive
-  if (!isReady || (!showWelcome && !showResumeModal && !state.isActive)) {
+  if (!isReady || (!showWelcome && !showCarousel && !showResumeModal && !state.isActive)) {
     return <>{children}</>
+  }
+
+  // Show carousel (new onboarding)
+  if (showCarousel) {
+    return (
+      <>
+        {children}
+        {renderInPortal(
+          <WelcomeCarousel
+            onComplete={handleCarouselComplete}
+            onSkip={handleCarouselSkip}
+          />
+        )}
+      </>
+    )
   }
 
   // Show resume modal

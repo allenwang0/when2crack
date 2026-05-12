@@ -151,6 +151,7 @@ export const ONBOARDING = {
 // Onboarding Analytics Events
 export const ONBOARDING_ANALYTICS_EVENTS = {
   STARTED: 'onboarding_started',
+  CAROUSEL_COMPLETED: 'onboarding_carousel_completed',
   STEP_VIEW: 'onboarding_step_view',
   STEP_NEXT: 'onboarding_step_next',
   STEP_PREVIOUS: 'onboarding_step_previous',

@@ -11,7 +11,7 @@ import type { OnboardingState, OnboardingContextValue } from '@/lib/types/onboar
 const OnboardingContext = createContext<OnboardingContextValue | null>(null)
 
 const INITIAL_STATE: OnboardingState = {
-  version: 1,
+  version: 2,
   currentStep: 0,
   isActive: false,
   hasCompleted: false,
@@ -19,6 +19,8 @@ const INITIAL_STATE: OnboardingState = {
   startedAt: null,
   completedAt: null,
   pausedForAction: false,
+  carouselCompleted: false,
+  useNewOnboarding: true,
 }
 
 export function OnboardingProvider({ children }: { children: React.ReactNode }) {
@@ -32,6 +34,7 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
   const [onboardingCompleted, setOnboardingCompleted, onboardingCompletedError] = useLocalStorage('onboarding_completed', false)
   const [onboardingVersion, setOnboardingVersion, onboardingVersionError] = useLocalStorage('onboarding_version', 0)
   const [onboardingSkipped, setOnboardingSkipped, onboardingSkippedError] = useLocalStorage('onboarding_skipped', false)
+  const [carouselCompleted, setCarouselCompleted, carouselCompletedError] = useLocalStorage('onboarding_carousel_completed', false)
 
   // Handle localStorage quota errors
   useEffect(() => {
@@ -40,6 +43,7 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
       onboardingCompletedError,
       onboardingVersionError,
       onboardingSkippedError,
+      carouselCompletedError,
     ]
 
     const hasQuotaError = errors.some(err => err === 'QUOTA_EXCEEDED')
@@ -48,7 +52,7 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
       showToast('Storage limit reached. Sign in to save your progress!', 'error')
       console.warn('LocalStorage quota exceeded in onboarding context')
     }
-  }, [onboardingSeenError, onboardingCompletedError, onboardingVersionError, onboardingSkippedError, showToast])
+  }, [onboardingSeenError, onboardingCompletedError, onboardingVersionError, onboardingSkippedError, carouselCompletedError, showToast])
 
   // Load saved state on mount
   useEffect(() => {
@@ -66,12 +70,18 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
         isActive: false,
       }))
     }
-  }, [onboardingCompleted, onboardingSkipped])
+    if (carouselCompleted) {
+      setState(prev => ({
+        ...prev,
+        carouselCompleted: true,
+      }))
+    }
+  }, [onboardingCompleted, onboardingSkipped, carouselCompleted])
 
   const startTour = useCallback(() => {
     const now = new Date().toISOString()
     setState({
-      version: 1,
+      version: 2,
       currentStep: 0,
       isActive: true,
       hasCompleted: false,
@@ -79,13 +89,15 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
       startedAt: now,
       completedAt: null,
       pausedForAction: false,
+      carouselCompleted: false,
+      useNewOnboarding: true,
     })
     setOnboardingSeen(true)
     setOnboardingCompleted(false)
     setOnboardingSkipped(false)
 
     // Track analytics
-    trackOnboardingEvent(ONBOARDING_ANALYTICS_EVENTS.STARTED, { version: 1 })
+    trackOnboardingEvent(ONBOARDING_ANALYTICS_EVENTS.STARTED, { version: 2 })
   }, [setOnboardingSeen, setOnboardingCompleted, setOnboardingSkipped])
 
   const skipTour = useCallback(() => {
@@ -151,7 +163,7 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
       completedAt: now,
     }))
     setOnboardingCompleted(true)
-    setOnboardingVersion(1)
+    setOnboardingVersion(2)
 
     // Track analytics
     const duration = state.startedAt
@@ -161,8 +173,22 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
     trackOnboardingEvent(ONBOARDING_ANALYTICS_EVENTS.COMPLETED, {
       duration_ms: duration,
       duration_seconds: Math.round(duration / 1000),
+      version: 2,
     })
   }, [setOnboardingCompleted, setOnboardingVersion, state.startedAt])
+
+  const completeCarousel = useCallback(() => {
+    setState(prev => ({
+      ...prev,
+      carouselCompleted: true,
+    }))
+    setCarouselCompleted(true)
+
+    // Track analytics
+    trackOnboardingEvent(ONBOARDING_ANALYTICS_EVENTS.CAROUSEL_COMPLETED, {
+      version: 2,
+    })
+  }, [setCarouselCompleted])
 
   const pauseForAction = useCallback(() => {
     setState(prev => ({
@@ -189,6 +215,7 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
     completeTour,
     pauseForAction,
     resumeFromAction,
+    completeCarousel,
   }
 
   return (
