@@ -194,6 +194,12 @@ export default function TonightPage() {
         throw new Error(data.error || 'Failed to fetch battle pair')
       }
 
+      // Check if all combinations are exhausted
+      if (data.exhausted) {
+        setShowOutOfComparisons(true)
+        return
+      }
+
       setPerson1(data.person1)
       setPerson2(data.person2)
     } catch (err) {
@@ -414,26 +420,31 @@ export default function TonightPage() {
   }
 
   // Battle completion screen
-  if (activeTab === 'battle' && showOutOfComparisons && !user) {
+  if (activeTab === 'battle' && showOutOfComparisons) {
     return (
       <div>
         {!user && !authLoading && <GuestBanner />}
         <OutOfComparisons
-          onReset={() => {
-            setCompletedBattles([])
-            const resetRoster = localRoster.map(person => ({
-              ...person,
-              elo_rating: calculateInitialElo(
-                person.attraction_score,
-                person.personality_score,
-                person.reliability_score
-              )
-            }))
-            setLocalRoster(resetRoster)
-            setShowOutOfComparisons(false)
-            fetchBattlePairGuest()
-          }}
-          totalPeople={localRoster.length}
+          isAuthenticated={!!user}
+          onReset={
+            user
+              ? undefined // Authenticated users can't reset - must wait until tomorrow
+              : () => {
+                  setCompletedBattles([])
+                  const resetRoster = localRoster.map(person => ({
+                    ...person,
+                    elo_rating: calculateInitialElo(
+                      person.attraction_score,
+                      person.personality_score,
+                      person.reliability_score
+                    )
+                  }))
+                  setLocalRoster(resetRoster)
+                  setShowOutOfComparisons(false)
+                  fetchBattlePairGuest()
+                }
+          }
+          totalPeople={user ? 0 : localRoster.length}
         />
       </div>
     )
@@ -618,13 +629,13 @@ export default function TonightPage() {
               <div className="relative">
                 <div className="grid grid-cols-2 gap-4 sm:gap-6">
                   <BattleCard
-                    person={person1}
-                    onClick={() => handleBattle(person1.id, person2.id)}
+                    person={person1!}
+                    onClick={() => handleBattle(person1!.id, person2!.id)}
                     disabled={processing}
                   />
                   <BattleCard
-                    person={person2}
-                    onClick={() => handleBattle(person2.id, person1.id)}
+                    person={person2!}
+                    onClick={() => handleBattle(person2!.id, person1!.id)}
                     disabled={processing}
                   />
                 </div>
