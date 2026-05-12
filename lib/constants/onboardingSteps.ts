@@ -38,7 +38,7 @@ export const ONBOARDING_STEPS: OnboardingStep[] = [
     autoScroll: true,
   },
   {
-    id: 5,
+    id: 4,
     route: '/tonight',
     title: 'Get Tonight\'s Picks',
     description: 'Our algorithm ranks who you should reach out to based on ELO rating, reliability score, and how recently you connected. No more overthinking who to text!',
@@ -51,7 +51,7 @@ export const ONBOARDING_STEPS: OnboardingStep[] = [
     tabState: { activeTab: 'tonight' },
   },
   {
-    id: 6,
+    id: 5,
     route: '/tonight',
     title: 'Battle to Rank',
     description: 'Can\'t decide who\'s really #1? Play head-to-head battles with your demo profiles. Your picks update ELO ratings (like chess). The more you play, the smarter your rankings get.',
@@ -64,7 +64,7 @@ export const ONBOARDING_STEPS: OnboardingStep[] = [
     tabState: { activeTab: 'battle' },
   },
   {
-    id: 7,
+    id: 6,
     route: '/profile',
     title: 'Track Your Progress',
     description: 'See your stats, unlock achievements, and customize your profile. 🎯 Pro tip: Sign in to sync your data across all devices and access full history.',
@@ -76,7 +76,7 @@ export const ONBOARDING_STEPS: OnboardingStep[] = [
     autoScroll: true,
   },
   {
-    id: 8,
+    id: 7,
     route: '/schedule',
     title: 'Share Your Availability',
     description: 'Set when you\'re free this week (6pm-2am) and generate a shareable link. They can view your schedule and share theirs back—coordinate without endless texts.',
@@ -88,7 +88,7 @@ export const ONBOARDING_STEPS: OnboardingStep[] = [
     autoScroll: true,
   },
   {
-    id: 9,
+    id: 8,
     route: '/profile',
     title: 'Need Help Anytime?',
     description: 'Tap the purple info button (top-right) anytime to revisit these tips or browse detailed FAQs. You\'ve got this! 🎉',

@@ -590,7 +590,7 @@ export default function TonightPage() {
             </div>
           )}
 
-          {!person1 || !person2 ? (
+          {!error && (!person1 || !person2) ? (
             <div className="bg-white border-2 border-dashed border-gray-300 rounded-2xl p-8 sm:p-12 text-center">
               <div className="text-5xl sm:text-6xl mb-4 sm:mb-6">⚔️</div>
               <p className="text-gray-900 font-semibold text-base sm:text-lg mb-2">Need more people</p>
