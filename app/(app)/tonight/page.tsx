@@ -276,18 +276,19 @@ export default function TonightPage() {
       }
 
       const firstName = selectedPerson.name.split(' ')[0]
-      showToast(`Message ready for ${firstName}! 💬`, 'success')
       setMessagesCount(prev => prev + 1)
       setLastMessagedPerson(firstName)
 
-      // Load next pair after a short delay
+      // Load next pair after modal closes (2 seconds total: 1.5s modal + 0.5s buffer)
       setTimeout(() => {
+        showToast(`${messagesCount + 1} ${messagesCount + 1 === 1 ? 'message' : 'messages'} sent today! 🔥`, 'success')
+
         if (user) {
           fetchBattlePair()
         } else {
           fetchBattlePairGuest()
         }
-      }, 500)
+      }, 2000)
     } catch (err) {
       console.error('Error logging outreach:', err)
       showToast('Failed to log outreach. Please try again.', 'error')

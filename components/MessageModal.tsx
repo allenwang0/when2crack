@@ -27,6 +27,7 @@ export function MessageModal({ person, isOpen, onClose, onSend, onScheduleInstea
   const router = useRouter()
   const [message, setMessage] = useState('')
   const [sending, setSending] = useState(false)
+  const [showSuccess, setShowSuccess] = useState(false)
   const initials = getInitials(person.name)
 
   if (!isOpen) return null
@@ -36,37 +37,24 @@ export function MessageModal({ person, isOpen, onClose, onSend, onScheduleInstea
 
     setSending(true)
     try {
+      // Copy to clipboard first
+      await navigator.clipboard.writeText(message)
+
+      // Log the outreach
       await onSend(message)
 
-      // Copy message to clipboard (since phone_number not in DB yet)
-      await navigator.clipboard.writeText(message)
+      // Show success state
+      setShowSuccess(true)
 
-      onClose()
-      setMessage('')
+      // Wait 1.5 seconds to show success, then close
+      setTimeout(() => {
+        setShowSuccess(false)
+        setMessage('')
+        onClose()
+      }, 1500)
     } catch (error) {
       console.error('Error sending message:', error)
-    } finally {
       setSending(false)
-    }
-  }
-
-  const handleCopy = async () => {
-    if (!message.trim()) return
-
-    try {
-      await navigator.clipboard.writeText(message)
-
-      // Visual feedback - could add a toast here
-      const button = document.activeElement as HTMLButtonElement
-      if (button) {
-        const originalText = button.textContent
-        button.textContent = '✓ Copied!'
-        setTimeout(() => {
-          button.textContent = originalText
-        }, 2000)
-      }
-    } catch (error) {
-      console.error('Error copying to clipboard:', error)
     }
   }
 
@@ -88,6 +76,17 @@ export function MessageModal({ person, isOpen, onClose, onSend, onScheduleInstea
         className="bg-white dark:bg-gray-800 rounded-t-3xl sm:rounded-3xl w-full sm:max-w-lg max-h-[85vh] sm:max-h-[90vh] overflow-y-auto shadow-2xl animate-slide-up sm:animate-scale-in"
         onClick={(e) => e.stopPropagation()}
       >
+        {/* Success State */}
+        {showSuccess && (
+          <div className="absolute inset-0 bg-green-500 dark:bg-green-600 rounded-t-3xl sm:rounded-3xl flex flex-col items-center justify-center z-10 animate-scale-in">
+            <div className="text-6xl mb-4 animate-bounce-slow">✓</div>
+            <h3 className="text-2xl font-bold text-white mb-2">Message Copied!</h3>
+            <p className="text-white/90 text-center px-6">
+              Now paste it into your messaging app
+            </p>
+          </div>
+        )}
+
         {/* Header */}
         <div className="sticky top-0 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -114,6 +113,9 @@ export function MessageModal({ person, isOpen, onClose, onSend, onScheduleInstea
               <h2 className="text-lg font-bold text-gray-900 dark:text-gray-100">
                 Message {person.name.split(' ')[0]}
               </h2>
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                Choose a message to copy
+              </p>
             </div>
           </div>
           <button
@@ -137,7 +139,11 @@ export function MessageModal({ person, isOpen, onClose, onSend, onScheduleInstea
                 <button
                   key={template}
                   onClick={() => setMessage(template)}
-                  className="w-full text-left px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl hover:bg-yellow-50 dark:hover:bg-gray-600 hover:border-yellow-400 dark:hover:border-yellow-400 transition-colors"
+                  className={`w-full text-left px-4 py-3 border rounded-xl transition-all ${
+                    message === template
+                      ? 'bg-yellow-50 dark:bg-yellow-900/20 border-yellow-400 dark:border-yellow-500 ring-2 ring-yellow-400'
+                      : 'bg-gray-50 dark:bg-gray-700 border-gray-200 dark:border-gray-600 hover:bg-yellow-50 dark:hover:bg-gray-600 hover:border-yellow-400'
+                  }`}
                 >
                   <span className="text-sm text-gray-900 dark:text-gray-100">{template}</span>
                 </button>
@@ -160,26 +166,39 @@ export function MessageModal({ person, isOpen, onClose, onSend, onScheduleInstea
             />
           </div>
 
+          {/* Preview Box */}
+          {message && (
+            <div className="bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-xl p-4">
+              <p className="text-xs font-semibold text-purple-700 dark:text-purple-300 mb-2">
+                READY TO COPY:
+              </p>
+              <p className="text-sm text-gray-900 dark:text-gray-100 font-medium">
+                "{message}"
+              </p>
+            </div>
+          )}
+
           {/* Action Buttons */}
           <div className="space-y-3">
             <Button
               onClick={handleSend}
-              disabled={!message.trim() || sending}
-              className="w-full"
+              disabled={!message.trim() || sending || showSuccess}
+              className="w-full text-lg py-4"
               size="lg"
             >
-              {sending ? 'Copying...' : '💬 Copy & Send Message'}
+              {sending ? (
+                <>
+                  <span className="inline-block animate-spin mr-2">⏳</span>
+                  Copying...
+                </>
+              ) : (
+                '📋 Copy Message'
+              )}
             </Button>
 
-            <Button
-              onClick={handleCopy}
-              disabled={!message.trim()}
-              variant="secondary"
-              className="w-full"
-              size="lg"
-            >
-              📋 Copy to Clipboard
-            </Button>
+            <p className="text-xs text-center text-gray-500 dark:text-gray-400">
+              Message will be copied to your clipboard
+            </p>
 
             <div className="relative">
               <div className="absolute inset-0 flex items-center">
