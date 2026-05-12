@@ -63,7 +63,13 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         </header>
 
         {/* Main content skeleton */}
-        <main className="flex-1 overflow-y-auto pt-14 pb-28 scroll-smooth">
+        <main
+          className="flex-1 overflow-y-auto pt-14 pb-[calc(8rem+env(safe-area-inset-bottom))] scroll-smooth"
+          style={{
+            WebkitOverflowScrolling: 'touch',
+            overscrollBehavior: 'contain'
+          }}
+        >
           <div className="max-w-md mx-auto w-full px-4 py-6">
             <div className="flex items-center justify-between mb-8">
               <div className="w-48 h-10 skeleton rounded-2xl" />
@@ -114,7 +120,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
               className="w-9 h-9 sm:w-10 sm:h-10 rounded-full flex-shrink-0"
               style={{ border: '2px solid #FFD93D' }}
             />
-            <h1 className="font-serif text-base sm:text-lg font-bold truncate text-gray-900 dark:text-gray-100">
+            <h1 className="font-serif text-xl sm:text-2xl font-bold truncate text-gray-900 dark:text-gray-100">
               when2crack
             </h1>
           </div>
@@ -226,7 +232,16 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       </header>
 
       {/* Main content - scrollable with padding for fixed header and nav */}
-      <main ref={scrollContainerRef} className="flex-1 overflow-y-auto pt-14 pb-28 scroll-smooth" role="main" aria-label="Main content">
+      <main
+        ref={scrollContainerRef}
+        className="flex-1 overflow-y-auto pt-14 pb-[calc(8rem+env(safe-area-inset-bottom))] scroll-smooth"
+        style={{
+          WebkitOverflowScrolling: 'touch',
+          overscrollBehavior: 'contain'
+        }}
+        role="main"
+        aria-label="Main content"
+      >
         <div className="max-w-md mx-auto w-full px-4">
           {children}
         </div>
