@@ -127,7 +127,7 @@ export function AchievementModal({
           </div>
 
           {/* Description */}
-          <p className="text-center text-gray-600 dark:text-gray-400 mb-4">
+          <p className="text-center text-gray-600 dark:text-gray-300 mb-4">
             {achievement.description}
           </p>
 
@@ -138,7 +138,7 @@ export function AchievementModal({
                 ✓ Unlocked
               </div>
               {unlockedAt && (
-                <div className="text-sm text-gray-600 dark:text-gray-400">
+                <div className="text-sm text-gray-600 dark:text-gray-300">
                   {formatDate(unlockedAt)}
                 </div>
               )}
@@ -151,7 +151,7 @@ export function AchievementModal({
               {/* Progress Bar */}
               {progress > 0 ? (
                 <div className="mb-4">
-                  <div className="flex justify-between text-xs text-gray-600 dark:text-gray-400 mb-2">
+                  <div className="flex justify-between text-xs text-gray-600 dark:text-gray-300 mb-2">
                     <span>Progress</span>
                     <span className="font-bold">{Math.floor(progress)}%</span>
                   </div>
@@ -169,7 +169,7 @@ export function AchievementModal({
                 <div className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">
                   How to unlock:
                 </div>
-                <div className="text-sm text-gray-600 dark:text-gray-400">
+                <div className="text-sm text-gray-600 dark:text-gray-300">
                   {achievement.hint || achievement.description}
                 </div>
                 <div className="text-xs font-semibold text-gray-500 dark:text-gray-500 mt-2">

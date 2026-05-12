@@ -221,7 +221,7 @@ export function OnboardingTooltip({
         {title}
       </h3>
 
-      <p id="onboarding-description" className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed mb-4">
+      <p id="onboarding-description" className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed mb-4">
         {description}
       </p>
 
@@ -253,14 +253,14 @@ export function OnboardingTooltip({
 
         <button
           onClick={onSkip}
-          className="text-xs text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 underline transition-colors text-center py-2"
+          className="text-xs text-gray-500 dark:text-gray-300 hover:text-gray-700 dark:hover:text-gray-200 underline transition-colors text-center py-2"
         >
           Skip Tour
         </button>
       </div>
 
       {/* Keyboard hints */}
-      <div className="text-xs text-gray-500 dark:text-gray-400 text-center mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
+      <div className="text-xs text-gray-500 dark:text-gray-300 text-center mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
         <kbd className="px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">→</kbd> Next ·{' '}
         {onPrevious && (
           <>

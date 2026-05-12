@@ -8,7 +8,7 @@ interface ProgressIndicatorProps {
 export function ProgressIndicator({ currentStep, totalSteps }: ProgressIndicatorProps) {
   return (
     <div className="flex flex-col items-center mb-4">
-      <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">
+      <p className="text-xs text-gray-500 dark:text-gray-300 mb-3">
         Step {currentStep} of {totalSteps}
       </p>
       <div className="flex gap-1.5">

@@ -536,7 +536,7 @@ export default function BattlePage() {
       </div>
 
       {/* Swipe instruction */}
-      <p className="text-center text-xs text-gray-500 dark:text-gray-400 mb-4">
+      <p className="text-center text-xs text-gray-500 dark:text-gray-300 mb-4">
         💡 Swipe right on left card or left on right card to vote
       </p>
 

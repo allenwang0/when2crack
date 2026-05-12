@@ -52,7 +52,7 @@ export function SkipConfirmationModal({ onConfirm, onCancel }: SkipConfirmationM
           Skip the tour?
         </h2>
 
-        <p id="skip-modal-description" className="text-gray-600 dark:text-gray-400 mb-6">
+        <p id="skip-modal-description" className="text-gray-600 dark:text-gray-300 mb-6">
           You can always restart the tour from the yellow info button (?) in the bottom-right corner.
         </p>
 
@@ -73,7 +73,7 @@ export function SkipConfirmationModal({ onConfirm, onCancel }: SkipConfirmationM
           </Button>
         </div>
 
-        <p className="text-xs text-gray-500 dark:text-gray-400 text-center mt-4">
+        <p className="text-xs text-gray-500 dark:text-gray-300 text-center mt-4">
           Press <kbd className="px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded">Esc</kbd> to cancel or <kbd className="px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded">Enter</kbd> to confirm
         </p>
       </div>

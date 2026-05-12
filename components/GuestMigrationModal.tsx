@@ -72,7 +72,7 @@ export function GuestMigrationModal({
         <div className="text-center mb-6">
           <div className="text-5xl mb-4">🎉</div>
           <h2 className="text-2xl font-bold mb-2 dark:text-gray-100">Welcome Back!</h2>
-          <p className="text-gray-600 dark:text-gray-400">
+          <p className="text-gray-600 dark:text-gray-300">
             We found your guest data. Would you like to transfer it to your account?
           </p>
         </div>
@@ -84,7 +84,7 @@ export function GuestMigrationModal({
             <li>✓ {stats.battlesCount} battle {stats.battlesCount === 1 ? 'comparison' : 'comparisons'}</li>
             <li>✓ All ELO ratings and scores</li>
           </ul>
-          <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+          <p className="text-xs text-gray-500 dark:text-gray-300 mt-2">
             Estimated time: {stats.estimatedTime}
           </p>
         </div>
@@ -127,7 +127,7 @@ export function GuestMigrationModal({
           </Button>
         </div>
 
-        <p className="text-xs text-gray-500 dark:text-gray-400 text-center mt-4">
+        <p className="text-xs text-gray-500 dark:text-gray-300 text-center mt-4">
           If you skip, your guest data will remain in your browser and won't be synced.
         </p>
       </div>

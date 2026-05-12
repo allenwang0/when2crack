@@ -28,7 +28,7 @@ export function TonightSwipeStack({
       <div className="text-center py-12">
         <div className="text-6xl mb-4">🎉</div>
         <h3 className="font-serif font-bold text-2xl mb-2 dark:text-gray-100">All Done!</h3>
-        <p className="text-gray-600 dark:text-gray-400">You've reviewed all recommendations</p>
+        <p className="text-gray-600 dark:text-gray-300">You've reviewed all recommendations</p>
       </div>
     )
   }
@@ -146,7 +146,7 @@ export function TonightSwipeStack({
           {/* Stats */}
           <div className="space-y-4 mb-6">
             <div className="bg-yellow-soft dark:bg-gray-700 rounded-xl p-4">
-              <p className="text-sm text-gray-600 dark:text-gray-400 mb-3 font-semibold">
+              <p className="text-sm text-gray-600 dark:text-gray-300 mb-3 font-semibold">
                 Why tonight:
               </p>
               <div className="space-y-2">
@@ -183,7 +183,7 @@ export function TonightSwipeStack({
           </div>
 
           {/* Instructions */}
-          <div className="mt-auto text-center text-sm text-gray-500 dark:text-gray-400 space-y-2">
+          <div className="mt-auto text-center text-sm text-gray-500 dark:text-gray-300 space-y-2">
             <p>👉 Swipe or drag right to shoot your shot</p>
             <p>👈 Swipe or drag left to skip</p>
             <p>👆 Swipe or drag up to schedule</p>
@@ -192,7 +192,7 @@ export function TonightSwipeStack({
       </div>
 
       {/* Counter */}
-      <div className="absolute -bottom-12 left-1/2 -translate-x-1/2 text-sm text-gray-500 dark:text-gray-400">
+      <div className="absolute -bottom-12 left-1/2 -translate-x-1/2 text-sm text-gray-500 dark:text-gray-300">
         {currentIndex + 1} / {recommendations.length}
       </div>
     </div>

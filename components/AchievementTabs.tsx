@@ -52,7 +52,7 @@ export function AchievementTabs({ tabs, activeTab, onTabChange }: AchievementTab
                       ${
                         isActive
                           ? 'bg-white/20 text-white'
-                          : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400'
+                          : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300'
                       }
                     `}
                   >

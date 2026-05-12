@@ -221,7 +221,7 @@ export default function RosterPage() {
           <h2 className="text-2xl sm:text-3xl font-serif font-bold text-gray-900 dark:text-gray-100">
             Your Roster
           </h2>
-          <span className="text-sm text-gray-600 dark:text-gray-400 mt-1 block">
+          <span className="text-sm text-gray-600 dark:text-gray-300 mt-1 block">
             {roster.length} {roster.length === 1 ? 'person' : 'people'}
           </span>
         </div>
@@ -303,7 +303,7 @@ export default function RosterPage() {
           <p className="text-gray-900 dark:text-gray-100 font-semibold text-base sm:text-lg mb-2">
             Add your first person to start
           </p>
-          <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
+          <p className="text-sm text-gray-600 dark:text-gray-300 mb-6">
             Build your roster and rank them with battles
           </p>
         </div>
@@ -311,7 +311,7 @@ export default function RosterPage() {
         <div className="bg-teal/10 dark:bg-teal/20 border-2 border-teal rounded-2xl p-6 text-center">
           <div className="text-4xl mb-3">✅</div>
           <p className="font-semibold text-teal-dark dark:text-teal mb-1">All caught up!</p>
-          <p className="text-sm text-gray-600 dark:text-gray-400">
+          <p className="text-sm text-gray-600 dark:text-gray-300">
             You've been in touch with everyone recently
           </p>
         </div>

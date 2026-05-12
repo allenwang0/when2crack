@@ -128,7 +128,7 @@ export function HelpFAQ({ isOpen, onClose }: HelpFAQProps) {
 
           {/* Footer */}
           <div className="px-6 py-3 border-t border-gray-200 dark:border-gray-700 text-center flex-shrink-0">
-            <p className="text-xs text-gray-600 dark:text-gray-400">
+            <p className="text-xs text-gray-600 dark:text-gray-300">
               Close this and reopen anytime with the info button
             </p>
           </div>

@@ -53,7 +53,7 @@ export function ResumeModal({ stepNumber, onResume, onSkip }: ResumeModalProps) 
             Welcome back!
           </h1>
 
-          <p id="resume-modal-description" className="text-base text-gray-600 dark:text-gray-400 leading-relaxed mb-8">
+          <p id="resume-modal-description" className="text-base text-gray-600 dark:text-gray-300 leading-relaxed mb-8">
             You were on step {stepNumber} of the tour. Would you like to continue where you left off?
           </p>
 
@@ -67,12 +67,12 @@ export function ResumeModal({ stepNumber, onResume, onSkip }: ResumeModalProps) 
 
           <button
             onClick={onSkip}
-            className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 underline transition-colors"
+            className="text-sm text-gray-500 dark:text-gray-300 hover:text-gray-700 dark:hover:text-gray-200 underline transition-colors"
           >
             Skip
           </button>
 
-          <p className="text-xs text-gray-500 dark:text-gray-400 text-center mt-4">
+          <p className="text-xs text-gray-500 dark:text-gray-300 text-center mt-4">
             Press <kbd className="px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded">Enter</kbd> to continue or <kbd className="px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded">Esc</kbd> to skip
           </p>
         </div>

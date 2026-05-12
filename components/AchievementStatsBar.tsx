@@ -25,7 +25,7 @@ export function AchievementStatsBar({
             <div className="font-bold text-lg text-gray-900 dark:text-gray-100">
               {unlockedCount}/{totalCount}
             </div>
-            <div className="text-xs text-gray-600 dark:text-gray-400">Unlocked</div>
+            <div className="text-xs text-gray-600 dark:text-gray-300">Unlocked</div>
           </div>
         </div>
 
@@ -35,7 +35,7 @@ export function AchievementStatsBar({
             <div className="font-bold text-lg text-yellow-bright">
               {earnedPoints}
             </div>
-            <div className="text-xs text-gray-600 dark:text-gray-400">Points</div>
+            <div className="text-xs text-gray-600 dark:text-gray-300">Points</div>
           </div>
         </div>
 
@@ -45,7 +45,7 @@ export function AchievementStatsBar({
             <div className="font-bold text-lg text-gray-900 dark:text-gray-100">
               {percentage}%
             </div>
-            <div className="text-xs text-gray-600 dark:text-gray-400">Complete</div>
+            <div className="text-xs text-gray-600 dark:text-gray-300">Complete</div>
           </div>
         </div>
       </div>

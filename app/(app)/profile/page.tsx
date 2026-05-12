@@ -205,7 +205,7 @@ export default function ProfilePage() {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] gap-3">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-pink"></div>
-        <p className="text-gray-600">Loading profile...</p>
+        <p className="text-gray-600 dark:text-gray-300">Loading profile...</p>
       </div>
     )
   }
@@ -314,7 +314,7 @@ export default function ProfilePage() {
                 </svg>
               </button>
             </div>
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-gray-500 dark:text-gray-400">
               {user ? user.email : 'Browsing in guest mode'}
             </p>
           </>
@@ -322,31 +322,31 @@ export default function ProfilePage() {
       </div>
 
       {/* Statistics Section */}
-      <h3 className="text-lg font-bold text-gray-900 mb-4 mt-6">Statistics</h3>
+      <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-4 mt-6">Statistics</h3>
       <div className="grid grid-cols-2 gap-3 mb-6 profile-stats">
         <div className="bg-white dark:bg-gray-800 border-2 border-pink/20 dark:border-pink/40 rounded-2xl p-5 text-center hover:border-pink/40 dark:hover:border-pink/60 transition-colors">
           <div className="text-4xl font-bold text-pink mb-3">{totalPeople}</div>
-          <div className="text-sm font-medium text-gray-600 dark:text-gray-400">Total People</div>
+          <div className="text-sm font-medium text-gray-600 dark:text-gray-300">Total People</div>
         </div>
         <div className="bg-white dark:bg-gray-800 border-2 border-purple/20 dark:border-purple/40 rounded-2xl p-5 text-center hover:border-purple/40 dark:hover:border-purple/60 transition-colors">
           <div className="text-4xl font-bold text-purple mb-3">{topTierCount}</div>
-          <div className="text-sm font-medium text-gray-600 dark:text-gray-400">S-Tier</div>
+          <div className="text-sm font-medium text-gray-600 dark:text-gray-300">S-Tier</div>
         </div>
         {user && (
           <div className="bg-white dark:bg-gray-800 border-2 border-teal/20 dark:border-teal/40 rounded-2xl p-5 text-center hover:border-teal/40 dark:hover:border-teal/60 transition-colors">
             <div className="text-4xl font-bold text-teal mb-3">{totalHangs}</div>
-            <div className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Hangs</div>
+            <div className="text-sm font-medium text-gray-600 dark:text-gray-300">Total Hangs</div>
           </div>
         )}
         <div className="bg-white dark:bg-gray-800 border-2 border-amber/20 dark:border-amber/40 rounded-2xl p-5 text-center hover:border-amber/40 dark:hover:border-amber/60 transition-colors">
           <div className="text-4xl font-bold text-amber mb-3">{avgCompositeScore}</div>
-          <div className="text-sm font-medium text-gray-600 dark:text-gray-400">Avg Score</div>
+          <div className="text-sm font-medium text-gray-600 dark:text-gray-300">Avg Score</div>
         </div>
       </div>
 
       {/* Quick Actions */}
-      <h3 className="text-lg font-bold text-gray-900 mb-4">Quick Actions</h3>
-      <div className="bg-white border-2 border-gray-200 rounded-2xl p-5 mb-6 shadow-sm">
+      <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-4">Quick Actions</h3>
+      <div className="bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-2xl p-5 mb-6 shadow-sm">
         <div className="space-y-3">
           <Button
             variant="primary"
@@ -371,7 +371,7 @@ export default function ProfilePage() {
             </svg>
             <div>
               <div className="font-semibold">View Roster</div>
-              <div className="text-xs text-gray-600">See all your people</div>
+              <div className="text-xs text-gray-600 dark:text-gray-400">See all your people</div>
             </div>
           </Button>
           <Button
@@ -384,7 +384,7 @@ export default function ProfilePage() {
             </svg>
             <div>
               <div className="font-semibold">Add Person</div>
-              <div className="text-xs text-gray-600">Add someone new to your roster</div>
+              <div className="text-xs text-gray-600 dark:text-gray-400">Add someone new to your roster</div>
             </div>
           </Button>
         </div>
@@ -404,18 +404,18 @@ export default function ProfilePage() {
                 <div className="text-2xl font-bold text-gray-900 dark:text-gray-100">
                   {unlockedCount}/{totalCount}
                 </div>
-                <div className="text-sm text-gray-600 dark:text-gray-400">Achievements Unlocked</div>
+                <div className="text-sm text-gray-600 dark:text-gray-300">Achievements Unlocked</div>
               </div>
               <div>
                 <div className="text-2xl font-bold text-yellow-bright">{earnedPoints}</div>
-                <div className="text-sm text-gray-600 dark:text-gray-400">Points</div>
+                <div className="text-sm text-gray-600 dark:text-gray-300">Points</div>
               </div>
             </div>
 
             {/* Recent Achievements */}
             {recentAchievements.length > 0 && (
               <div className="mb-4">
-                <div className="text-xs font-semibold text-gray-600 dark:text-gray-400 mb-2">
+                <div className="text-xs font-semibold text-gray-600 dark:text-gray-300 mb-2">
                   Recently Unlocked:
                 </div>
                 <div className="flex gap-2">

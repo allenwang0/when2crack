@@ -68,7 +68,7 @@ export class OnboardingErrorBoundary extends Component<Props, State> {
               <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">
                 Tour Paused
               </h2>
-              <p className="text-gray-600 dark:text-gray-400">
+              <p className="text-gray-600 dark:text-gray-300">
                 The onboarding tour encountered an issue. You can skip the tour or try again.
               </p>
             </div>

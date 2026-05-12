@@ -44,7 +44,7 @@ export default function AchievementsPage() {
   const handleBadgeClick = (achievement: Achievement) => {
     const achWithProgress = achievementsWithProgress.find((a) => a.id === achievement.id)
     if (achWithProgress) {
-      setSelectedAchievement(achWithProgress)
+      setSelectedAchievement(achWithProgress as AchievementWithProgress)
       setIsModalOpen(true)
     }
   }

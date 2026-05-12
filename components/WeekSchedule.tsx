@@ -357,7 +357,7 @@ export function WeekSchedule({ comparisonMode = false, comparisonName }: WeekSch
           {/* Time labels - 8pm through 4am */}
           <div className="space-y-1">
             {[20, 21, 22, 23, 0, 1, 2, 3, 4].map(hour => (
-              <div key={hour} className="w-16 text-xs text-gray-600 dark:text-gray-400 text-right pr-2 h-11 flex items-center justify-end">
+              <div key={hour} className="w-16 text-xs text-gray-600 dark:text-gray-300 text-right pr-2 h-11 flex items-center justify-end">
                 {formatHour(hour)}
               </div>
             ))}

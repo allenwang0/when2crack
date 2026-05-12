@@ -183,7 +183,7 @@ export function SpotlightOverlay({
       >
         {!targetFound && (
           <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 max-w-sm mx-4 text-center">
-            <p className="text-gray-600 dark:text-gray-400 mb-2">
+            <p className="text-gray-600 dark:text-gray-300 mb-2">
               {ONBOARDING.AUTO_SKIP_AFTER_RETRIES
                 ? 'Target element not found. Skipping to next step...'
                 : 'Looking for the next element...'}

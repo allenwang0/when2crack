@@ -26,7 +26,7 @@ export function Achievements({ achievements }: AchievementsProps) {
         <div className="inline-block bg-gradient-to-r from-pink to-purple text-white px-8 py-3 rounded-2xl mb-4 shadow-lg">
           <span className="font-bold text-xl">🏆 Achievements</span>
         </div>
-        <p className="text-sm text-gray-600 dark:text-gray-400">
+        <p className="text-sm text-gray-600 dark:text-gray-300">
           Track your progress and unlock rewards
         </p>
       </div>
@@ -59,14 +59,14 @@ export function Achievements({ achievements }: AchievementsProps) {
                 <h3 className="font-bold text-lg mb-2 text-foreground">
                   {achievement.title}
                 </h3>
-                <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
                   {achievement.description}
                 </p>
 
                 {/* Progress bar if applicable */}
                 {achievement.progress !== undefined && achievement.total && (
                   <div>
-                    <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400 mb-1">
+                    <div className="flex justify-between text-xs text-gray-500 dark:text-gray-300 mb-1">
                       <span>Progress</span>
                       <span>
                         {achievement.progress}/{achievement.total}
@@ -102,19 +102,19 @@ export function Achievements({ achievements }: AchievementsProps) {
             <div className="text-4xl font-bold mb-2 text-foreground dark:text-gray-100">
               {achievements.filter(a => a.unlocked).length}
             </div>
-            <div className="text-sm font-medium text-gray-600 dark:text-gray-400">Unlocked</div>
+            <div className="text-sm font-medium text-gray-600 dark:text-gray-300">Unlocked</div>
           </div>
           <div>
             <div className="text-4xl font-bold mb-2 text-foreground dark:text-gray-100">
               {achievements.length}
             </div>
-            <div className="text-sm font-medium text-gray-600 dark:text-gray-400">Total</div>
+            <div className="text-sm font-medium text-gray-600 dark:text-gray-300">Total</div>
           </div>
           <div>
             <div className="text-4xl font-bold mb-2 text-yellow-bright">
               {achievements.length > 0 ? Math.round((achievements.filter(a => a.unlocked).length / achievements.length) * 100) : 0}%
             </div>
-            <div className="text-sm font-medium text-gray-600 dark:text-gray-400">Complete</div>
+            <div className="text-sm font-medium text-gray-600 dark:text-gray-300">Complete</div>
           </div>
         </div>
       </div>

@@ -75,7 +75,7 @@ export function Slider({
           }%, var(--purple) ${((value - min) / (max - min)) * 100}%, var(--purple) 100%)`,
         }}
       />
-      <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400 mt-3">
+      <div className="flex justify-between text-xs text-gray-500 dark:text-gray-300 mt-3">
         <span>{min}</span>
         <span>{max}</span>
       </div>

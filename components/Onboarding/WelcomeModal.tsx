@@ -60,7 +60,7 @@ export function WelcomeModal({ onStart, onSkip }: WelcomeModalProps) {
           </h1>
 
           {/* Description */}
-          <p id="welcome-modal-description" className="text-base text-gray-600 dark:text-gray-400 leading-relaxed mb-8">
+          <p id="welcome-modal-description" className="text-base text-gray-600 dark:text-gray-300 leading-relaxed mb-8">
             When2Crack helps you manage your romantic prospects with smart rankings and recommendations. Take a 60-second tour to get started!
           </p>
 
@@ -76,13 +76,13 @@ export function WelcomeModal({ onStart, onSkip }: WelcomeModalProps) {
           {/* Skip Link */}
           <button
             onClick={onSkip}
-            className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 underline transition-colors"
+            className="text-sm text-gray-500 dark:text-gray-300 hover:text-gray-700 dark:hover:text-gray-200 underline transition-colors"
           >
             Skip
           </button>
 
           {/* Keyboard hints */}
-          <p className="text-xs text-gray-500 dark:text-gray-400 text-center mt-4">
+          <p className="text-xs text-gray-500 dark:text-gray-300 text-center mt-4">
             Press <kbd className="px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded">Enter</kbd> to start or <kbd className="px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded">Esc</kbd> to skip
           </p>
         </div>
