@@ -16,6 +16,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const [signingOut, setSigningOut] = useState(false)
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false)
   const [showFAQ, setShowFAQ] = useState(false)
+  // Apply system theme automatically (no user toggle)
+  useTheme()
   const { scrollContainerRef } = useScroll()
 
   // Initialize starter roster for new guest users
