@@ -129,9 +129,9 @@ export function useAchievements() {
   const filterByCategory = useCallback(
     (category: Achievement['category'] | 'all'): AchievementWithProgress[] => {
       if (category === 'all') {
-        return sortedAchievements
+        return sortedAchievements as AchievementWithProgress[]
       }
-      return sortedAchievements.filter((a) => a.category === category)
+      return sortedAchievements.filter((a) => a.category === category) as AchievementWithProgress[]
     },
     [sortedAchievements]
   )

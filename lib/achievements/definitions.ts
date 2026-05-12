@@ -497,12 +497,12 @@ export function getCategories(): Array<{
 /**
  * Sort achievements by priority: in-progress > recently unlocked > locked by category
  */
-export function sortAchievementsByPriority(
-  achievements: Achievement[],
+export function sortAchievementsByPriority<T extends Achievement>(
+  achievements: T[],
   progressMap: Map<string, number>,
   unlockedIds: string[],
   recentlyUnlockedIds: string[] = []
-): Achievement[] {
+): T[] {
   return [...achievements].sort((a, b) => {
     const aProgress = progressMap.get(a.id) || 0
     const bProgress = progressMap.get(b.id) || 0
