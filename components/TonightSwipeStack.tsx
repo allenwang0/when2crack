@@ -57,7 +57,7 @@ export function TonightSwipeStack({
     }, 300)
   }
 
-  const swipe = useSwipe({ onSwipe: handleSwipe, threshold: 70 })
+  const { swiping, swipeOffset, ...swipeHandlers } = useSwipe({ onSwipe: handleSwipe, threshold: 70 })
   const initials = getInitials(person.name)
 
   return (
@@ -77,11 +77,11 @@ export function TonightSwipeStack({
 
       {/* Current card */}
       <div
-        {...swipe}
+        {...swipeHandlers}
         className="absolute inset-0 bg-white dark:bg-gray-800 rounded-2xl border-2 border-gray-200 dark:border-gray-700 overflow-hidden cursor-grab active:cursor-grabbing shadow-lg"
         style={{
-          transform: swipe.swiping
-            ? `translateX(${swipe.swipeOffset.x}px) translateY(${swipe.swipeOffset.y}px) rotate(${swipe.swipeOffset.x / 20}deg)`
+          transform: swiping
+            ? `translateX(${swipeOffset.x}px) translateY(${swipeOffset.y}px) rotate(${swipeOffset.x / 20}deg)`
             : direction
             ? direction === 'right'
               ? 'translateX(500px) rotate(20deg)'
@@ -89,22 +89,22 @@ export function TonightSwipeStack({
               ? 'translateX(-500px) rotate(-20deg)'
               : 'translateY(-500px)'
             : 'none',
-          transition: swipe.swiping ? 'none' : 'transform 0.3s ease-out',
+          transition: swiping ? 'none' : 'transform 0.3s ease-out',
           zIndex: 20,
         }}
       >
         {/* Swipe indicators */}
-        {swipe.swipeOffset.x > 50 && (
+        {swipeOffset.x > 50 && (
           <div className="absolute top-8 right-8 bg-teal text-white px-6 py-3 rounded-full font-bold text-lg rotate-12 shadow-lg z-30 animate-fade-in">
             SHOOT! 🎯
           </div>
         )}
-        {swipe.swipeOffset.x < -50 && (
+        {swipeOffset.x < -50 && (
           <div className="absolute top-8 left-8 bg-gray-500 text-white px-6 py-3 rounded-full font-bold text-lg -rotate-12 shadow-lg z-30 animate-fade-in">
             SKIP
           </div>
         )}
-        {swipe.swipeOffset.y < -50 && (
+        {swipeOffset.y < -50 && (
           <div className="absolute top-8 left-1/2 -translate-x-1/2 bg-purple text-white px-6 py-3 rounded-full font-bold text-lg shadow-lg z-30 animate-fade-in">
             SCHEDULE 📅
           </div>
