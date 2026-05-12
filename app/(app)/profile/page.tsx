@@ -322,31 +322,31 @@ export default function ProfilePage() {
       </div>
 
       {/* Statistics Section */}
-      <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-4 mt-6">Statistics</h3>
-      <div className="grid grid-cols-2 gap-3 mb-6 profile-stats">
-        <div className="bg-white dark:bg-gray-800 border-2 border-pink/20 dark:border-pink/40 rounded-2xl p-5 text-center hover:border-pink/40 dark:hover:border-pink/60 transition-colors">
+      <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-4 sm:mb-6 mt-6">Statistics</h3>
+      <div className="grid grid-cols-2 gap-3 sm:gap-4 mb-6 profile-stats">
+        <div className="bg-white dark:bg-gray-800 border-2 border-pink/20 dark:border-pink/40 rounded-2xl p-5 sm:p-6 text-center hover:border-pink/40 dark:hover:border-pink/60 transition-colors">
           <div className="text-4xl font-bold text-pink mb-3">{totalPeople}</div>
           <div className="text-sm font-medium text-gray-600 dark:text-gray-300">Total People</div>
         </div>
-        <div className="bg-white dark:bg-gray-800 border-2 border-purple/20 dark:border-purple/40 rounded-2xl p-5 text-center hover:border-purple/40 dark:hover:border-purple/60 transition-colors">
+        <div className="bg-white dark:bg-gray-800 border-2 border-purple/20 dark:border-purple/40 rounded-2xl p-5 sm:p-6 text-center hover:border-purple/40 dark:hover:border-purple/60 transition-colors">
           <div className="text-4xl font-bold text-purple mb-3">{topTierCount}</div>
           <div className="text-sm font-medium text-gray-600 dark:text-gray-300">S-Tier</div>
         </div>
         {user && (
-          <div className="bg-white dark:bg-gray-800 border-2 border-teal/20 dark:border-teal/40 rounded-2xl p-5 text-center hover:border-teal/40 dark:hover:border-teal/60 transition-colors">
+          <div className="bg-white dark:bg-gray-800 border-2 border-teal/20 dark:border-teal/40 rounded-2xl p-5 sm:p-6 text-center hover:border-teal/40 dark:hover:border-teal/60 transition-colors">
             <div className="text-4xl font-bold text-teal mb-3">{totalHangs}</div>
             <div className="text-sm font-medium text-gray-600 dark:text-gray-300">Total Hangs</div>
           </div>
         )}
-        <div className="bg-white dark:bg-gray-800 border-2 border-amber/20 dark:border-amber/40 rounded-2xl p-5 text-center hover:border-amber/40 dark:hover:border-amber/60 transition-colors">
+        <div className="bg-white dark:bg-gray-800 border-2 border-amber/20 dark:border-amber/40 rounded-2xl p-5 sm:p-6 text-center hover:border-amber/40 dark:hover:border-amber/60 transition-colors">
           <div className="text-4xl font-bold text-amber mb-3">{avgCompositeScore}</div>
           <div className="text-sm font-medium text-gray-600 dark:text-gray-300">Avg Score</div>
         </div>
       </div>
 
       {/* Quick Actions */}
-      <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-4">Quick Actions</h3>
-      <div className="bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-2xl p-5 mb-6 shadow-sm">
+      <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-4 sm:mb-6">Quick Actions</h3>
+      <div className="bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-2xl p-5 sm:p-6 mb-6 shadow-sm">
         <div className="space-y-3">
           <Button
             variant="primary"

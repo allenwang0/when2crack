@@ -2,6 +2,10 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { checkUnlockedAchievements, ACHIEVEMENTS } from '@/lib/achievements/definitions'
 import type { UserStats } from '@/lib/achievements/definitions'
+import { validateAuth } from '@/lib/api/validation'
+import { logger } from '@/lib/utils/logger'
+import type { SupabaseClient } from '@supabase/supabase-js'
+import type { Database } from '@/lib/types'
 
 /**
  * GET /api/achievements
@@ -26,13 +30,13 @@ export async function GET(request: NextRequest) {
       .eq('user_id', user.id)
 
     if (achievementsError) {
-      console.error('Error fetching achievements:', achievementsError)
+      logger.error('Error fetching achievements:', achievementsError)
       return NextResponse.json({ unlocked: [], newUnlocks: [] })
     }
 
     // Get user stats to check for new achievements
     const stats = await getUserStats(user.id, supabase)
-    const currentlyUnlocked = achievements?.map((a: any) => a.achievement_id) || []
+    const currentlyUnlocked = (achievements as any)?.map((a: any) => a.achievement_id) || []
     const newUnlocks = checkUnlockedAchievements(stats, currentlyUnlocked)
 
     // Save new achievements
@@ -42,6 +46,7 @@ export async function GET(request: NextRequest) {
         achievement_id: a.id,
         unlocked_at: new Date().toISOString(),
         seen: false,
+        progress: 0,
       }))
 
       await (supabase.from('user_achievements') as any).insert(newAchievements)
@@ -54,7 +59,7 @@ export async function GET(request: NextRequest) {
       stats, // Include stats for progress calculation on client
     })
   } catch (error) {
-    console.error('Error in achievements API:', error)
+    logger.error('Error in achievements API:', error)
     return NextResponse.json(
       { error: 'Failed to fetch achievements' },
       { status: 500 }
@@ -96,7 +101,7 @@ export async function POST(request: NextRequest) {
       .in('achievement_id', achievementIds)
 
     if (error) {
-      console.error('Error marking achievements as seen:', error)
+      logger.error('Error marking achievements as seen:', error)
       return NextResponse.json(
         { error: 'Failed to update achievements' },
         { status: 500 }
@@ -105,7 +110,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ success: true })
   } catch (error) {
-    console.error('Error in mark-seen API:', error)
+    logger.error('Error in mark-seen API:', error)
     return NextResponse.json(
       { error: 'Failed to mark achievements as seen' },
       { status: 500 }
@@ -116,7 +121,10 @@ export async function POST(request: NextRequest) {
 /**
  * Get user statistics for achievement checking
  */
-async function getUserStats(userId: string, supabase: any): Promise<UserStats> {
+async function getUserStats(
+  userId: string,
+  supabase: SupabaseClient<Database>
+): Promise<UserStats> {
   // Fetch roster count
   const { count: rosterCount } = await supabase
     .from('roster')
@@ -166,6 +174,6 @@ async function getUserStats(userId: string, supabase: any): Promise<UserStats> {
     totalLogins: 0, // TODO: Track in DB
     when2cracksSent,
     scheduleShares: when2cracksSent, // Same as when2cracks for now
-    accountCreatedDate: userData?.created_at || new Date().toISOString(),
+    accountCreatedDate: (userData as any)?.created_at || new Date().toISOString(),
   }
 }

@@ -45,11 +45,8 @@ export function TonightSwipeStack({
       triggerHaptic('light')
       setDirection('left')
       onSkip(person.id)
-    } else if (swipeDirection === 'up') {
-      triggerHaptic('medium')
-      setDirection('up')
-      onSchedule(person.id)
     }
+    // Removed vertical swipe handling to prevent scroll conflicts
 
     setTimeout(() => {
       setCurrentIndex((prev) => prev + 1)
@@ -81,13 +78,11 @@ export function TonightSwipeStack({
         className="absolute inset-0 bg-white dark:bg-gray-800 rounded-2xl border-2 border-gray-200 dark:border-gray-700 overflow-hidden cursor-grab active:cursor-grabbing shadow-lg"
         style={{
           transform: swiping
-            ? `translateX(${swipeOffset.x}px) translateY(${swipeOffset.y}px) rotate(${swipeOffset.x / 20}deg)`
-            : direction
-            ? direction === 'right'
-              ? 'translateX(500px) rotate(20deg)'
-              : direction === 'left'
-              ? 'translateX(-500px) rotate(-20deg)'
-              : 'translateY(-500px)'
+            ? `translateX(${swipeOffset.x}px) rotate(${swipeOffset.x / 20}deg)`
+            : direction === 'right'
+            ? 'translateX(500px) rotate(20deg)'
+            : direction === 'left'
+            ? 'translateX(-500px) rotate(-20deg)'
             : 'none',
           transition: swiping ? 'none' : 'transform 0.3s ease-out',
           zIndex: 20,
@@ -102,11 +97,6 @@ export function TonightSwipeStack({
         {swipeOffset.x < -50 && (
           <div className="absolute top-8 left-8 bg-gray-500 text-white px-6 py-3 rounded-full font-bold text-lg -rotate-12 shadow-lg z-30 animate-fade-in">
             SKIP
-          </div>
-        )}
-        {swipeOffset.y < -50 && (
-          <div className="absolute top-8 left-1/2 -translate-x-1/2 bg-purple text-white px-6 py-3 rounded-full font-bold text-lg shadow-lg z-30 animate-fade-in">
-            SCHEDULE 📅
           </div>
         )}
 
@@ -182,11 +172,24 @@ export function TonightSwipeStack({
             </div>
           </div>
 
-          {/* Instructions */}
-          <div className="mt-auto text-center text-sm text-gray-500 dark:text-gray-300 space-y-2">
-            <p>👉 Swipe or drag right to shoot your shot</p>
-            <p>👈 Swipe or drag left to skip</p>
-            <p>👆 Swipe or drag up to schedule</p>
+          {/* Action Button */}
+          <div className="mt-auto">
+            <button
+              onClick={(e) => {
+                e.stopPropagation()
+                triggerHaptic('medium')
+                onSchedule(person.id)
+              }}
+              className="w-full py-3 px-4 bg-purple hover:bg-purple/90 text-white rounded-xl font-bold text-base transition-all active:scale-95 shadow-md mb-4"
+            >
+              📅 Schedule a Time
+            </button>
+
+            {/* Instructions */}
+            <div className="text-center text-sm text-gray-500 dark:text-gray-300 space-y-1">
+              <p>👉 Swipe right to shoot your shot</p>
+              <p>👈 Swipe left to skip</p>
+            </div>
           </div>
         </div>
       </div>

@@ -7,6 +7,8 @@
 export const ELO_K_FACTOR = 32
 export const ELO_DEFAULT_RATING = 1000
 export const ELO_SCORE_MULTIPLIER = 10 // Used when initializing from composite scores
+export const ELO_MIN = 0
+export const ELO_MAX = 3000
 
 // Timeouts (in milliseconds)
 export const AUTH_INITIALIZATION_TIMEOUT = 5000 // Increased from 3000

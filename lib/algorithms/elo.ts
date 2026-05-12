@@ -1,7 +1,7 @@
 // Elo rating system for pairwise battle comparisons
 // Based on the Elo algorithm used in chess, adapted for roster ranking
 
-import { ELO_K_FACTOR, ELO_DEFAULT_RATING, ELO_SCORE_MULTIPLIER } from '@/lib/constants'
+import { ELO_K_FACTOR, ELO_DEFAULT_RATING, ELO_SCORE_MULTIPLIER, ELO_MIN, ELO_MAX } from '@/lib/constants'
 
 /**
  * Calculate expected score for a player
@@ -26,8 +26,12 @@ export function updateElo(
   const expectedWinner = calculateExpectedScore(winnerRating, loserRating)
   const expectedLoser = calculateExpectedScore(loserRating, winnerRating)
 
-  const newWinnerRating = winnerRating + ELO_K_FACTOR * (1 - expectedWinner)
-  const newLoserRating = loserRating + ELO_K_FACTOR * (0 - expectedLoser)
+  let newWinnerRating = winnerRating + ELO_K_FACTOR * (1 - expectedWinner)
+  let newLoserRating = loserRating + ELO_K_FACTOR * (0 - expectedLoser)
+
+  // Enforce ELO bounds to prevent extreme ratings
+  newWinnerRating = Math.max(ELO_MIN, Math.min(ELO_MAX, newWinnerRating))
+  newLoserRating = Math.max(ELO_MIN, Math.min(ELO_MAX, newLoserRating))
 
   return [Math.round(newWinnerRating), Math.round(newLoserRating)]
 }

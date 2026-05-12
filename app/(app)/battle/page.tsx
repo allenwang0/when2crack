@@ -497,7 +497,7 @@ export default function BattlePage() {
 
     return (
       <div className="py-6">
-        <h2 className="text-2xl font-serif font-bold mb-4">Battle</h2>
+        <h2 className="text-2xl font-serif font-bold mb-4 sm:mb-6">Battle</h2>
         <div className="bg-card border border-border rounded-lg p-6 text-center">
           <div className="text-6xl mb-4">
             {isEmptyRosterError ? '👥' : '⚠️'}

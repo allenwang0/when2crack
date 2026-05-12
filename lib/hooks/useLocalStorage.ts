@@ -80,6 +80,9 @@ export function useLocalStorage<T>(key: string, initialValue: T) {
       const valueToStore =
         value instanceof Function ? value(storedValue) : value
 
+      // Store previous value for potential rollback
+      const previousValue = storedValue
+
       // Update state immediately for responsive UI
       setStoredValue(valueToStore)
       // Store latest value for potential unmount flush
@@ -101,6 +104,9 @@ export function useLocalStorage<T>(key: string, initialValue: T) {
             if (dataSize > available) {
               setError('QUOTA_EXCEEDED')
               showQuotaError()
+              // Revert state to previous value
+              setStoredValue(previousValue)
+              latestValueRef.current = previousValue
               return
             }
 
@@ -113,8 +119,14 @@ export function useLocalStorage<T>(key: string, initialValue: T) {
             if (error.name === 'QuotaExceededError' || error.code === 22) {
               setError('QUOTA_EXCEEDED')
               showQuotaError()
+              // Revert state to previous value
+              setStoredValue(previousValue)
+              latestValueRef.current = previousValue
             } else {
               logger.error('localStorage error:', error)
+              // For other errors, also revert to be safe
+              setStoredValue(previousValue)
+              latestValueRef.current = previousValue
             }
           }
         }, 300) // 300ms debounce - increased to reduce event loop blocking

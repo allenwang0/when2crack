@@ -101,12 +101,12 @@ export default function SchedulePage() {
       </div>
 
       {sharedFor && (
-        <div className="bg-gradient-to-r from-pink-50 to-purple-50 border-2 border-pink/60 rounded-2xl p-5 mb-6 text-center shadow-sm">
-          <div className="text-2xl mb-2">📅</div>
-          <p className="text-sm font-bold text-gray-900 mb-1">
+        <div className="bg-gradient-to-r from-pink-50 to-purple-50 dark:from-pink-950/20 dark:to-purple-950/20 border-2 border-pink/60 rounded-2xl p-5 sm:p-6 mb-6 text-center shadow-sm">
+          <div className="text-2xl mb-3">📅</div>
+          <p className="text-sm font-bold text-gray-900 dark:text-gray-100 mb-2">
             Scheduling with <span className="text-pink">{sharedFor}</span>
           </p>
-          <p className="text-xs text-gray-700">
+          <p className="text-xs text-gray-700 dark:text-gray-300">
             Mark your free times below to coordinate a hangout
           </p>
         </div>
@@ -116,13 +116,13 @@ export default function SchedulePage() {
 
       {/* Share Schedule Section - Only show when NOT in comparison mode */}
       {!sharedFor && (
-        <div className="mt-8 bg-gradient-to-r from-pink-50 to-purple-50 border-2 border-pink/60 rounded-2xl p-6 text-center shadow-sm">
-          <div className="mb-5">
-            <div className="text-4xl mb-3">💌</div>
-            <h3 className="font-bold text-lg text-gray-900 mb-2">
+        <div className="mt-8 sm:mt-12 bg-gradient-to-r from-pink-50 to-purple-50 dark:from-pink-950/20 dark:to-purple-950/20 border-2 border-pink/60 rounded-2xl p-6 sm:p-8 text-center shadow-sm">
+          <div className="mb-5 sm:mb-6">
+            <div className="text-4xl mb-3 sm:mb-4">💌</div>
+            <h3 className="font-bold text-lg text-gray-900 dark:text-gray-100 mb-2 sm:mb-3">
               Share Your When2Crack
             </h3>
-            <p className="text-sm text-gray-700">
+            <p className="text-sm text-gray-700 dark:text-gray-300">
               Send your availability to coordinate a hangout
             </p>
           </div>

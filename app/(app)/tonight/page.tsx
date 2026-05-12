@@ -491,16 +491,16 @@ export default function TonightPage() {
       {activeTab === 'tonight' && (
         <div className="tonight-recommendations">
           <div className="text-center mb-6">
-            <h2 className="text-2xl sm:text-3xl font-serif font-bold mb-2 text-gray-900 dark:text-gray-100">
+            <h2 className="text-2xl sm:text-3xl font-serif font-bold mb-3 sm:mb-4 text-gray-900 dark:text-gray-100">
               Tonight's Top Picks
             </h2>
-            <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
+            <p className="text-sm text-gray-600 dark:text-gray-300 mb-6 sm:mb-8">
               Weighted by reliability, recency, and vibe
             </p>
 
             {/* View toggle */}
             {recommendations.length > 0 && (
-              <div className="flex gap-2 justify-center mb-4">
+              <div className="flex gap-3 sm:gap-4 justify-center mb-4">
                 <button
                   onClick={() => setViewMode('stack')}
                   className={`px-4 py-2 rounded-full text-sm font-semibold transition-colors ${
@@ -583,8 +583,8 @@ export default function TonightPage() {
       {activeTab === 'battle' && (
         <div className="battle-section">
           <div className="text-center mb-6">
-            <h2 className="text-2xl sm:text-3xl font-serif font-bold mb-2 text-gray-900 dark:text-gray-100">Battle Mode</h2>
-            <p className="text-sm text-gray-600 dark:text-gray-300 mb-3">
+            <h2 className="text-2xl sm:text-3xl font-serif font-bold mb-3 sm:mb-4 text-gray-900 dark:text-gray-100">Battle Mode</h2>
+            <p className="text-sm text-gray-600 dark:text-gray-300 mb-4 sm:mb-6">
               Right now, tonight — who would you rather?
             </p>
             {!user && totalPossibleBattles > 0 && (

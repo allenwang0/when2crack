@@ -126,7 +126,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       clearTimeout(timeout)
       subscription.unsubscribe()
     }
-  }, [supabase, ensureUserProfile, loading])
+    // loading is set inside effect, not a dependency
+  }, [supabase, ensureUserProfile])
 
   const signOut = async () => {
     try {

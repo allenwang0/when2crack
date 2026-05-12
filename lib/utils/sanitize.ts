@@ -36,11 +36,12 @@ export function sanitizeNotes(notes: string): string {
 
 /**
  * Validate and sanitize score input (1-10)
+ * Preserves decimal values before rounding to integer
  */
 export function sanitizeScore(score: number): number {
-  const num = parseInt(String(score), 10)
-  if (isNaN(num)) return 5 // Default to middle
-  return Math.max(1, Math.min(10, num))
+  const num = Number(score)
+  if (isNaN(num) || !isFinite(num)) return 5 // Default to middle
+  return Math.max(1, Math.min(10, Math.round(num)))
 }
 
 /**
@@ -100,4 +101,21 @@ export function sanitizeUrl(url: string): string {
   }
 
   return url.trim()
+}
+
+/**
+ * Sanitize avatar URL
+ * Allows data: URLs for base64 images (validated on upload)
+ * Sanitizes HTTP/HTTPS URLs
+ */
+export function sanitizeAvatarUrl(url: string | null): string | null {
+  if (!url) return null
+
+  // Base64 data URLs are safe (already validated on upload via imageValidation.ts)
+  if (url.startsWith('data:image/')) {
+    return url
+  }
+
+  // HTTP/HTTPS URLs - sanitize using existing function
+  return sanitizeUrl(url) || null
 }

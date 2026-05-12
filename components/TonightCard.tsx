@@ -32,14 +32,14 @@ export const TonightCard = memo(function TonightCard({ recommendation, rank, onS
   }
 
   return (
-    <div className="bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-2xl p-5 hover:border-yellow-400 hover:shadow-lg transition-all duration-200">
+    <div className="bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-2xl p-5 sm:p-6 hover:border-yellow-400 hover:shadow-lg transition-all duration-200">
       {/* Rank */}
-      <div className={`text-sm font-semibold mb-3 ${rankColors[rank] || 'text-gray-600 dark:text-gray-300'}`}>
+      <div className={`text-sm font-semibold mb-3 sm:mb-4 ${rankColors[rank] || 'text-gray-600 dark:text-gray-300'}`}>
         {rankLabels[rank] || `#${rank}`}
       </div>
 
       {/* Person Info */}
-      <div className="flex items-start gap-4 mb-4">
+      <div className="flex items-start gap-4 mb-4 sm:mb-5">
         {person.avatar_url && person.avatar_url.trim() !== '' && person.avatar_url !== 'null' && person.avatar_url !== 'undefined' ? (
           <div className="w-16 h-16 rounded-full overflow-hidden flex-shrink-0 border-2 border-pink bg-white dark:bg-gray-800">
             <img
@@ -78,7 +78,7 @@ export const TonightCard = memo(function TonightCard({ recommendation, rank, onS
       </div>
 
       {/* Reasoning - Increased Contrast */}
-      <div className="bg-yellow-soft dark:bg-yellow-900/20 rounded-xl p-4 mb-4 space-y-3 border border-yellow-bright/20 dark:border-yellow-bright/30">
+      <div className="bg-yellow-soft dark:bg-yellow-900/20 rounded-xl p-4 sm:p-5 mb-4 sm:mb-5 space-y-3 border border-yellow-bright/20 dark:border-yellow-bright/30">
         <p className="text-xs text-gray-700 dark:text-gray-300 font-semibold mb-2">Why tonight:</p>
         <div className="flex items-center justify-between text-sm">
           <span className="text-gray-700 dark:text-gray-300">Composite</span>

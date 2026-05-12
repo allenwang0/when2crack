@@ -111,7 +111,7 @@ export default function AchievementsPage() {
 
       {/* Header */}
       <div className="text-center mb-6">
-        <h1 className="text-3xl font-serif font-bold mb-2 text-gray-900 dark:text-gray-100">
+        <h1 className="text-3xl font-serif font-bold mb-4 sm:mb-6 text-gray-900 dark:text-gray-100">
           Achievements
         </h1>
         <p className="text-sm text-gray-600 dark:text-gray-300">

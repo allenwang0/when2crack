@@ -241,7 +241,7 @@ export default function RosterPage() {
 
       {/* View mode tabs */}
       {roster.length > 0 && (
-        <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
+        <div className="flex gap-3 sm:gap-4 mb-6 overflow-x-auto pb-2">
           <button
             onClick={() => {
               setViewMode('ranked')

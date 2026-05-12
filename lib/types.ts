@@ -168,6 +168,162 @@ export type Database = {
           created_at?: string
         }
       }
+      user_achievements: {
+        Row: {
+          id: string
+          user_id: string
+          achievement_id: string
+          unlocked_at: string
+          seen: boolean
+          progress: number
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          achievement_id: string
+          unlocked_at?: string
+          seen?: boolean
+          progress?: number
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          achievement_id?: string
+          unlocked_at?: string
+          seen?: boolean
+          progress?: number
+          created_at?: string
+        }
+      }
+      user_schedules: {
+        Row: {
+          id: string
+          user_id: string
+          schedule_data: any
+          updated_at: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          schedule_data?: any
+          updated_at?: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          schedule_data?: any
+          updated_at?: string
+          created_at?: string
+        }
+      }
+      when2crack_shares: {
+        Row: {
+          id: string
+          sender_id: string
+          recipient_roster_id: string
+          schedule_data: any
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          sender_id: string
+          recipient_roster_id: string
+          schedule_data?: any
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          sender_id?: string
+          recipient_roster_id?: string
+          schedule_data?: any
+          created_at?: string
+        }
+      }
+      daily_battle_combinations: {
+        Row: {
+          id: string
+          user_id: string
+          person1_id: string
+          person2_id: string
+          shown: boolean
+          shown_order: number | null
+          date: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          person1_id: string
+          person2_id: string
+          shown?: boolean
+          shown_order?: number | null
+          date?: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          person1_id?: string
+          person2_id?: string
+          shown?: boolean
+          shown_order?: number | null
+          date?: string
+          created_at?: string
+        }
+      }
+    }
+    Functions: {
+      process_battle: {
+        Args: {
+          p_user_id: string
+          p_winner_id: string
+          p_loser_id: string
+        }
+        Returns: {
+          success: boolean
+          winner: {
+            id: string
+            old_rating: number
+            new_rating: number
+            change: number
+          }
+          loser: {
+            id: string
+            old_rating: number
+            new_rating: number
+            change: number
+          }
+        }
+      }
+      get_next_daily_battle_pair: {
+        Args: {
+          p_user_id: string
+        }
+        Returns: {
+          person1_id: string | null
+          person2_id: string | null
+          remaining_count: number
+          total_count: number
+        }
+      }
+      mark_combination_shown: {
+        Args: {
+          p_user_id: string
+          p_person1_id: string
+          p_person2_id: string
+        }
+        Returns: void
+      }
+      initialize_daily_combinations: {
+        Args: {
+          p_user_id: string
+        }
+        Returns: void
+      }
     }
   }
 }

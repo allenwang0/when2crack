@@ -1,19 +1,17 @@
-import { NextResponse } from 'next/server'
+import { NextResponse, NextRequest } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { selectBattlePair } from '@/lib/algorithms/battles'
 import type { RosterPerson, Battle } from '@/lib/types'
+import { validateAuth } from '@/lib/api/validation'
+import { logger } from '@/lib/utils/logger'
 
-export async function GET() {
-  const supabase = await createClient()
-
-  // Get authenticated user
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
-  if (!user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+export async function GET(request: NextRequest) {
+  // Validate authentication
+  const authResult = await validateAuth(request)
+  if (authResult.error) {
+    return authResult.error
   }
+  const { user, supabase } = authResult
 
   try {
     // Get next battle pair using the daily combination system
@@ -24,12 +22,12 @@ export async function GET() {
       total_count: number
     }
 
-    const { data: pairData, error: pairError } = await supabase
+    const { data: pairData, error: pairError } = (await supabase
       .rpc('get_next_daily_battle_pair', { p_user_id: user.id } as any)
-      .single() as { data: BattlePairResult | null; error: any }
+      .single()) as { data: BattlePairResult | null; error: any }
 
     if (pairError) {
-      console.error('RPC error getting battle pair:', pairError)
+      logger.error('RPC error getting battle pair:', pairError)
       throw pairError
     }
 
@@ -43,13 +41,13 @@ export async function GET() {
         .neq('status', 'Archived')
 
       if (countError) {
-        console.error('Error checking roster count:', countError)
+        logger.error('Error checking roster count:', countError)
         throw countError
       }
 
       // If roster is empty or has < 2 people, return empty roster error
       if (!count || count < 2) {
-        console.log(`User ${user.id} has insufficient roster (${count} people)`)
+        logger.info(`User ${user.id} has insufficient roster (${count} people)`)
         return NextResponse.json(
           {
             errorCode: 'EMPTY_ROSTER',
@@ -62,7 +60,7 @@ export async function GET() {
       }
 
       // Otherwise, all combinations are exhausted for today
-      console.log(`User ${user.id} exhausted all daily combinations (total: ${pairData?.total_count || 0})`)
+      logger.info(`User ${user.id} exhausted all daily combinations (total: ${pairData?.total_count || 0})`)
       return NextResponse.json(
         {
           exhausted: true,
@@ -82,7 +80,7 @@ export async function GET() {
       .single()
 
     if (p1Error || !person1Data) {
-      console.error('Error fetching person1:', p1Error)
+      logger.error('Error fetching person1:', p1Error)
       throw p1Error || new Error('Person1 not found')
     }
 
@@ -93,14 +91,14 @@ export async function GET() {
       .single()
 
     if (p2Error || !person2Data) {
-      console.error('Error fetching person2:', p2Error)
+      logger.error('Error fetching person2:', p2Error)
       throw p2Error || new Error('Person2 not found')
     }
 
     const person1 = person1Data as RosterPerson
     const person2 = person2Data as RosterPerson
 
-    console.log(`Successfully fetched battle pair for user ${user.id}: ${person1.name} vs ${person2.name}`)
+    logger.info(`Successfully fetched battle pair for user ${user.id}: ${person1.name} vs ${person2.name}`)
     return NextResponse.json({
       person1,
       person2,
@@ -108,7 +106,7 @@ export async function GET() {
       total: pairData.total_count,
     })
   } catch (error) {
-    console.error('Error getting battle pair:', error)
+    logger.error('Error getting battle pair:', error)
     return NextResponse.json(
       {
         errorCode: 'SYSTEM_ERROR',
