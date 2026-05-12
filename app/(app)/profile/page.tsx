@@ -194,8 +194,8 @@ export default function ProfilePage() {
 
   // Get recent achievements (3 most recent unlocked)
   const recentAchievements = achievementsWithProgress
-    .filter(a => a.isUnlocked)
-    .sort((a, b) => {
+    .filter((a: any) => a.isUnlocked)
+    .sort((a: any, b: any) => {
       if (!a.unlockedAt || !b.unlockedAt) return 0
       return new Date(b.unlockedAt).getTime() - new Date(a.unlockedAt).getTime()
     })
@@ -314,7 +314,7 @@ export default function ProfilePage() {
                 </svg>
               </button>
             </div>
-            <p className="text-sm text-gray-500 dark:text-gray-400">
+            <p className="text-sm text-gray-500 dark:text-gray-300">
               {user ? user.email : 'Browsing in guest mode'}
             </p>
           </>
@@ -371,7 +371,7 @@ export default function ProfilePage() {
             </svg>
             <div>
               <div className="font-semibold">View Roster</div>
-              <div className="text-xs text-gray-600 dark:text-gray-400">See all your people</div>
+              <div className="text-xs text-gray-600 dark:text-gray-300">See all your people</div>
             </div>
           </Button>
           <Button
@@ -384,7 +384,7 @@ export default function ProfilePage() {
             </svg>
             <div>
               <div className="font-semibold">Add Person</div>
-              <div className="text-xs text-gray-600 dark:text-gray-400">Add someone new to your roster</div>
+              <div className="text-xs text-gray-600 dark:text-gray-300">Add someone new to your roster</div>
             </div>
           </Button>
         </div>

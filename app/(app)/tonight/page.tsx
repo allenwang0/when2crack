@@ -588,7 +588,7 @@ export default function TonightPage() {
               Right now, tonight — who would you rather?
             </p>
             {!user && totalPossibleBattles > 0 && (
-              <p className="text-xs text-gray-500 dark:text-gray-400 font-medium">
+              <p className="text-xs text-gray-500 dark:text-gray-300 font-medium">
                 Battle {battlesCompleted + 1} of {totalPossibleBattles}
               </p>
             )}
