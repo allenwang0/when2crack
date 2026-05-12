@@ -14,16 +14,21 @@ import { OutOfComparisons } from '@/components/OutOfComparisons'
 import { Button } from '@/components/ui/Button'
 import { useLocalStorage } from '@/lib/hooks/useLocalStorage'
 import { useToast } from '@/lib/hooks/useToast'
+import { useScroll } from '@/lib/hooks/useScroll'
 import { ToastContainer } from '@/components/ui/Toast'
 import type { TonightRecommendation, RosterPerson } from '@/lib/types'
 import { calculateEloChanges, calculateInitialElo } from '@/lib/algorithms/elo'
 import { API_SAFETY_TIMEOUT, BATTLE_RESULT_DISPLAY_DURATION } from '@/lib/constants'
+import { useOnboarding } from '@/lib/contexts/OnboardingContext'
+import { DEMO_ROSTER_PEOPLE } from '@/lib/constants/onboardingDemoData'
 
 export default function TonightPage() {
   const { user, loading: authLoading } = useAuth()
+  const { state: onboardingState } = useOnboarding()
   const supabase = createClient()
   const router = useRouter()
   const { toasts, showToast, removeToast } = useToast()
+  const { scrollToTop } = useScroll()
   const [localRoster, setLocalRoster] = useLocalStorage<RosterPerson[]>('guest_roster', [])
   const [completedBattles, setCompletedBattles] = useLocalStorage<string[]>('completed_battles', [])
 
@@ -60,7 +65,11 @@ export default function TonightPage() {
     setError('')
 
     try {
-      const sorted = [...localRoster]
+      // Use demo data during onboarding, otherwise use local roster
+      const isOnboarding = onboardingState.isActive
+      const rosterToUse = isOnboarding ? DEMO_ROSTER_PEOPLE : localRoster
+
+      const sorted = [...rosterToUse]
         .filter(p => p.status !== 'Archived')
         .sort((a, b) => {
           const scoreA = a.elo_rating + (a.reliability_score * 10)
@@ -128,22 +137,26 @@ export default function TonightPage() {
     setBattleResult(null)
 
     try {
-      if (localRoster.length < 2) {
+      // Use demo data during onboarding, otherwise use local roster
+      const isOnboarding = onboardingState.isActive
+      const rosterToUse = isOnboarding ? DEMO_ROSTER_PEOPLE : localRoster
+
+      if (rosterToUse.length < 2) {
         setError('Not enough people in roster')
         setLoading(false)
         return
       }
 
-      // Convert completed battles to Set for O(1) lookups
-      const completedSet = new Set(completedBattles)
+      // Convert completed battles to Set for O(1) lookups (skip for onboarding)
+      const completedSet = isOnboarding ? new Set() : new Set(completedBattles)
 
       // Find available pairs without generating all pairs upfront
       const availablePairs: Array<[RosterPerson, RosterPerson]> = []
-      for (let i = 0; i < localRoster.length; i++) {
-        for (let j = i + 1; j < localRoster.length; j++) {
-          const key = getBattleKey(localRoster[i].id, localRoster[j].id)
+      for (let i = 0; i < rosterToUse.length; i++) {
+        for (let j = i + 1; j < rosterToUse.length; j++) {
+          const key = getBattleKey(rosterToUse[i].id, rosterToUse[j].id)
           if (!completedSet.has(key)) {
-            availablePairs.push([localRoster[i], localRoster[j]])
+            availablePairs.push([rosterToUse[i], rosterToUse[j]])
           }
         }
       }
@@ -197,13 +210,17 @@ export default function TonightPage() {
     setError('')
 
     try {
-      if (person1 && person2) {
+      const isOnboarding = onboardingState.isActive
+      const rosterToUse = isOnboarding ? (DEMO_ROSTER_PEOPLE as RosterPerson[]) : localRoster
+
+      // Mark battle as completed (only if not onboarding)
+      if (person1 && person2 && !isOnboarding) {
         const battleKey = getBattleKey(person1.id, person2.id)
         setCompletedBattles([...completedBattles, battleKey])
       }
 
-      const winner = localRoster.find(p => p.id === winnerId)
-      const loser = localRoster.find(p => p.id === loserId)
+      const winner = rosterToUse.find(p => p.id === winnerId)
+      const loser = rosterToUse.find(p => p.id === loserId)
 
       if (!winner || !loser) {
         throw new Error('Person not found')
@@ -214,17 +231,20 @@ export default function TonightPage() {
         loser.elo_rating
       )
 
-      const updatedRoster = localRoster.map(person => {
-        if (person.id === winnerId) {
-          return { ...person, elo_rating: newWinnerRating }
-        }
-        if (person.id === loserId) {
-          return { ...person, elo_rating: newLoserRating }
-        }
-        return person
-      })
+      // Update roster (only if not onboarding)
+      if (!isOnboarding) {
+        const updatedRoster = localRoster.map(person => {
+          if (person.id === winnerId) {
+            return { ...person, elo_rating: newWinnerRating }
+          }
+          if (person.id === loserId) {
+            return { ...person, elo_rating: newLoserRating }
+          }
+          return person
+        })
 
-      setLocalRoster(updatedRoster)
+        setLocalRoster(updatedRoster)
+      }
 
       setBattleResult({
         winner: winnerId,
@@ -429,7 +449,10 @@ export default function TonightPage() {
       {/* Tabs */}
       <div className="flex gap-3 mb-6 touch-manipulation">
         <button
-          onClick={() => setActiveTab('tonight')}
+          onClick={() => {
+            setActiveTab('tonight')
+            scrollToTop()
+          }}
           className={`flex-1 py-3 px-4 rounded-2xl font-bold transition-all text-base active:scale-95 ${
             activeTab === 'tonight'
               ? 'bg-gray-900 text-yellow-bright shadow-lg border-2 border-gray-900'
@@ -439,7 +462,10 @@ export default function TonightPage() {
           Tonight
         </button>
         <button
-          onClick={() => setActiveTab('battle')}
+          onClick={() => {
+            setActiveTab('battle')
+            scrollToTop()
+          }}
           className={`flex-1 py-3 px-4 rounded-2xl font-bold transition-all text-base active:scale-95 ${
             activeTab === 'battle'
               ? 'bg-gray-900 text-yellow-bright shadow-lg border-2 border-gray-900'

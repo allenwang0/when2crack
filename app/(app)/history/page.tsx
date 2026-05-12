@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { createClient } from '@/lib/supabase/client'
 import { useAuth } from '@/lib/contexts/AuthContext'
+import { useScroll } from '@/lib/hooks/useScroll'
 import { GuestBanner } from '@/components/GuestBanner'
 import { Badge } from '@/components/ui/Badge'
 import { getInitials, getTierColor } from '@/lib/utils/colors'
@@ -31,6 +32,7 @@ export default function HistoryPage() {
   const router = useRouter()
   const { user, loading: authLoading } = useAuth()
   const supabase = createClient()
+  const { scrollToTop } = useScroll()
 
   const [activeTab, setActiveTab] = useState<'hangs' | 'when2cracks'>('hangs')
   const [hangs, setHangs] = useState<HangWithPerson[]>([])
@@ -168,7 +170,10 @@ export default function HistoryPage() {
         {/* Tabs */}
         <div className="flex gap-2 mb-6">
           <button
-            onClick={() => setActiveTab('hangs')}
+            onClick={() => {
+              setActiveTab('hangs')
+              scrollToTop()
+            }}
             className={`flex-1 py-3 px-4 rounded-xl font-semibold transition-all ${
               activeTab === 'hangs'
                 ? 'bg-gradient-to-r from-pink to-purple text-white shadow-md'
@@ -178,7 +183,10 @@ export default function HistoryPage() {
             Hangs ({hangs.length})
           </button>
           <button
-            onClick={() => setActiveTab('when2cracks')}
+            onClick={() => {
+              setActiveTab('when2cracks')
+              scrollToTop()
+            }}
             className={`flex-1 py-3 px-4 rounded-xl font-semibold transition-all ${
               activeTab === 'when2cracks'
                 ? 'bg-gradient-to-r from-pink to-purple text-white shadow-md'

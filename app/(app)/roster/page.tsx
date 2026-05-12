@@ -9,6 +9,7 @@ import { SkeletonRosterCard } from '@/components/skeletons/SkeletonRosterCard'
 import { GuestBanner } from '@/components/GuestBanner'
 import { Button } from '@/components/ui/Button'
 import { useLocalStorage } from '@/lib/hooks/useLocalStorage'
+import { useScroll } from '@/lib/hooks/useScroll'
 import { updateLoginStreak } from '@/lib/utils/loginStreak'
 import { sortByDiscover, sortByRecent, filterNeedsTLC } from '@/lib/algorithms/discover'
 import { logger } from '@/lib/utils/logger'
@@ -18,6 +19,7 @@ export default function RosterPage() {
   const router = useRouter()
   const { user, loading: authLoading } = useAuth()
   const supabase = createClient()
+  const { scrollToTop } = useScroll()
   const [roster, setRoster] = useState<RosterPerson[]>([])
   const [loading, setLoading] = useState(true)
   const [loadingMessage, setLoadingMessage] = useState('Loading...')
@@ -241,7 +243,10 @@ export default function RosterPage() {
       {roster.length > 0 && (
         <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
           <button
-            onClick={() => setViewMode('ranked')}
+            onClick={() => {
+              setViewMode('ranked')
+              scrollToTop()
+            }}
             className={`px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition-all ${
               viewMode === 'ranked'
                 ? 'bg-pink text-white shadow-md'
@@ -251,7 +256,10 @@ export default function RosterPage() {
             🏆 Ranked
           </button>
           <button
-            onClick={() => setViewMode('discover')}
+            onClick={() => {
+              setViewMode('discover')
+              scrollToTop()
+            }}
             className={`px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition-all ${
               viewMode === 'discover'
                 ? 'bg-purple text-white shadow-md'
@@ -261,7 +269,10 @@ export default function RosterPage() {
             ✨ Discover
           </button>
           <button
-            onClick={() => setViewMode('recent')}
+            onClick={() => {
+              setViewMode('recent')
+              scrollToTop()
+            }}
             className={`px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition-all ${
               viewMode === 'recent'
                 ? 'bg-teal text-white shadow-md'
@@ -271,7 +282,10 @@ export default function RosterPage() {
             🕐 Recent
           </button>
           <button
-            onClick={() => setViewMode('tlc')}
+            onClick={() => {
+              setViewMode('tlc')
+              scrollToTop()
+            }}
             className={`px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition-all ${
               viewMode === 'tlc'
                 ? 'bg-amber text-white shadow-md'

@@ -37,6 +37,18 @@ export async function POST(request: NextRequest) {
       throw error
     }
 
+    // Mark this combination as shown in the daily tracker
+    const { error: markError } = await supabase.rpc('mark_combination_shown', {
+      p_user_id: user.id,
+      p_person1_id: winner_id,
+      p_person2_id: loser_id,
+    })
+
+    if (markError) {
+      console.error('Error marking combination as shown:', markError)
+      // Don't throw - battle was already processed successfully
+    }
+
     // The RPC function returns the result in the correct format
     return NextResponse.json(data)
   } catch (error) {

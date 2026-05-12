@@ -17,12 +17,23 @@ import type { RosterPerson } from '@/lib/types'
 import { calculateEloChanges, calculateInitialElo } from '@/lib/algorithms/elo'
 import { API_SAFETY_TIMEOUT, BATTLE_RESULT_DISPLAY_DURATION } from '@/lib/constants'
 import { logger } from '@/lib/utils/logger'
+import { useOnboarding } from '@/lib/contexts/OnboardingContext'
+import { DEMO_ROSTER_PEOPLE } from '@/lib/constants/onboardingDemoData'
+import {
+  generateAllCombinations,
+  getNextCombination,
+  markCombinationShown,
+  getTodayDateString,
+  shouldResetCombinations,
+  type CombinationWithPeople,
+} from '@/lib/algorithms/combination-manager'
 
 export default function BattlePage() {
   const { user, loading: authLoading } = useAuth()
+  const { state: onboardingState } = useOnboarding()
   const [localRoster, setLocalRoster] = useLocalStorage<RosterPerson[]>('guest_roster', [])
-  const [completedBattles, setCompletedBattles] = useLocalStorage<string[]>('completed_battles', [])
-  const [skippedBattles, setSkippedBattles] = useLocalStorage<string[]>('skipped_battles', [])
+  const [dailyCombinations, setDailyCombinations] = useLocalStorage<CombinationWithPeople[]>('daily_combinations', [])
+  const [lastResetDate, setLastResetDate] = useLocalStorage<string>('last_reset_date', '')
   const [person1, setPerson1] = useState<RosterPerson | null>(null)
   const [person2, setPerson2] = useState<RosterPerson | null>(null)
   const [loading, setLoading] = useState(true)
@@ -36,6 +47,8 @@ export default function BattlePage() {
   const [error, setError] = useState('')
   const [showOutOfComparisons, setShowOutOfComparisons] = useState(false)
   const [showConfetti, setShowConfetti] = useState(false)
+  const [remaining, setRemaining] = useState<number>(0)
+  const [total, setTotal] = useState<number>(0)
 
   // Battle undo functionality
   const { recordBattle, undo, isUndoable, getRemainingTime } = useBattleUndo({
@@ -64,50 +77,54 @@ export default function BattlePage() {
     threshold: 50,
   })
 
-  const getBattleKey = (id1: string, id2: string) => {
-    return [id1, id2].sort().join('-')
-  }
-
   const fetchBattlePairGuest = () => {
     setLoading(true)
     setError('')
     setResult(null)
 
     try {
-      if (localRoster.length < 2) {
+      // Use demo data during onboarding, otherwise use local roster
+      const isOnboarding = onboardingState.isActive
+      const rosterToUse = isOnboarding ? DEMO_ROSTER_PEOPLE : localRoster
+
+      if (rosterToUse.length < 2) {
         setError('Not enough people in roster')
         setLoading(false)
         return
       }
 
-      // Convert completed/skipped battles to Sets for O(1) lookups
-      const completedSet = new Set(completedBattles)
-      const skippedSet = new Set(skippedBattles)
-
-      // Find available pairs without generating all pairs upfront
-      const availablePairs: Array<[RosterPerson, RosterPerson]> = []
-      for (let i = 0; i < localRoster.length; i++) {
-        for (let j = i + 1; j < localRoster.length; j++) {
-          const key = getBattleKey(localRoster[i].id, localRoster[j].id)
-          if (!completedSet.has(key) && !skippedSet.has(key)) {
-            availablePairs.push([localRoster[i], localRoster[j]])
-          }
-        }
+      // Check if we need to reset for a new day (skip for demo data)
+      let combinations = dailyCombinations
+      if (!isOnboarding && shouldResetCombinations(lastResetDate)) {
+        // Generate fresh combinations for today
+        combinations = generateAllCombinations(localRoster)
+        setDailyCombinations(combinations)
+        setLastResetDate(getTodayDateString())
+      } else if (isOnboarding) {
+        // Generate demo combinations on the fly
+        combinations = generateAllCombinations(rosterToUse)
       }
 
-      // If all battles completed, show completion screen
-      if (availablePairs.length === 0) {
+      // Get the next unshown combination
+      const nextCombination = getNextCombination(combinations)
+
+      if (!nextCombination) {
+        // All combinations exhausted for today
         setShowOutOfComparisons(true)
+        setRemaining(0)
+        setTotal(combinations.length)
         setLoading(false)
         return
       }
 
       setShowOutOfComparisons(false)
+      setPerson1(nextCombination.person1)
+      setPerson2(nextCombination.person2)
 
-      // Pick a random available pair
-      const randomPair = availablePairs[Math.floor(Math.random() * availablePairs.length)]
-      setPerson1(randomPair[0])
-      setPerson2(randomPair[1])
+      // Update progress tracking
+      const shown = combinations.filter(c => c.shown).length
+      setRemaining(combinations.length - shown)
+      setTotal(combinations.length)
     } catch (err) {
       if (err instanceof Error) {
         setError(err.message)
@@ -130,8 +147,20 @@ export default function BattlePage() {
         throw new Error(data.error || 'Failed to fetch battle pair')
       }
 
+      // Check if all combinations are exhausted
+      if (data.exhausted) {
+        setShowOutOfComparisons(true)
+        setRemaining(0)
+        setTotal(data.total || 0)
+        setLoading(false)
+        return
+      }
+
       setPerson1(data.person1)
       setPerson2(data.person2)
+      setRemaining(data.remaining || 0)
+      setTotal(data.total || 0)
+      setShowOutOfComparisons(false)
     } catch (err) {
       if (err instanceof Error) {
         setError(err.message)
@@ -188,10 +217,18 @@ export default function BattlePage() {
 
     setLocalRoster(updatedRoster)
 
-    // Remove from completed battles
+    // Unmark this combination as shown
     if (person1 && person2) {
-      const battleKey = getBattleKey(person1.id, person2.id)
-      setCompletedBattles(completedBattles.filter(key => key !== battleKey))
+      const updatedCombinations = dailyCombinations.map(c => {
+        if (
+          (c.person1_id === battleToUndo.winnerId && c.person2_id === battleToUndo.loserId) ||
+          (c.person1_id === battleToUndo.loserId && c.person2_id === battleToUndo.winnerId)
+        ) {
+          return { ...c, shown: false, shown_order: null }
+        }
+        return c
+      })
+      setDailyCombinations(updatedCombinations)
     }
 
     // Clear result display
@@ -205,15 +242,22 @@ export default function BattlePage() {
     setError('')
 
     try {
-      // Mark this battle as completed
-      if (person1 && person2) {
-        const battleKey = getBattleKey(person1.id, person2.id)
-        setCompletedBattles([...completedBattles, battleKey])
+      const isOnboarding = onboardingState.isActive
+      const rosterToUse = isOnboarding ? (DEMO_ROSTER_PEOPLE as RosterPerson[]) : localRoster
+
+      // Mark this combination as shown (only if not onboarding)
+      if (person1 && person2 && !isOnboarding) {
+        const updatedCombinations = markCombinationShown(
+          dailyCombinations,
+          person1.id,
+          person2.id
+        )
+        setDailyCombinations(updatedCombinations)
       }
 
       // Calculate ELO changes
-      const winner = localRoster.find(p => p.id === winnerId)
-      const loser = localRoster.find(p => p.id === loserId)
+      const winner = rosterToUse.find(p => p.id === winnerId)
+      const loser = rosterToUse.find(p => p.id === loserId)
 
       if (!winner || !loser) {
         throw new Error('Person not found')
@@ -224,20 +268,25 @@ export default function BattlePage() {
         loser.elo_rating
       )
 
-      // Record battle for undo
-      recordBattle(winnerId, loserId, winner.elo_rating, loser.elo_rating)
+      // Record battle for undo (only if not onboarding)
+      if (!isOnboarding) {
+        recordBattle(winnerId, loserId, winner.elo_rating, loser.elo_rating)
+      }
 
-      const updatedRoster = localRoster.map(person => {
-        if (person.id === winnerId) {
-          return { ...person, elo_rating: newWinnerRating }
-        }
-        if (person.id === loserId) {
-          return { ...person, elo_rating: newLoserRating }
-        }
-        return person
-      })
+      // Update roster (only if not onboarding)
+      if (!isOnboarding) {
+        const updatedRoster = localRoster.map(person => {
+          if (person.id === winnerId) {
+            return { ...person, elo_rating: newWinnerRating }
+          }
+          if (person.id === loserId) {
+            return { ...person, elo_rating: newLoserRating }
+          }
+          return person
+        })
 
-      setLocalRoster(updatedRoster)
+        setLocalRoster(updatedRoster)
+      }
 
       // Show result
       setResult({
@@ -339,31 +388,37 @@ export default function BattlePage() {
     )
   }
 
-  if (showOutOfComparisons && !user) {
+  if (showOutOfComparisons) {
     return (
       <div>
         {!user && !authLoading && <GuestBanner />}
         <OutOfComparisons
-          onReset={() => {
-            // Reset completed and skipped battles
-            setCompletedBattles([])
-            setSkippedBattles([])
+          onReset={
+            !user
+              ? () => {
+                  // Reset all ELO ratings to default
+                  const resetRoster = localRoster.map(person => ({
+                    ...person,
+                    elo_rating: calculateInitialElo(
+                      person.attraction_score,
+                      person.personality_score,
+                      person.reliability_score
+                    ),
+                  }))
+                  setLocalRoster(resetRoster)
 
-            // Reset all ELO ratings to default
-            const resetRoster = localRoster.map(person => ({
-              ...person,
-              elo_rating: calculateInitialElo(
-                person.attraction_score,
-                person.personality_score,
-                person.reliability_score
-              )
-            }))
-            setLocalRoster(resetRoster)
+                  // Generate fresh combinations
+                  const freshCombinations = generateAllCombinations(resetRoster)
+                  setDailyCombinations(freshCombinations)
+                  setLastResetDate(getTodayDateString())
 
-            setShowOutOfComparisons(false)
-            fetchBattlePairGuest()
-          }}
-          totalPeople={localRoster.length}
+                  setShowOutOfComparisons(false)
+                  fetchBattlePairGuest()
+                }
+              : undefined
+          }
+          totalPeople={user ? total : localRoster.length}
+          isAuthenticated={!!user}
         />
       </div>
     )
@@ -396,9 +451,11 @@ export default function BattlePage() {
   }
 
   // Calculate progress
-  const totalPossibleBattles = (localRoster.length * (localRoster.length - 1)) / 2
-  const battlesCompleted = completedBattles.length
-  const battlesRemaining = totalPossibleBattles - battlesCompleted
+  const totalPossibleBattles = user ? total : dailyCombinations.length
+  const battlesCompleted = user
+    ? total - remaining
+    : dailyCombinations.filter(c => c.shown).length
+  const battlesRemaining = user ? remaining : totalPossibleBattles - battlesCompleted
 
   return (
     <div className="py-6">
@@ -409,9 +466,10 @@ export default function BattlePage() {
         <p className="text-sm text-gray-600 mb-3">
           Right now, tonight — who would you rather?
         </p>
-        {!user && totalPossibleBattles > 0 && (
+        {totalPossibleBattles > 0 && (
           <p className="text-xs text-gray-500">
             Battle {battlesCompleted + 1} of {totalPossibleBattles}
+            {user && ' • Resets daily'}
           </p>
         )}
       </div>
@@ -494,10 +552,14 @@ export default function BattlePage() {
         <Button
           variant="tertiary"
           onClick={() => {
-            // Mark this pair as skipped (guest mode only)
+            // Mark this combination as shown (even if skipped)
             if (!user && person1 && person2) {
-              const battleKey = getBattleKey(person1.id, person2.id)
-              setSkippedBattles([...skippedBattles, battleKey])
+              const updatedCombinations = markCombinationShown(
+                dailyCombinations,
+                person1.id,
+                person2.id
+              )
+              setDailyCombinations(updatedCombinations)
             }
             // Load new pair
             user ? fetchBattlePair() : fetchBattlePairGuest()

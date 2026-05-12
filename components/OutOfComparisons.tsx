@@ -3,11 +3,12 @@
 import { Button } from './ui/Button'
 
 interface OutOfComparisonsProps {
-  onReset: () => void
+  onReset?: () => void
   totalPeople: number
+  isAuthenticated?: boolean
 }
 
-export function OutOfComparisons({ onReset, totalPeople }: OutOfComparisonsProps) {
+export function OutOfComparisons({ onReset, totalPeople, isAuthenticated = false }: OutOfComparisonsProps) {
   const totalBattles = (totalPeople * (totalPeople - 1)) / 2
 
   return (
@@ -28,15 +29,18 @@ export function OutOfComparisons({ onReset, totalPeople }: OutOfComparisonsProps
 
         {/* Title */}
         <h2 className="text-3xl font-serif font-bold mb-5 text-pink">
-          All Done!
+          All Done for Today!
         </h2>
 
         <p className="text-lg mb-6 text-foreground/80">
-          You've compared everyone! 🏆
+          {isAuthenticated
+            ? "You've completed all comparisons for today! 🏆"
+            : "You've compared everyone! 🏆"}
         </p>
 
         <p className="text-sm text-foreground/60 mb-10">
           Completed {totalBattles} battles with {totalPeople} people
+          {isAuthenticated && ' today'}
         </p>
 
         {/* Fun stats */}
@@ -65,16 +69,29 @@ export function OutOfComparisons({ onReset, totalPeople }: OutOfComparisonsProps
 
         {/* Actions */}
         <div className="space-y-3">
-          <Button
-            onClick={onReset}
-            className="w-full py-4 text-lg font-semibold shadow-lg bg-gradient-to-r from-pink to-purple text-white"
-          >
-            Start Over 🔄
-          </Button>
+          {isAuthenticated ? (
+            <div className="bg-card border border-border rounded-lg p-6">
+              <p className="text-base text-foreground/80 mb-2">
+                Come back tomorrow for a fresh set of comparisons! 🌅
+              </p>
+              <p className="text-xs text-foreground/50">
+                Daily battles reset at midnight
+              </p>
+            </div>
+          ) : onReset ? (
+            <>
+              <Button
+                onClick={onReset}
+                className="w-full py-4 text-lg font-semibold shadow-lg bg-gradient-to-r from-pink to-purple text-white"
+              >
+                Start Over 🔄
+              </Button>
 
-          <p className="text-xs text-foreground/50">
-            Reset to compare everyone again
-          </p>
+              <p className="text-xs text-foreground/50">
+                Reset to compare everyone again
+              </p>
+            </>
+          ) : null}
         </div>
 
         {/* Decorative elements */}

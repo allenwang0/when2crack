@@ -7,6 +7,7 @@ import { OnboardingController } from '@/components/Onboarding'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { useTheme } from '@/lib/hooks/useTheme'
+import { useScroll } from '@/lib/hooks/useScroll'
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const { user, loading, signOut } = useAuth()
@@ -16,6 +17,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const [showFAQ, setShowFAQ] = useState(false)
   const { theme, resolvedTheme, setTheme } = useTheme()
   const [showThemeMenu, setShowThemeMenu] = useState(false)
+  const { scrollContainerRef } = useScroll()
 
   const handleSignOut = async () => {
     // For authenticated users, show confirmation if they have guest data
@@ -57,7 +59,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         </header>
 
         {/* Main content skeleton */}
-        <main className="flex-1 overflow-y-auto pt-16 pb-28">
+        <main className="flex-1 overflow-y-auto pt-14 pb-28 scroll-smooth">
           <div className="max-w-md mx-auto w-full px-4 py-6">
             <div className="flex items-center justify-between mb-8">
               <div className="w-48 h-10 skeleton rounded-2xl" />
@@ -220,7 +222,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       </header>
 
       {/* Main content - scrollable with padding for fixed header and nav */}
-      <main className="flex-1 overflow-y-auto pt-16 pb-28" role="main" aria-label="Main content">
+      <main ref={scrollContainerRef} className="flex-1 overflow-y-auto pt-14 pb-28 scroll-smooth" role="main" aria-label="Main content">
         <div className="max-w-md mx-auto w-full px-4">
           {children}
         </div>

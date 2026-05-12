@@ -137,6 +137,18 @@ button, .card, input, select {
   overflow: hidden;
 }
 
+/* Smooth scroll for programmatic scrolling */
+.scroll-smooth {
+  scroll-behavior: smooth;
+}
+
+/* Respect user's motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  .scroll-smooth {
+    scroll-behavior: auto;
+  }
+}
+
 /* Remove any default margins/padding */
 h1, h2, h3, h4, h5, h6, p {
   margin: 0;

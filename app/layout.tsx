@@ -1,7 +1,10 @@
 import type { Metadata } from "next";
 import { DM_Sans, DM_Serif_Display } from "next/font/google";
+import { Analytics } from '@vercel/analytics/react';
 import { AuthProvider } from "@/lib/contexts/AuthContext";
 import { OnboardingProvider } from "@/lib/contexts/OnboardingContext";
+import { ScrollProvider } from "@/lib/contexts/ScrollContext";
+import { PostHogProvider } from "@/components/PostHogProvider";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import "./globals.css";
 
@@ -54,10 +57,15 @@ export default function RootLayout({
         <ErrorBoundary>
           <AuthProvider>
             <OnboardingProvider>
-              {children}
+              <ScrollProvider>
+                <PostHogProvider>
+                  {children}
+                </PostHogProvider>
+              </ScrollProvider>
             </OnboardingProvider>
           </AuthProvider>
         </ErrorBoundary>
+        <Analytics />
       </body>
     </html>
   );
