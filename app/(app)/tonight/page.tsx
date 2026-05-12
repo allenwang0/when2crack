@@ -75,10 +75,11 @@ export default function TonightPage() {
       const completedSet = isOnboarding ? new Set() : new Set(completedBattles)
 
       // Find available pairs - prioritize tonight-worthy candidates
-      const tonightCandidates = rosterToUse.filter(p =>
-        p.status !== 'Archived' &&
-        ((p.composite_score || 0) >= 6 || (p.reliability_score || 0) >= 5)
-      )
+      const tonightCandidates = rosterToUse.filter(p => {
+        const compositeScore = (p.attraction_score + p.personality_score + p.reliability_score) / 3
+        return p.status !== 'Archived' &&
+          (compositeScore >= 6 || (p.reliability_score || 0) >= 5)
+      })
 
       const candidatesToUse = tonightCandidates.length >= 2 ? tonightCandidates : rosterToUse
 
