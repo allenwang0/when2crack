@@ -257,23 +257,18 @@ export default function TonightPage() {
     try {
       if (user) {
         // Log outreach for authenticated users
-        // @ts-expect-error - Supabase generated types issue
-        const { error } = await supabase
-          .from('outreach_log')
-          .insert({
-            roster_id: selectedPerson.id,
-            user_id: user.id,
-            outreach_date: new Date().toISOString(),
-          })
+        // Using any due to Supabase generated type constraints
+        const { error } = await (supabase.from('outreach_log') as any).insert({
+          roster_id: selectedPerson.id,
+          user_id: user.id,
+          outreach_date: new Date().toISOString(),
+        })
 
         if (error) throw error
 
-        // @ts-expect-error - Supabase generated types issue
-        const { error: updateError } = await supabase
-          .from('roster')
-          .update({
-            last_contact_date: new Date().toISOString(),
-          })
+        const { error: updateError } = await (supabase.from('roster') as any).update({
+          last_contact_date: new Date().toISOString(),
+        })
           .eq('id', selectedPerson.id)
           .eq('user_id', user.id)
 
