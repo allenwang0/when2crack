@@ -19,6 +19,7 @@ import { API_SAFETY_TIMEOUT, BATTLE_RESULT_DISPLAY_DURATION } from '@/lib/consta
 import { logger } from '@/lib/utils/logger'
 import { useOnboarding } from '@/lib/contexts/OnboardingContext'
 import { DEMO_ROSTER_PEOPLE } from '@/lib/constants/onboardingDemoData'
+import { STARTER_ROSTER_PEOPLE } from '@/lib/constants/starterRoster'
 import {
   generateAllCombinations,
   getNextCombination,
@@ -85,10 +86,18 @@ export default function BattlePage() {
     try {
       // Use demo data during onboarding, otherwise use local roster
       const isOnboarding = onboardingState.isActive
-      const rosterToUse = isOnboarding ? DEMO_ROSTER_PEOPLE : localRoster
+      let rosterToUse = isOnboarding ? DEMO_ROSTER_PEOPLE : localRoster
+
+      // Fallback: If guest user has empty roster, initialize with starter people
+      if (!isOnboarding && localRoster.length === 0) {
+        logger.info('Battle page: Empty guest roster detected, initializing with starter people')
+        setLocalRoster(STARTER_ROSTER_PEOPLE)
+        rosterToUse = STARTER_ROSTER_PEOPLE
+      }
 
       if (rosterToUse.length < 2) {
-        setError('Not enough people in roster')
+        logger.warn('Battle page: Not enough people in roster', { count: rosterToUse.length })
+        setError('You need at least 2 people in your roster to start battles. Add more people to begin comparing!')
         setLoading(false)
         return
       }
@@ -143,8 +152,16 @@ export default function BattlePage() {
       const response = await fetch('/api/battles/pair')
       const data = await response.json()
 
+      // Handle empty roster error (200 response with errorCode)
+      if (data.errorCode === 'EMPTY_ROSTER') {
+        setError(data.message || 'You need at least 2 people in your roster to start battles.')
+        setLoading(false)
+        return
+      }
+
+      // Handle system errors (500 response)
       if (!response.ok) {
-        throw new Error(data.error || 'Failed to fetch battle pair')
+        throw new Error(data.error || 'Something went wrong. Please try again.')
       }
 
       // Check if all combinations are exhausted
@@ -164,6 +181,8 @@ export default function BattlePage() {
     } catch (err) {
       if (err instanceof Error) {
         setError(err.message)
+      } else {
+        setError('Something went wrong. Please try again.')
       }
     } finally {
       setLoading(false)
@@ -425,12 +444,32 @@ export default function BattlePage() {
   }
 
   if (error) {
+    const isEmptyRosterError = error.includes('at least 2 people') || error.includes('Not enough people')
+
     return (
       <div className="py-6">
         <h2 className="text-2xl font-serif font-bold mb-4">Battle</h2>
         <div className="bg-card border border-border rounded-lg p-6 text-center">
-          <p className="text-red-500 mb-4">{error}</p>
-          <Button onClick={fetchBattlePair}>Try Again</Button>
+          <div className="text-6xl mb-4">
+            {isEmptyRosterError ? '👥' : '⚠️'}
+          </div>
+          <p className={`${isEmptyRosterError ? 'text-gray-700 dark:text-gray-300' : 'text-red-500'} mb-4 font-medium`}>
+            {error}
+          </p>
+          {isEmptyRosterError ? (
+            <div className="flex flex-col gap-2">
+              <Button onClick={() => window.location.href = '/add'}>
+                Add People to Roster
+              </Button>
+              <Button variant="tertiary" onClick={user ? fetchBattlePair : fetchBattlePairGuest}>
+                Try Again
+              </Button>
+            </div>
+          ) : (
+            <Button onClick={user ? fetchBattlePair : fetchBattlePairGuest}>
+              Try Again
+            </Button>
+          )}
         </div>
       </div>
     )
