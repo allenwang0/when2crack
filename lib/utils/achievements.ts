@@ -1,3 +1,15 @@
+/**
+ * @deprecated LEGACY ACHIEVEMENT SYSTEM - DO NOT USE
+ *
+ * This file contains the old achievement system and is deprecated.
+ * Use the new system instead:
+ * - /lib/achievements/definitions.ts for achievement definitions
+ * - /lib/hooks/useAchievements.ts for fetching achievements
+ * - New components in /components/Achievement*.tsx
+ *
+ * This file is kept for backward compatibility only.
+ */
+
 import type { RosterPerson } from '../types'
 
 export interface Achievement {

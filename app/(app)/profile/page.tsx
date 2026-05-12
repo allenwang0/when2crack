@@ -6,13 +6,12 @@ import { createClient } from '@/lib/supabase/client'
 import { useAuth } from '@/lib/contexts/AuthContext'
 import { useOnboarding } from '@/lib/contexts/OnboardingContext'
 import { GuestBanner } from '@/components/GuestBanner'
-import { Achievements } from '@/components/Achievements'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { useLocalStorage } from '@/lib/hooks/useLocalStorage'
 import { useToast } from '@/lib/hooks/useToast'
 import { ToastContainer } from '@/components/ui/Toast'
-import { calculateAchievements } from '@/lib/utils/achievements'
+import { useAchievements } from '@/lib/hooks/useAchievements'
 import { isValidAvatarUrl, DEFAULT_PROFILE_PIC } from '@/lib/utils/avatar'
 import type { RosterPerson } from '@/lib/types'
 
@@ -23,10 +22,16 @@ export default function ProfilePage() {
   const supabase = createClient()
   const { toasts, showToast, removeToast } = useToast()
   const [localRoster] = useLocalStorage<RosterPerson[]>('guest_roster', [])
-  const [completedBattles] = useLocalStorage<string[]>('completed_battles', [])
-  const [weekSchedule] = useLocalStorage<string[]>('week_schedule', [])
   const [displayName, setDisplayName] = useLocalStorage<string>('display_name', '')
   const [userAvatar, setUserAvatar] = useLocalStorage<string | null>('user_avatar', null)
+
+  // Fetch achievements for authenticated users
+  const {
+    achievementsWithProgress,
+    unlockedCount,
+    totalCount,
+    earnedPoints,
+  } = useAchievements()
 
   const [roster, setRoster] = useState<RosterPerson[]>([])
   const [totalHangs, setTotalHangs] = useState(0)
@@ -181,18 +186,20 @@ export default function ProfilePage() {
 
   // Calculate stats
   const totalPeople = roster.length
-  const totalBattles = user ? 0 : completedBattles.length
+  const totalBattles = user ? 0 : 0 // Battles count removed for guests
   const topTierCount = roster.filter(p => p.tier === 'S').length
   const avgCompositeScore = roster.length > 0
     ? Math.round(roster.reduce((acc, p) => acc + (p.attraction_score + p.personality_score + p.reliability_score) / 3, 0) / roster.length)
     : 0
 
-  const achievements = calculateAchievements(
-    totalPeople,
-    completedBattles.length,
-    weekSchedule.length > 0,
-    0
-  )
+  // Get recent achievements (3 most recent unlocked)
+  const recentAchievements = achievementsWithProgress
+    .filter(a => a.isUnlocked)
+    .sort((a, b) => {
+      if (!a.unlockedAt || !b.unlockedAt) return 0
+      return new Date(b.unlockedAt).getTime() - new Date(a.unlockedAt).getTime()
+    })
+    .slice(0, 3)
 
   if (loading) {
     return (
@@ -317,29 +324,23 @@ export default function ProfilePage() {
       {/* Statistics Section */}
       <h3 className="text-lg font-bold text-gray-900 mb-4 mt-6">Statistics</h3>
       <div className="grid grid-cols-2 gap-3 mb-6 profile-stats">
-        <div className="bg-white border-2 border-pink/20 rounded-2xl p-5 text-center hover:border-pink/40 transition-colors">
+        <div className="bg-white dark:bg-gray-800 border-2 border-pink/20 dark:border-pink/40 rounded-2xl p-5 text-center hover:border-pink/40 dark:hover:border-pink/60 transition-colors">
           <div className="text-4xl font-bold text-pink mb-3">{totalPeople}</div>
-          <div className="text-sm font-medium text-gray-600">Total People</div>
+          <div className="text-sm font-medium text-gray-600 dark:text-gray-400">Total People</div>
         </div>
-        <div className="bg-white border-2 border-purple/20 rounded-2xl p-5 text-center hover:border-purple/40 transition-colors">
+        <div className="bg-white dark:bg-gray-800 border-2 border-purple/20 dark:border-purple/40 rounded-2xl p-5 text-center hover:border-purple/40 dark:hover:border-purple/60 transition-colors">
           <div className="text-4xl font-bold text-purple mb-3">{topTierCount}</div>
-          <div className="text-sm font-medium text-gray-600">S-Tier</div>
+          <div className="text-sm font-medium text-gray-600 dark:text-gray-400">S-Tier</div>
         </div>
-        {!user && (
-          <div className="bg-white border-2 border-teal/20 rounded-2xl p-5 text-center hover:border-teal/40 transition-colors">
-            <div className="text-4xl font-bold text-teal mb-3">{totalBattles}</div>
-            <div className="text-sm font-medium text-gray-600">Battles</div>
-          </div>
-        )}
         {user && (
-          <div className="bg-white border-2 border-teal/20 rounded-2xl p-5 text-center hover:border-teal/40 transition-colors">
+          <div className="bg-white dark:bg-gray-800 border-2 border-teal/20 dark:border-teal/40 rounded-2xl p-5 text-center hover:border-teal/40 dark:hover:border-teal/60 transition-colors">
             <div className="text-4xl font-bold text-teal mb-3">{totalHangs}</div>
-            <div className="text-sm font-medium text-gray-600">Total Hangs</div>
+            <div className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Hangs</div>
           </div>
         )}
-        <div className="bg-white border-2 border-amber/20 rounded-2xl p-5 text-center hover:border-amber/40 transition-colors">
+        <div className="bg-white dark:bg-gray-800 border-2 border-amber/20 dark:border-amber/40 rounded-2xl p-5 text-center hover:border-amber/40 dark:hover:border-amber/60 transition-colors">
           <div className="text-4xl font-bold text-amber mb-3">{avgCompositeScore}</div>
-          <div className="text-sm font-medium text-gray-600">Avg Score</div>
+          <div className="text-sm font-medium text-gray-600 dark:text-gray-400">Avg Score</div>
         </div>
       </div>
 
@@ -389,11 +390,58 @@ export default function ProfilePage() {
         </div>
       </div>
 
-      {/* Achievements Section */}
-      <h3 className="text-lg font-bold text-gray-900 mb-4">Achievements</h3>
-      <div className="mb-6">
-        <Achievements achievements={achievements} />
-      </div>
+      {/* Achievements Preview - Only for authenticated users */}
+      {user && (
+        <>
+          <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-4">Achievements</h3>
+          <div
+            onClick={() => router.push('/achievements')}
+            className="bg-gradient-to-r from-yellow-50 to-white dark:from-yellow-900/20 dark:to-gray-800 border-2 border-yellow-bright rounded-2xl p-5 mb-6 cursor-pointer hover:shadow-lg transition-all"
+          >
+            {/* Stats Summary */}
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <div className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+                  {unlockedCount}/{totalCount}
+                </div>
+                <div className="text-sm text-gray-600 dark:text-gray-400">Achievements Unlocked</div>
+              </div>
+              <div>
+                <div className="text-2xl font-bold text-yellow-bright">{earnedPoints}</div>
+                <div className="text-sm text-gray-600 dark:text-gray-400">Points</div>
+              </div>
+            </div>
+
+            {/* Recent Achievements */}
+            {recentAchievements.length > 0 && (
+              <div className="mb-4">
+                <div className="text-xs font-semibold text-gray-600 dark:text-gray-400 mb-2">
+                  Recently Unlocked:
+                </div>
+                <div className="flex gap-2">
+                  {recentAchievements.map((achievement) => (
+                    <div
+                      key={achievement.id}
+                      className="w-12 h-12 rounded-full bg-gradient-to-br from-yellow-400 to-yellow-600 flex items-center justify-center text-2xl shadow-md"
+                      title={achievement.name}
+                    >
+                      {achievement.icon}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* View All Link */}
+            <div className="flex items-center justify-between text-sm font-semibold text-pink hover:text-purple transition-colors">
+              <span>View All Achievements</span>
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </div>
+          </div>
+        </>
+      )}
 
       {/* Restart Tour Button */}
       <div className="mb-6">

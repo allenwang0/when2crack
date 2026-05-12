@@ -62,8 +62,20 @@ export function OnboardingTooltip({
   }, [])
 
   useEffect(() => {
-    if (!targetSelector || isMobile) {
+    // On mobile, always use mobile positioning
+    if (isMobile) {
       setTooltipStyle({})
+      return
+    }
+
+    // For null target (Step 8 FAQ), center on screen
+    if (!targetSelector) {
+      setTooltipStyle({
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
+      })
+      setPosition('bottom')
       return
     }
 
@@ -164,14 +176,15 @@ export function OnboardingTooltip({
     if (!isMobile) return tooltipStyle
 
     // Fixed position above nav bar on mobile
-    // Nav bar is h-16 (64px) + safe area padding
+    // Nav bar is h-16 (64px) from Navigation.tsx:95
+    // Header is h-14 (56px) from layout.tsx:109
     // Force the tooltip to be visible above the nav bar
     return {
-      bottom: 'calc(64px + 1rem + env(safe-area-inset-bottom))', // nav height + gap + safe area
+      bottom: '80px', // nav height (64px) + gap (16px)
       left: '1rem',
       right: '1rem',
       transform: 'none', // Override any desktop transforms
-      maxHeight: 'calc(100vh - 64px - 56px - 2rem)', // viewport - nav - header - gaps
+      maxHeight: 'calc(100vh - 80px - 56px - 2rem)', // viewport - nav - header - gaps
       overflowY: 'auto',
     }
   }

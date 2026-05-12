@@ -51,6 +51,7 @@ export async function GET(request: NextRequest) {
       unlocked: achievements || [],
       newUnlocks: newUnlocks.map((a) => a.id),
       allAchievements: ACHIEVEMENTS,
+      stats, // Include stats for progress calculation on client
     })
   } catch (error) {
     console.error('Error in achievements API:', error)

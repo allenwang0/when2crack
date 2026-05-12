@@ -116,19 +116,19 @@ export const FEATURES = {
 // Onboarding (all timing values in milliseconds)
 export const ONBOARDING = {
   // Timing
-  INITIAL_CALCULATION_DELAY: 100,        // SpotlightOverlay initial position calc
+  INITIAL_CALCULATION_DELAY: 500,        // SpotlightOverlay initial position calc (increased to wait for tab content)
   TOOLTIP_POSITION_DELAY: 150,           // OnboardingTooltip position calc (after spotlight)
   AUTH_SETTLE_DELAY: 500,                // Wait for auth state to settle
-  TAB_FORCE_INITIAL_DELAY: 300,          // Initial delay before forcing tab
-  TAB_FORCE_RETRY_DELAY: 200,            // Delay between tab force retries
+  TAB_FORCE_INITIAL_DELAY: 100,          // Initial delay before forcing tab (start sooner)
+  TAB_FORCE_RETRY_DELAY: 300,            // Delay between tab force retries (increased)
   CONFETTI_DURATION: 2000,               // How long confetti shows
   COMPLETION_REDIRECT_DELAY: 2000,       // Delay before redirecting after completion
 
   // Retry logic
-  SPOTLIGHT_MAX_RETRIES: 10,             // Max retries to find spotlight target
-  SPOTLIGHT_RETRY_DELAY: 200,            // Delay between spotlight retries
-  TAB_FORCE_MAX_RETRIES: 3,              // Max retries for tab forcing
-  AUTO_SKIP_AFTER_RETRIES: true,         // Auto-skip step if target never found
+  SPOTLIGHT_MAX_RETRIES: 15,             // Max retries to find spotlight target (increased for tab switches)
+  SPOTLIGHT_RETRY_DELAY: 300,            // Delay between spotlight retries (increased)
+  TAB_FORCE_MAX_RETRIES: 4,              // Max retries for tab forcing (increased)
+  AUTO_SKIP_AFTER_RETRIES: false,        // Don't auto-skip - let user see what's happening
 
   // MutationObserver
   MUTATION_DEBOUNCE_MS: 500,             // Debounce for mutation recalculations

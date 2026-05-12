@@ -1,3 +1,15 @@
+/**
+ * @deprecated LEGACY ACHIEVEMENTS COMPONENT - DO NOT USE
+ *
+ * This component uses the old achievement system and is deprecated.
+ * Use the new components instead:
+ * - AchievementGrid for grid display
+ * - AchievementBadge for individual badges
+ * - AchievementModal for detail view
+ *
+ * This file is kept for backward compatibility only.
+ */
+
 'use client'
 
 import type { Achievement } from '@/lib/utils/achievements'

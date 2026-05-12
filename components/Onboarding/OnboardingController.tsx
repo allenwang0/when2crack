@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState, useRef } from 'react'
+import { createPortal } from 'react-dom'
 import { useRouter, usePathname } from 'next/navigation'
 import { useAuth } from '@/lib/contexts/AuthContext'
 import { useOnboarding } from '@/lib/contexts/OnboardingContext'
@@ -29,7 +30,14 @@ export function OnboardingController({ children }: OnboardingControllerProps) {
   const [showSkipConfirmation, setShowSkipConfirmation] = useState(false)
   const [showResumeModal, setShowResumeModal] = useState(false)
   const [resumeStep, setResumeStep] = useState(0)
+  const [isMounted, setIsMounted] = useState(false)
   const tabEventTimeoutsRef = useRef<NodeJS.Timeout[]>([])
+
+  // Track if component is mounted (for portal rendering)
+  useEffect(() => {
+    setIsMounted(true)
+    return () => setIsMounted(false)
+  }, [])
 
   // Check if should show welcome or resume modal on mount
   useEffect(() => {
@@ -164,6 +172,12 @@ export function OnboardingController({ children }: OnboardingControllerProps) {
     }, ONBOARDING.COMPLETION_REDIRECT_DELAY)
   }
 
+  // Helper to render overlay content in a portal (outside scroll container)
+  const renderInPortal = (content: React.ReactNode) => {
+    if (!isMounted || typeof document === 'undefined') return null
+    return createPortal(content, document.body)
+  }
+
   // Don't render onboarding UI if not ready or inactive
   if (!isReady || (!showWelcome && !showResumeModal && !state.isActive)) {
     return <>{children}</>
@@ -174,11 +188,13 @@ export function OnboardingController({ children }: OnboardingControllerProps) {
     return (
       <>
         {children}
-        <ResumeModal
-          stepNumber={resumeStep}
-          onResume={handleResume}
-          onSkip={handleResumeSkip}
-        />
+        {renderInPortal(
+          <ResumeModal
+            stepNumber={resumeStep}
+            onResume={handleResume}
+            onSkip={handleResumeSkip}
+          />
+        )}
       </>
     )
   }
@@ -188,12 +204,16 @@ export function OnboardingController({ children }: OnboardingControllerProps) {
     return (
       <>
         {children}
-        <WelcomeModal onStart={handleStart} onSkip={handleSkipRequest} />
-        {showSkipConfirmation && (
-          <SkipConfirmationModal
-            onConfirm={handleSkipConfirm}
-            onCancel={handleSkipCancel}
-          />
+        {renderInPortal(
+          <>
+            <WelcomeModal onStart={handleStart} onSkip={handleSkipRequest} />
+            {showSkipConfirmation && (
+              <SkipConfirmationModal
+                onConfirm={handleSkipConfirm}
+                onCancel={handleSkipCancel}
+              />
+            )}
+          </>
         )}
       </>
     )
@@ -208,31 +228,35 @@ export function OnboardingController({ children }: OnboardingControllerProps) {
       return (
         <>
           {children}
-          <OnboardingErrorBoundary onReset={handleSkipConfirm}>
-            <SpotlightOverlay
-              targetSelector={null}
-              shape="none"
-              padding={0}
-              allowInteraction={true}
-              onAutoSkip={nextStep}
-            >
-              <OnboardingTooltip
-                step={state.currentStep}
-                totalSteps={ONBOARDING_STEPS.length}
-                title={step.title}
-                description={step.description}
-                onNext={handleNext}
-                onPrevious={state.currentStep > 1 ? previousStep : undefined}
-                onSkip={handleSkipRequest}
-                targetSelector={null}
-              />
-            </SpotlightOverlay>
-          </OnboardingErrorBoundary>
-          {showSkipConfirmation && (
-            <SkipConfirmationModal
-              onConfirm={handleSkipConfirm}
-              onCancel={handleSkipCancel}
-            />
+          {renderInPortal(
+            <>
+              <OnboardingErrorBoundary onReset={handleSkipConfirm}>
+                <SpotlightOverlay
+                  targetSelector={null}
+                  shape="none"
+                  padding={0}
+                  allowInteraction={true}
+                  onAutoSkip={nextStep}
+                >
+                  <OnboardingTooltip
+                    step={state.currentStep}
+                    totalSteps={ONBOARDING_STEPS.length}
+                    title={step.title}
+                    description={step.description}
+                    onNext={handleNext}
+                    onPrevious={state.currentStep > 1 ? previousStep : undefined}
+                    onSkip={handleSkipRequest}
+                    targetSelector={null}
+                  />
+                </SpotlightOverlay>
+              </OnboardingErrorBoundary>
+              {showSkipConfirmation && (
+                <SkipConfirmationModal
+                  onConfirm={handleSkipConfirm}
+                  onCancel={handleSkipCancel}
+                />
+              )}
+            </>
           )}
         </>
       )
@@ -241,32 +265,36 @@ export function OnboardingController({ children }: OnboardingControllerProps) {
     return (
       <>
         {children}
-        <OnboardingErrorBoundary onReset={handleSkipConfirm}>
-          <SpotlightOverlay
-            targetSelector={step.spotlightTarget}
-            shape={step.spotlightShape}
-            padding={step.spotlightPadding}
-            allowInteraction={step.allowInteraction}
-            onAutoSkip={nextStep}
-          >
-            <OnboardingTooltip
-              step={state.currentStep}
-              totalSteps={ONBOARDING_STEPS.length}
-              title={step.title}
-              description={step.description}
-              onNext={handleNext}
-              onPrevious={state.currentStep > 1 ? previousStep : undefined}
-              onSkip={handleSkipRequest}
-              targetSelector={step.spotlightTarget}
-              customContent={step.customContent}
-            />
-          </SpotlightOverlay>
-        </OnboardingErrorBoundary>
-        {showSkipConfirmation && (
-          <SkipConfirmationModal
-            onConfirm={handleSkipConfirm}
-            onCancel={handleSkipCancel}
-          />
+        {renderInPortal(
+          <>
+            <OnboardingErrorBoundary onReset={handleSkipConfirm}>
+              <SpotlightOverlay
+                targetSelector={step.spotlightTarget}
+                shape={step.spotlightShape}
+                padding={step.spotlightPadding}
+                allowInteraction={step.allowInteraction}
+                onAutoSkip={nextStep}
+              >
+                <OnboardingTooltip
+                  step={state.currentStep}
+                  totalSteps={ONBOARDING_STEPS.length}
+                  title={step.title}
+                  description={step.description}
+                  onNext={handleNext}
+                  onPrevious={state.currentStep > 1 ? previousStep : undefined}
+                  onSkip={handleSkipRequest}
+                  targetSelector={step.spotlightTarget}
+                  customContent={step.customContent}
+                />
+              </SpotlightOverlay>
+            </OnboardingErrorBoundary>
+            {showSkipConfirmation && (
+              <SkipConfirmationModal
+                onConfirm={handleSkipConfirm}
+                onCancel={handleSkipCancel}
+              />
+            )}
+          </>
         )}
       </>
     )
@@ -277,7 +305,7 @@ export function OnboardingController({ children }: OnboardingControllerProps) {
     return (
       <>
         {children}
-        <ConfettiAnimation />
+        {renderInPortal(<ConfettiAnimation />)}
       </>
     )
   }
